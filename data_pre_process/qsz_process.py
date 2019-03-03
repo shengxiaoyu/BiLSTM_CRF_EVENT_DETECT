@@ -3,7 +3,7 @@ import os
 __doc__ = 'description:起诉状处理'
 __author__ = '13314409603@163.com'
 
-from BILSTM_CRF_EVENT_DETECT.data_process import DataProcess
+from data_pre_process.data_process import DataProcess
 from enum import Enum
 from pyltp import SentenceSplitter
 import re
