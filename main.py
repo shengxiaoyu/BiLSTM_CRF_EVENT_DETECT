@@ -11,8 +11,7 @@ import sys
 from data_pre_process.qsz_process import QszProcess
 from pyltp import Segmentor
 from Word2Vec.my_word2vec import Word2VecModel
-from LSTM_CRF.word2vec_lstm_crf_ed import main
-import numpy as np
+from data_pre_process.tsbl_process import TsblProcess
 
 FLAGS = None
 
@@ -20,8 +19,16 @@ def processData():
     #分词模型
     segmentot = Segmentor()
     segmentot.load_with_lexicon(FLAGS.segmentor_model_path,FLAGS.segmentor_user_dict_path)
+    #起诉状处理
     qszProcess = QszProcess(FLAGS.source_dataset_path)
     qszProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'起诉状'))
+
+    qszProcess = QszProcess(FLAGS.source_dataset_path2)
+    qszProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'起诉状'))
+
+    #庭审笔录处理
+    tsblProcess = TsblProcess(FLAGS.source_dataset_path2)
+    tsblProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'庭审笔录'),'sentence')
     segmentot.release()
 
 def trainWord2Vec(new_data_path=None):
@@ -34,19 +41,20 @@ def testWore2vec():
     wv = wv.getEmbedded()
     print(wv.most_similar('原告'))
     print(wv.similarity('原告', '被告'))
-    print(wv['原告'])
-    print(wv['被告'])
-
+    print(wv.most_similar('结婚'))
+    print(wv.similarity('结婚', '离婚'))
+    print(wv.most_similar('争吵'))
 if __name__=='__main__':
     rootPath = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\'
     parser = argparse.ArgumentParser(description='Bi-LSTM+CRF')
     parser.add_argument('--root_dir',help='root dir',default=rootPath)
     parser.add_argument('--source_dataset_path',help='source dataset path',default='E:\\研二1\\学术论文\\准备材料2\\离婚纠纷第二批（分庭审笔录）\\不含庭审笔录')
+    parser.add_argument('--source_dataset_path2',help='source dataset path',default='E:\\研二1\\学术论文\\准备材料2\\离婚纠纷第二批（分庭审笔录）\\含庭审笔录')
     parser.add_argument('--segment_result_save_path',help='save the Experimental data',default=os.path.join(rootPath,'segment_result'))
     parser.add_argument('--segmentor_model_path',help='segmentor model path',default=rootPath+'ltp_data_v3.4.0\\cws.model')
     parser.add_argument('--segmentor_user_dict_path',help='segmentor user dictionary path',default=rootPath+'ltp_data_v3.4.0\\userDict.txt')
     parser.add_argument('--word2vec_model_save_path',help='word2vec model save path',default=os.path.join(rootPath,'word2vec'))
-    parser.add_argument('--embedded_dim',help='word embedded dim',default=30)
+    parser.add_argument('--embedded_dim',help='word embedded dim',default=300)
     parser.add_argument('--labeled_data_path',help='labeled data path',default=os.path.join(rootPath,'NERdata'))
     parser.add_argument('--batch_size',help='batch size',default=12)
     parser.add_argument('--num_epochs',help='num of epochs',default=10)
@@ -59,7 +67,7 @@ if __name__=='__main__':
     parser.add_argument('--device_map',help='which device to see',default='CPU:0')
     FLAGS,args = parser.parse_known_args()
     # processData()
-    # trainWord2Vec()
-    # testWore2vec()
-    main(FLAGS)
+    # trainWord2Vec('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\segment_result\\庭审笔录')
+    testWore2vec()
+    # main(FLAGS)
     sys.exit(0)

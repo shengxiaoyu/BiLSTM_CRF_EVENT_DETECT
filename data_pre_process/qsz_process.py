@@ -15,42 +15,40 @@ class QszProcess(DataProcess):
         raise NotImplementedError()
 
     def segmentAndSave(self,segmentor,segment_result_save_path):
-        for root, dirs, files in os.walk(self.rootDir):
-            for dir in dirs:
-                content = self.__get_content_of_one_Qsz__(os.path.join(self.rootDir, dir))
-                ssly = self.__getSsly__(content)
-                # 排除空
-                if(ssly==None):
-                    print(dir+' '+content)
-                else:
-                    # 分句
-                    sentences = SentenceSplitter.split(ssly)
-                    lines = []
-                    for str in sentences:
-                        # 分词
-                        words = segmentor.segment(str)
-                        # 去除标点符号
-                        words = self.delBdfh(words)
-                        if (len(words) == 0):
-                            continue
-                        lines.append(words)
-                    if(len(lines)>0):
-                        fw = open(os.path.join(segment_result_save_path, dir + '.txt'), 'w', encoding='utf8')
-                        for words in lines:
-                            fw.write(' '.join(list(words)))
-                            fw.write('\n')
-                        fw.flush()
-                        fw.close()
-        segmentor.release()
+        for ah in os.listdir(self.rootDir) :
+            content = self.__get_content_of_one_Qsz__(os.path.join(self.rootDir, ah))
+            ssly = self.__getSsly__(content)
+            # 排除空
+            if(ssly==None):
+                print(ah+' '+content)
+            else:
+                # 分句
+                sentences = SentenceSplitter.split(ssly)
+                lines = []
+                for str in sentences:
+                    # 分词
+                    words = segmentor.segment(str)
+                    # 去除标点符号
+                    words = self.delBdfh(words)
+                    if (len(words) == 0):
+                        continue
+                    lines.append(words)
+                if(len(lines)>0):
+                    fw = open(os.path.join(segment_result_save_path, ah + '.txt'), 'w', encoding='utf8')
+                    for words in lines:
+                        fw.write(' '.join(list(words)))
+                        fw.write('\n')
+                    fw.flush()
+                    fw.close()
         return
 
     # 获得单个起诉状内容
     def __get_content_of_one_Qsz__(self,path):
         # 单个案件地址
         #获取该案件地址下的file
-        files = [fs for rt, ds, fs in os.walk(path)][0]
+
         content = ''
-        for fileName in files:
+        for fileName in os.listdir(path):
             if (fileName.find('_ocr.txt') != -1):
                 with open(os.path.join(path,fileName),encoding='utf8') as f:
                     content += f.read()

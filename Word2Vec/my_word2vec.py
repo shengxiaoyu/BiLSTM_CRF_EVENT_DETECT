@@ -18,7 +18,8 @@ class Word2VecModel(object):
         else:
             print('word2vec model first train')
             # sentencs =
-            self.model = Word2Vec(PathLineSentences(train_data_save_path),size=self.size,window=self.window,min_count=self.min_count,workers=self.workers)
+            self.model = Word2Vec(PathLineSentences(train_data_save_path),size=self.size,window=self.window,min_count=self.min_count,workers=self.workers,
+                                  sg=1)#1-skip,0-cbow
             print('word2vec model first train end!')
 
             self.save()
@@ -26,7 +27,11 @@ class Word2VecModel(object):
 
     def reTrain(self,train_data_save_path):
         # self.model.build_vocab(MySentences(train_data_save_path)
-        self.model.train(PathLineSentences(train_data_save_path))
+        total_examples = 0
+        for file in os.listdir(train_data_save_path):
+            with open(os.path.join(train_data_save_path,file),'r',encoding='utf8')as f:
+                total_examples += len(f.readlines())
+        self.model.train(PathLineSentences(train_data_save_path),total_examples=total_examples,epochs=5)
         print('word2vec retrain end!')
 
     def save(self):
