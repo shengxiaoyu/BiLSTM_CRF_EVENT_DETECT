@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
+import sys
+
 import numpy as np
+import csv
 
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
@@ -9,7 +12,7 @@ __author__ = '13314409603@163.com'
 MAX_LENGTH = 1000
 LENGTHS = [0 for _ in range(MAX_LENGTH)]
 SUMS = [0 for _ in range(MAX_LENGTH)]
-
+COUNT = 1
 #统计句子长度分布
 def calSentenceLength(path):
     if(os.path.isdir(path)):
@@ -31,16 +34,21 @@ def getMax(rate):
         if(SUMS[index]/SUMS[-1]>=rate):
             return index
 
+#将案号转为indxe 文件名称
+def an2Index(path):
+    if(not os.path.exists(path)):
+        return
+    elif(os.path.isdir(path)):
+        for file in os.listdir(path):
+            an2Index(os.path.join(path,file))
+    else:
+        global COUNT
+        os.renames(path,os.path.join(os.path.dirname(path),str(COUNT)+'.txt'))
+        COUNT += 1
 
 
 
 
 if __name__ == '__main__':
-    calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\segment_result')
-    with open('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\sentence_length.txt','r+',encoding='utf8') as f:
-        for counter in LENGTHS:
-            f.write(str(counter))
-            f.write('\n')
-
-    print(LENGTHS)
-    pass
+    an2Index('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\segment_result\\庭审笔录')
+    sys.exit(0)

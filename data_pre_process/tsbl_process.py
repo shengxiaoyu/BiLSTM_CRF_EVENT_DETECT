@@ -217,9 +217,5 @@ class TsblProcess(DataProcess):
 
 if __name__ == '__main__':
     rootdir = r'E:\研二1\学术论文\准备材料2\离婚纠纷第二批（分庭审笔录）\含庭审笔录'
-    files = os.listdir(r'E:\研二1\学术论文\准备材料2\离婚纠纷第二批（分庭审笔录）\含庭审笔录\(2017)津0104民初9121号')
-    tsblPro = TsblProcess('')
-    content = tsblPro.__getDocContent__(r'E:\研二1\学术论文\准备材料2\离婚纠纷第二批（分庭审笔录）\含庭审笔录\(2018)津0105民初7846号\庭审笔录\(2018)津0105民初7846号-庭审笔录-201810300900.doc')
-    # content = tsblPro.__getDocContent__(r'E:\研二1\学术论文\准备材料2\离婚纠纷第二批（分庭审笔录）\含庭审笔录\(2017)津0104民初10817号\庭审笔录\王寅雪庭审笔录.doc')
-    print('\n'.join(list(content)))
+
     pass

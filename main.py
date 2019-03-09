@@ -12,6 +12,8 @@ from data_pre_process.qsz_process import QszProcess
 from pyltp import Segmentor
 from Word2Vec.my_word2vec import Word2VecModel
 from data_pre_process.tsbl_process import TsblProcess
+from data_pre_process.cpws_process import CpwsProcess
+from LSTM_CRF.word2vec_lstm_crf_ed import main
 
 FLAGS = None
 
@@ -20,22 +22,27 @@ def processData():
     segmentot = Segmentor()
     segmentot.load_with_lexicon(FLAGS.segmentor_model_path,FLAGS.segmentor_user_dict_path)
     #起诉状处理
-    qszProcess = QszProcess(FLAGS.source_dataset_path)
-    qszProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'起诉状'))
-
-    qszProcess = QszProcess(FLAGS.source_dataset_path2)
-    qszProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'起诉状'))
-
-    #庭审笔录处理
+    # qszProcess = QszProcess(FLAGS.source_dataset_path)
+    # qszProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'起诉状'))
+    #
+    # qszProcess = QszProcess(FLAGS.source_dataset_path2)
+    # qszProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'起诉状'))
+    #
+    # #庭审笔录处理
     tsblProcess = TsblProcess(FLAGS.source_dataset_path2)
     tsblProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'庭审笔录'),'sentence')
+
+    # cpwsProcess = CpwsProcess(FLAGS.source_dataset_path3)
+    # cpwsProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'裁判文书'))
+
     segmentot.release()
 
-def trainWord2Vec(new_data_path=None):
+def trainWord2Vec(new_data_path):
     #训练word2vec，传入path表示使用新训练集继续训练
-    wvm = Word2VecModel(FLAGS.word2vec_model_save_path,os.path.join(FLAGS.segment_result_save_path,'起诉状'),size=FLAGS.embedded_dim)
+    wvm = Word2VecModel(FLAGS.word2vec_model_save_path,os.path.join(FLAGS.segment_result_save_path,'裁判文书'),size=FLAGS.embedded_dim)
     if(new_data_path!=None):
-        wvm.reTrain(new_data_path)
+        wvm.reTrain(os.path.join(new_data_path,'庭审笔录'))
+        wvm.reTrain(os.path.join(new_data_path,'起诉状'))
 def testWore2vec():
     wv = Word2VecModel(FLAGS.word2vec_model_save_path, '',FLAGS.embedded_dim)
     wv = wv.getEmbedded()
@@ -44,12 +51,17 @@ def testWore2vec():
     print(wv.most_similar('结婚'))
     print(wv.similarity('结婚', '离婚'))
     print(wv.most_similar('争吵'))
+    print(wv.most_similar('洗衣机'))
+    print(wv.most_similar('夫妻'))
+    print(wv.most_similar('生育'))
+    print(wv.most_similar('诉讼'))
 if __name__=='__main__':
     rootPath = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\'
     parser = argparse.ArgumentParser(description='Bi-LSTM+CRF')
     parser.add_argument('--root_dir',help='root dir',default=rootPath)
     parser.add_argument('--source_dataset_path',help='source dataset path',default='E:\\研二1\\学术论文\\准备材料2\\离婚纠纷第二批（分庭审笔录）\\不含庭审笔录')
     parser.add_argument('--source_dataset_path2',help='source dataset path',default='E:\\研二1\\学术论文\\准备材料2\\离婚纠纷第二批（分庭审笔录）\\含庭审笔录')
+    parser.add_argument('--source_dataset_path3',help='source dataset path',default='E:\\研二2\\2013')
     parser.add_argument('--segment_result_save_path',help='save the Experimental data',default=os.path.join(rootPath,'segment_result'))
     parser.add_argument('--segmentor_model_path',help='segmentor model path',default=rootPath+'ltp_data_v3.4.0\\cws.model')
     parser.add_argument('--segmentor_user_dict_path',help='segmentor user dictionary path',default=rootPath+'ltp_data_v3.4.0\\userDict.txt')
@@ -62,12 +74,13 @@ if __name__=='__main__':
     parser.add_argument('--learning_rate',help='learning rate',default=0.001)
     parser.add_argument('--hidden_units',help='hidden units',default=100)
     parser.add_argument('--num_layers',help='num of layers',default=1)
-    parser.add_argument('--max_sequence_length',help='max length of sequence',default=50)
-    parser.add_argument('--mode',help='train or test or predict',default='train')
+    parser.add_argument('--max_sequence_length',help='max length of sequence',default=55)
+    # parser.add_argument('--mode',help='train or test or predict',default='train')
+    parser.add_argument('--mode',help='train or test or predict',default='predict')
     parser.add_argument('--device_map',help='which device to see',default='CPU:0')
     FLAGS,args = parser.parse_known_args()
-    # processData()
-    # trainWord2Vec('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\segment_result\\庭审笔录')
-    testWore2vec()
+    processData()
+    # trainWord2Vec('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\segment_result')
+    # testWore2vec()
     # main(FLAGS)
     sys.exit(0)

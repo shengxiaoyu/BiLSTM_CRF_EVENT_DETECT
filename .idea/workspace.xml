@@ -2,12 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="18e8512d-1099-462e-a409-dfed69db7164" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/data_pre_process/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data_pre_process/tsbl_process.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/BILSTM_CRF_EVENT_DETECT.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BILSTM_CRF_EVENT_DETECT.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data_pre_process/convert_ann_txt_to_label.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Word2Vec/my_word2vec.py" beforeDir="false" afterPath="$PROJECT_DIR$/Word2Vec/my_word2vec.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_pre_process/qsz_process.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_pre_process/qsz_process.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LSTM_CRF/word2vec_lstm_crf_ed.py" beforeDir="false" afterPath="$PROJECT_DIR$/LSTM_CRF/word2vec_lstm_crf_ed.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_pre_process/cpws_process.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_pre_process/cpws_process.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_pre_process/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_pre_process/cal_sentence_length.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_pre_process/tsbl_process.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_pre_process/tsbl_process.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,13 +19,15 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$tsbl_process.coverage" NAME="tsbl_process Coverage Results" MODIFIED="1551861675426" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_pre_process" />
     <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$pytest_for_main_testWore2vec.coverage" NAME="pytest for main.testWore2vec Coverage Results" MODIFIED="1551495879559" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$convert_ann_txt_to_label.coverage" NAME="convert_ann_txt_to_label Coverage Results" MODIFIED="1552111871503" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_pre_process" />
     <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$Nosetests_in_main_py.coverage" NAME="Nosetests in main.py Coverage Results" MODIFIED="1551503599400" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$pytest_in_main_py.coverage" NAME="pytest in main.py Coverage Results" MODIFIED="1551503539301" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$word2vec_lstm_crf_ed__1_.coverage" NAME="word2vec_lstm_crf_ed (1) Coverage Results" MODIFIED="1551502758870" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/LSTM_CRF" />
     <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$my_word2vec.coverage" NAME="my_word2vec Coverage Results" MODIFIED="1551514300016" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Word2Vec" />
+    <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$cpws_process.coverage" NAME="cpws_process Coverage Results" MODIFIED="1551931168506" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_pre_process" />
     <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$word2vec_lstm_crf_ed.coverage" NAME="word2vec_lstm_crf_ed Coverage Results" MODIFIED="1551605803878" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/LSTM_CRF" />
-    <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$main.coverage" NAME="main Coverage Results" MODIFIED="1551864462782" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1551878812503" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_pre_process" />
+    <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$main.coverage" NAME="main Coverage Results" MODIFIED="1552032459460" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1552030412589" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_pre_process" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -43,14 +45,35 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/data_pre_process/main.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="76">
-              <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+            <state relative-caret-position="412">
+              <caret line="82" column="77" selection-start-line="82" selection-start-column="77" selection-end-line="82" selection-end-column="77" />
+              <folding>
+                <element signature="e#109#118#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/data_pre_process/cal_sentence_length.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="95">
+              <caret line="9" column="25" selection-start-line="9" selection-start-column="14" selection-end-line="9" selection-end-column="25" />
               <folding>
                 <element signature="e#47#56#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/data_pre_process/convert_ann_txt_to_label.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2299">
+              <caret line="121" column="16" selection-start-line="121" selection-start-column="16" selection-end-line="121" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -85,13 +108,10 @@
       <list>
         <option value="$PROJECT_DIR$/Bi-LSTM_CRF/word2vec_lstm_crf_ed.py" />
         <option value="$PROJECT_DIR$/LSTM_CRF/lstm_crf_layer.py" />
-        <option value="$PROJECT_DIR$/LSTM_CRF/word2vec_lstm_crf_ed.py" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/data_pre_process/Tsbl_process.py" />
-        <option value="$PROJECT_DIR$/data_pre_process/tsbl_process.py" />
         <option value="$PROJECT_DIR$/data_pre_process/qsz_process.py" />
         <option value="$PROJECT_DIR$/Word2Vec/my_word2vec.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="E:/研二2/2013/63.xml" />
         <option value="E:/研二2/2013/116.xml" />
         <option value="E:/研二2/2013/234.xml" />
@@ -101,13 +121,18 @@
         <option value="E:/研二2/2013/1724.xml" />
         <option value="E:/研二2/2013/1726.xml" />
         <option value="E:/研二2/2013/1729.xml" />
+        <option value="$PROJECT_DIR$/data_pre_process/cpws_process.py" />
+        <option value="$PROJECT_DIR$/LSTM_CRF/word2vec_lstm_crf_ed.py" />
+        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/data_pre_process/main.py" />
+        <option value="$PROJECT_DIR$/data_pre_process/tsbl_process.py" />
+        <option value="$PROJECT_DIR$/data_pre_process/convert_ann_txt_to_label.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="473" />
-    <option name="y" value="119" />
+    <option name="x" value="-1460" />
+    <option name="y" value="-128" />
     <option name="width" value="1382" />
     <option name="height" value="784" />
   </component>
@@ -116,6 +141,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -132,12 +158,11 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="E:/研二2/annotation-tool-master" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -162,7 +187,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.main (1)">
+  <component name="RunManager" selected="Python.convert_ann_txt_to_label">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="BILSTM_CRF_EVENT_DETECT" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -185,6 +210,25 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="convert_ann_txt_to_label" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="BILSTM_CRF_EVENT_DETECT" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data_pre_process" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_pre_process/convert_ann_txt_to_label.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="BILSTM_CRF_EVENT_DETECT" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -198,7 +242,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_pre_process/main.py" />
+      <option name="SCRIPT_NAME" value="E:\pyWorkspace\BILSTM_CRF_EVENT_DETECT\data_pre_process\cal_sentence_length.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -229,7 +273,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="my_word2vec" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="qsz_process" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="BILSTM_CRF_EVENT_DETECT" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -237,14 +281,14 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Word2Vec" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data_pre_process" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Word2Vec/my_word2vec.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_pre_process/qsz_process.py" />
       <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
@@ -266,29 +310,7 @@
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_pre_process/tsbl_process.py" />
       <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="word2vec_lstm_crf_ed" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="BILSTM_CRF_EVENT_DETECT" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/LSTM_CRF" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/LSTM_CRF/word2vec_lstm_crf_ed.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
@@ -297,11 +319,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.main (1)" />
+        <item itemvalue="Python.convert_ann_txt_to_label" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.tsbl_process" />
-        <item itemvalue="Python.word2vec_lstm_crf_ed" />
-        <item itemvalue="Python.my_word2vec" />
+        <item itemvalue="Python.qsz_process" />
+        <item itemvalue="Python.main (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -329,6 +351,12 @@
       <workItem from="1551858515209" duration="6523000" />
       <workItem from="1551869555410" duration="5710000" />
       <workItem from="1551877478538" duration="2602000" />
+      <workItem from="1551928599645" duration="10808000" />
+      <workItem from="1551948953844" duration="2647000" />
+      <workItem from="1552008048093" duration="15318000" />
+      <workItem from="1552049185478" duration="2339000" />
+      <workItem from="1552099056394" duration="8536000" />
+      <workItem from="1552110498997" duration="1116000" />
     </task>
     <servers />
   </component>
@@ -365,7 +393,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="97650000" />
+    <option name="totallyTimeSpent" value="138414000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -377,21 +405,22 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="784" extended-state="6" />
+    <frame x="-1448" y="-363" width="1456" height="916" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16187595" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21203439" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.54307693" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49924356" weight="0.34" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.22307692" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49924356" weight="0.40461537" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" weight="0.32923076" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.3286445" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Python Console" order="8" weight="0.3276923" />
-      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="8" visible="true" weight="0.24680308" />
+      <window_info anchor="bottom" id="Version Control" order="9" weight="0.32992327" />
       <window_info anchor="bottom" id="Database Changes" order="10" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.50075644" side_tool="true" weight="0.35846153" />
       <window_info anchor="bottom" id="Terminal" order="12" />
@@ -437,6 +466,11 @@
           <line>48</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/LSTM_CRF/word2vec_lstm_crf_ed.py</url>
+          <line>165</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
@@ -469,88 +503,53 @@ labels.numpy()</expression-string>
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string>str(LENGTHS)</expression-string>
+        <expression-string>['O' for _ in line.split()]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>len(sentence)</expression-string>
+        <expression-string>fData.read()</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>content[37]</expression-string>
+        <expression-string>print(' '.join(labelLine))</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>content[38]</expression-string>
+        <expression-string>print(line)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>content == None</expression-string>
+        <expression-string>len(line.split())</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>list(content)</expression-string>
+        <expression-string>len(labelLine)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>for v in content</expression-string>
+        <expression-string>len(line)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>os.listdir(ajTsbl)</expression-string>
+        <expression-string>entitiesDict.values()</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>print(var)</expression-string>
+        <expression-string>content[489:494]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/LSTM_CRF/lstm_crf_layer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="36" column="23" selection-start-line="36" selection-start-column="13" selection-end-line="36" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../sd/Lib/site-packages/numpy/core/shape_base.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-504">
-          <caret line="229" column="4" selection-start-line="229" selection-start-column="4" selection-end-line="229" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../sd/Lib/site-packages/numpy/core/numeric.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="84">
-          <caret line="171" column="14" lean-forward="true" selection-start-line="171" selection-start-column="14" selection-end-line="171" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Anaconda/Lib/site-packages/tensorflow/python/estimator/run_config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="101">
-          <caret line="322" column="6" selection-start-line="322" selection-start-column="6" selection-end-line="322" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../sd/Lib/site-packages/six.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="302">
-          <caret line="692" selection-start-line="692" selection-end-line="692" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/Anaconda/Lib/site-packages/tensorflow/python/ops/weights_broadcast_ops.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="70">
@@ -618,13 +617,6 @@ labels.numpy()</expression-string>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="19">
           <caret line="2463" column="4" selection-start-line="2463" selection-start-column="4" selection-end-line="2463" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/Anaconda/Lib/site-packages/tensorflow/python/estimator/estimator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="130">
-          <caret line="576" selection-start-line="576" selection-end-line="576" />
         </state>
       </provider>
     </entry>
@@ -711,13 +703,6 @@ labels.numpy()</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/Anaconda/Lib/ntpath.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="74" column="4" selection-start-line="74" selection-start-column="4" selection-end-line="74" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/Anaconda/Lib/os.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -735,16 +720,6 @@ labels.numpy()</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/LSTM_CRF/word2vec_lstm_crf_ed.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-96">
-          <caret line="231" column="85" selection-start-line="231" selection-start-column="81" selection-end-line="231" selection-end-column="85" />
-          <folding>
-            <element signature="e#107#130#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/Anaconda/Lib/site-packages/gensim/models/base_any2vec.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="231">
@@ -759,77 +734,10 @@ labels.numpy()</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Word2Vec/my_word2vec.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="10" column="22" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
-          <folding>
-            <element signature="e#75#84#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="266">
           <caret line="17" selection-start-line="17" selection-end-line="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2018.3/system/python_stubs/-460517944/builtins.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="5020" column="8" selection-start-line="5020" selection-start-column="8" selection-end-line="5020" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="13" column="46" selection-start-line="13" selection-start-column="46" selection-end-line="13" selection-end-column="46" />
-          <folding>
-            <element signature="e#365#996#0" />
-            <element signature="e#1291#1563#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_pre_process/qsz_process.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="13" column="25" selection-start-line="13" selection-start-column="25" selection-end-line="13" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_pre_process/tsbl_process.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4104">
-          <caret line="222" column="48" selection-start-line="222" selection-start-column="48" selection-end-line="222" selection-end-column="48" />
-          <folding>
-            <element signature="e#107#116#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://E:/研二2/2013/116.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="163" column="23" selection-start-line="163" selection-start-column="23" selection-end-line="163" selection-end-column="23" />
-          <folding>
-            <element signature="n#WS#0;n#QW#0;n#writ#0;n#!!top" />
-            <element signature="n#DSR#0;n#QW#0;n#writ#0;n#!!top" />
-            <element signature="n#SSJL#0;n#QW#0;n#writ#0;n#!!top" />
-            <element signature="n#CMSSD#0;n#AJJBQK#0;n#QW#0;n#writ#0;n#!!top" />
-            <element signature="n#CPFXGC#0;n#QW#0;n#writ#0;n#!!top" />
-            <element signature="n#PJJG#0;n#QW#0;n#writ#0;n#!!top" />
-            <element signature="n#WW#0;n#QW#0;n#writ#0;n#!!top" />
-            <element signature="n#CUS_SJ#0;n#QW#0;n#writ#0;n#!!top" />
-            <element signature="n#CUS_SJ#1;n#QW#0;n#writ#0;n#!!top" />
-            <element signature="n#CUS_SJ#2;n#QW#0;n#writ#0;n#!!top" />
-            <element signature="n#CUS_SJ#3;n#QW#0;n#writ#0;n#!!top" />
-            <element signature="n#CUS_SJ#4;n#QW#0;n#writ#0;n#!!top" />
-            <element signature="n#CUS_SJ#5;n#QW#0;n#writ#0;n#!!top" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -911,8 +819,8 @@ labels.numpy()</expression-string>
     </entry>
     <entry file="file://E:/研二2/2013/63.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="165" column="19" selection-start-line="165" selection-start-column="19" selection-end-line="165" selection-end-column="19" />
+        <state relative-caret-position="38">
+          <caret line="2" column="7" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="7" />
           <folding>
             <element signature="n#WS#0;n#QW#0;n#writ#0;n#!!top" />
             <element signature="n#DSR#0;n#QW#0;n#writ#0;n#!!top" />
@@ -925,20 +833,140 @@ labels.numpy()</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/Anaconda/Lib/typing.py">
+    <entry file="file://D:/Anaconda/Lib/xml/sax/handler.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="125">
-          <caret line="2327" column="8" selection-start-line="2327" selection-start-column="8" selection-end-line="2327" selection-end-column="8" />
+        <state relative-caret-position="19">
+          <caret line="46" column="6" selection-start-line="46" selection-start-column="6" selection-end-line="46" selection-end-column="6" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_pre_process/main.py">
+    <entry file="file://$PROJECT_DIR$/data_pre_process/data_process.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://E:/研二2/2013/116.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+        <state relative-caret-position="418">
+          <caret line="150" column="16" selection-start-line="150" selection-start-column="10" selection-end-line="150" selection-end-column="16" />
+          <folding>
+            <element signature="n#DSR#0;n#QW#0;n#writ#0;n#!!top" />
+            <element signature="n#SSJL#0;n#QW#0;n#writ#0;n#!!top" />
+            <element signature="n#CMSSD#0;n#AJJBQK#0;n#QW#0;n#writ#0;n#!!top" />
+            <element signature="n#CPFXGC#0;n#QW#0;n#writ#0;n#!!top" />
+            <element signature="n#PJJG#0;n#QW#0;n#writ#0;n#!!top" />
+            <element signature="n#WW#0;n#QW#0;n#writ#0;n#!!top" />
+            <element signature="n#CUS_SJ#0;n#QW#0;n#writ#0;n#!!top" />
+            <element signature="n#CUS_SJ#1;n#QW#0;n#writ#0;n#!!top" />
+            <element signature="n#CUS_SJ#2;n#QW#0;n#writ#0;n#!!top" />
+            <element signature="n#CUS_SJ#3;n#QW#0;n#writ#0;n#!!top" />
+            <element signature="n#CUS_SJ#4;n#QW#0;n#writ#0;n#!!top" />
+            <element signature="n#CUS_SJ#5;n#QW#0;n#writ#0;n#!!top" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_pre_process/cpws_process.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="303">
+          <caret line="52" column="25" lean-forward="true" selection-start-line="52" selection-start-column="25" selection-end-line="52" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Word2Vec/my_word2vec.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="259">
+          <caret line="20" column="107" selection-start-line="20" selection-start-column="101" selection-end-line="20" selection-end-column="107" />
+          <folding>
+            <element signature="e#75#84#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Anaconda/Lib/site-packages/tensorflow/python/estimator/estimator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21736">
+          <caret line="1194" selection-start-line="1194" selection-end-line="1194" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Anaconda/Lib/ntpath.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="240" column="4" selection-start-line="240" selection-start-column="4" selection-end-line="240" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Desktop/Bi-LSTM+CRF/newTag.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="8" column="17" lean-forward="true" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2018.3/system/python_stubs/-460517944/builtins.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="226" column="4" selection-start-line="226" selection-start-column="4" selection-end-line="226" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Anaconda/Lib/typing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="164">
+          <caret line="2295" column="24" lean-forward="true" selection-start-line="2295" selection-start-column="24" selection-end-line="2295" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_pre_process/qsz_process.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="46" column="16" lean-forward="true" selection-start-line="46" selection-start-column="16" selection-end-line="46" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LSTM_CRF/word2vec_lstm_crf_ed.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="20" column="79" lean-forward="true" selection-start-line="20" selection-start-column="79" selection-end-line="21" selection-end-column="43" />
+          <folding>
+            <element signature="e#107#130#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_pre_process/tsbl_process.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4">
+          <caret line="187" column="19" lean-forward="true" selection-start-line="187" selection-start-column="19" selection-end-line="187" selection-end-column="19" />
+          <folding>
+            <element signature="e#107#116#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="412">
+          <caret line="82" column="77" selection-start-line="82" selection-start-column="77" selection-end-line="82" selection-end-column="77" />
+          <folding>
+            <element signature="e#109#118#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_pre_process/cal_sentence_length.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="9" column="25" selection-start-line="9" selection-start-column="14" selection-end-line="9" selection-end-column="25" />
           <folding>
             <element signature="e#47#56#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_pre_process/convert_ann_txt_to_label.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2299">
+          <caret line="121" column="16" selection-start-line="121" selection-start-column="16" selection-end-line="121" selection-end-column="16" />
         </state>
       </provider>
     </entry>

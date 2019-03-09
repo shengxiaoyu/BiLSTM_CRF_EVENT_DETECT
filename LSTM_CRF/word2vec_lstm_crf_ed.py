@@ -23,28 +23,30 @@ def initTagsAndWord2Vec(rootdir):
     WV.add('<pad>', np.zeros(WV.vector_size))
     TAG_2_ID['<pad>'] = len(TAG_2_ID)
     ID_2_TAG[len(ID_2_TAG)] = '<pad>'
-    # fill tag2id id2tag
-    with open(os.path.join(rootdir, 'tag.txt'), 'r', encoding='utf8') as f:
-        id = len(TAG_2_ID)
-        tag = None
-        #B-tag I-tag
-        for value in list(f.readlines()):
-            # B-tag
-            value = value.strip()
-            tag = 'B-' + value
-            TAG_2_ID[tag] = id
-            ID_2_TAG[id] = tag
-            id += 1
 
-            # I-tag
-            tag = 'I-' + value
-            TAG_2_ID[tag] = id
-            ID_2_TAG[id] = tag
-            id += 1
-
+    #读取brat的annotation.conf文件生成tag—id
+    with open(os.path.join(rootdir, 'annotation.conf'),'r',encoding='utf8') as f:
+        index = 1
+        isBegin = False
+        for line in f.readlines():
+            if (line.startswith('#') or line.strip()=='' or line==None):
+                continue
+            if(line.startswith('[events]')):
+                isBegin = True
+                continue
+            if(line.startswith('[attributes]')):
+                isEnd = False
+                break
+            if(isBegin):
+                eventAndParamters = line.split('\t')
+                for par in eventAndParamters[1].split(','):
+                    tag = eventAndParamters[0]+'_'+par.split(':')[0]
+                    TAG_2_ID[tag] = index
+                    ID_2_TAG[index] = tag
+                    index += 1
         #O
-        TAG_2_ID['O'] = id
-        ID_2_TAG[id] = 'O'
+        TAG_2_ID['O'] = index
+        ID_2_TAG[index] = 'O'
 
 def paddingAndEmbedding(words,tags,max_sequence_length):
 
@@ -59,6 +61,12 @@ def paddingAndEmbedding(words,tags,max_sequence_length):
         tags = tags[:max_sequence_length]
 
     #embedding
+    #如果是词汇表中没用的词，则使用<pad>代替
+    for index in range(len(words)):
+        try:
+            WV[words[index]]
+        except:
+            words[index] = '<pad>'
     words = [WV[word] for word in words]
     tags = [TAG_2_ID[tag] for tag in tags]
 
@@ -156,7 +164,7 @@ def model_fn(features,labels,mode,params):
                 mode, loss=loss, eval_metric_ops=metrics)
 
         elif mode == tf.estimator.ModeKeys.TRAIN:
-            train_op = tf.train.AdamOptimizer(learning_rate=params.learning_rate).minimize(
+            train_op = tf.train.AdamOptimizer(learning_rate=params['learning_rate']).minimize(
                 loss, global_step=tf.train.get_or_create_global_step())
             return tf.estimator.EstimatorSpec(
                 mode, loss=loss, train_op=train_op)
@@ -168,7 +176,7 @@ def main(FLAGS):
 
     # 在re train 的时候，才删除上一轮产出的文件，在predicted 的时候不做clean
     output_dir = os.path.join(FLAGS.root_dir,'output')
-    if FLAGS.mode:
+    if FLAGS.mode =='train':
         if os.path.exists(output_dir):
             def del_file(path):
                 ls = os.listdir(path)
@@ -232,12 +240,16 @@ def main(FLAGS):
         targets = generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),max_sequence_length = FLAGS.max_sequence_length)
         predictions = filter(lambda x:x != TAG_2_ID['<pad>'],predictions)
         for target,predict in zip(targets,predictions):
-            (_,_),tags = target
+            (_,length),tags = target
             labels = "人工标记："
             output = "预测结果："
-            for tag_id,pre_tag in zip(tags,predict['pre_ids']):
-                labels += ID_2_TAG[tag_id]
-                output += ID_2_TAG[pre_tag]
+            pre_ids = predict['pre_ids']
+            # for tag_id,pre_tag in zip(tags,predict['pre_ids']):
+            #     labels += ID_2_TAG[tag_id]
+            #     output += ID_2_TAG[pre_tag]
+            for index in range(length):
+                labels += ID_2_TAG[tags[index]]
+                output += ID_2_TAG[pre_ids[index]]
             print('\n'.join([labels,output]))
             print('\n')
 if __name__ == '__main__':
