@@ -23,13 +23,18 @@ class CpwsProcess(DataProcess):
         def segmentParasgraphAndSave(parasgraph,fileWriter):
             sentences = SentenceSplitter.split(parasgraph)
             for sentence in sentences:
-                words = segmentor.segment(sentence)
-                # 去除标点符号
-                words = self.delBdfh(words)
-                if (len(words) == 0):
+                sentence = sentence.strip()
+                if(sentence==None or len(sentence)==0):
                     continue
-                fileWriter.write(' '.join(words))
+                fileWriter.write(sentence)
                 fileWriter.write('\n')
+                # words = segmentor.segment(sentence)
+                # # 去除标点符号
+                # words = self.delBdfh(words)
+                # if (len(words) == 0):
+                #     continue
+                # fileWriter.write(' '.join(words))
+                # fileWriter.write('\n')
 
 
         for fileName in os.listdir(self.rootDir):

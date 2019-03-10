@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="18e8512d-1099-462e-a409-dfed69db7164" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/data_pre_process/convert_ann_txt_to_label.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LSTM_CRF/word2vec_lstm_crf_ed.py" beforeDir="false" afterPath="$PROJECT_DIR$/LSTM_CRF/word2vec_lstm_crf_ed.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_pre_process/cpws_process.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_pre_process/cpws_process.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_pre_process/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_pre_process/cal_sentence_length.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_pre_process/tsbl_process.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_pre_process/tsbl_process.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -24,9 +20,9 @@
     <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$pytest_in_main_py.coverage" NAME="pytest in main.py Coverage Results" MODIFIED="1551503539301" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$word2vec_lstm_crf_ed__1_.coverage" NAME="word2vec_lstm_crf_ed (1) Coverage Results" MODIFIED="1551502758870" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/LSTM_CRF" />
     <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$my_word2vec.coverage" NAME="my_word2vec Coverage Results" MODIFIED="1551514300016" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Word2Vec" />
-    <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$cpws_process.coverage" NAME="cpws_process Coverage Results" MODIFIED="1551931168506" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_pre_process" />
+    <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$cpws_process.coverage" NAME="cpws_process Coverage Results" MODIFIED="1552143780073" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_pre_process" />
     <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$word2vec_lstm_crf_ed.coverage" NAME="word2vec_lstm_crf_ed Coverage Results" MODIFIED="1551605803878" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/LSTM_CRF" />
-    <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$main.coverage" NAME="main Coverage Results" MODIFIED="1552032459460" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$main.coverage" NAME="main Coverage Results" MODIFIED="1552143950851" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/BILSTM_CRF_EVENT_DETECT$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1552030412589" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/data_pre_process" />
   </component>
   <component name="DatabaseView">
@@ -45,11 +41,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="412">
-              <caret line="82" column="77" selection-start-line="82" selection-start-column="77" selection-end-line="82" selection-end-column="77" />
+            <state relative-caret-position="277">
+              <caret line="37" column="23" lean-forward="true" selection-start-line="37" selection-start-column="23" selection-end-line="37" selection-end-column="23" />
               <folding>
                 <element signature="e#109#118#0" expanded="true" />
               </folding>
@@ -58,10 +54,19 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/data_pre_process/cpws_process.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="66">
+              <caret line="39" selection-start-line="39" selection-end-line="39" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data_pre_process/cal_sentence_length.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="95">
-              <caret line="9" column="25" selection-start-line="9" selection-start-column="14" selection-end-line="9" selection-end-column="25" />
+            <state relative-caret-position="190">
+              <caret line="10" selection-start-line="10" selection-end-line="10" />
               <folding>
                 <element signature="e#47#56#0" expanded="true" />
               </folding>
@@ -69,11 +74,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data_pre_process/convert_ann_txt_to_label.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2299">
-              <caret line="121" column="16" selection-start-line="121" selection-start-column="16" selection-end-line="121" selection-end-column="16" />
+            <state relative-caret-position="228">
+              <caret line="12" selection-start-line="12" selection-end-line="12" />
             </state>
           </provider>
         </entry>
@@ -121,27 +126,25 @@
         <option value="E:/研二2/2013/1724.xml" />
         <option value="E:/研二2/2013/1726.xml" />
         <option value="E:/研二2/2013/1729.xml" />
-        <option value="$PROJECT_DIR$/data_pre_process/cpws_process.py" />
         <option value="$PROJECT_DIR$/LSTM_CRF/word2vec_lstm_crf_ed.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/data_pre_process/main.py" />
         <option value="$PROJECT_DIR$/data_pre_process/tsbl_process.py" />
         <option value="$PROJECT_DIR$/data_pre_process/convert_ann_txt_to_label.py" />
+        <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/data_pre_process/cpws_process.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-1460" />
-    <option name="y" value="-128" />
-    <option name="width" value="1382" />
-    <option name="height" value="784" />
+    <option name="x" value="-7" />
+    <option name="width" value="697" />
+    <option name="height" value="775" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -158,6 +161,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -187,7 +191,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.convert_ann_txt_to_label">
+  <component name="RunManager" selected="Python.main">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="BILSTM_CRF_EVENT_DETECT" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -214,6 +218,9 @@
       <module name="BILSTM_CRF_EVENT_DETECT" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data_pre_process" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -229,7 +236,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="main (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="cpws_process" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="BILSTM_CRF_EVENT_DETECT" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -242,7 +249,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="E:\pyWorkspace\BILSTM_CRF_EVENT_DETECT\data_pre_process\cal_sentence_length.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_pre_process/cpws_process.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -319,11 +326,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.convert_ann_txt_to_label" />
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.cpws_process" />
+        <item itemvalue="Python.convert_ann_txt_to_label" />
         <item itemvalue="Python.tsbl_process" />
         <item itemvalue="Python.qsz_process" />
-        <item itemvalue="Python.main (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -356,7 +363,12 @@
       <workItem from="1552008048093" duration="15318000" />
       <workItem from="1552049185478" duration="2339000" />
       <workItem from="1552099056394" duration="8536000" />
-      <workItem from="1552110498997" duration="1116000" />
+      <workItem from="1552110498997" duration="2496000" />
+      <workItem from="1552117408883" duration="629000" />
+      <workItem from="1552132940479" duration="681000" />
+      <workItem from="1552133994436" duration="67000" />
+      <workItem from="1552141294252" duration="1373000" />
+      <workItem from="1552143049158" duration="1891000" />
     </task>
     <servers />
   </component>
@@ -393,7 +405,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="138414000" />
+    <option name="totallyTimeSpent" value="144435000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -405,21 +417,21 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1448" y="-363" width="1456" height="916" extended-state="6" />
+    <frame x="-8" y="-8" width="1382" height="784" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21203439" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22692889" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.22307692" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49924356" weight="0.40461537" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.36615384" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49924356" weight="0.34923077" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3286445" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="8" visible="true" weight="0.24680308" />
+      <window_info anchor="bottom" id="Python Console" order="8" weight="0.24680308" />
       <window_info anchor="bottom" id="Version Control" order="9" weight="0.32992327" />
       <window_info anchor="bottom" id="Database Changes" order="10" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.50075644" side_tool="true" weight="0.35846153" />
@@ -471,6 +483,11 @@
           <line>165</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/data_pre_process/cpws_process.py</url>
+          <line>39</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
@@ -502,6 +519,11 @@ labels.numpy()</expression-string>
       </expression>
     </expressions>
     <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>sentences</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>['O' for _ in line.split()]</expression-string>
         <language-id>Python</language-id>
@@ -539,11 +561,6 @@ labels.numpy()</expression-string>
       </expression>
       <expression>
         <expression-string>entitiesDict.values()</expression-string>
-        <language-id>Python</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>content[489:494]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -864,13 +881,6 @@ labels.numpy()</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_pre_process/cpws_process.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="303">
-          <caret line="52" column="25" lean-forward="true" selection-start-line="52" selection-start-column="25" selection-end-line="52" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Word2Vec/my_word2vec.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="259">
@@ -895,13 +905,7 @@ labels.numpy()</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Desktop/Bi-LSTM+CRF/newTag.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="8" column="17" lean-forward="true" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/Desktop/Bi-LSTM+CRF/newTag.csv" />
     <entry file="file://$USER_HOME$/.PyCharm2018.3/system/python_stubs/-460517944/builtins.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="162">
@@ -943,20 +947,10 @@ labels.numpy()</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="412">
-          <caret line="82" column="77" selection-start-line="82" selection-start-column="77" selection-end-line="82" selection-end-column="77" />
-          <folding>
-            <element signature="e#109#118#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data_pre_process/cal_sentence_length.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="9" column="25" selection-start-line="9" selection-start-column="14" selection-end-line="9" selection-end-column="25" />
+        <state relative-caret-position="190">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
           <folding>
             <element signature="e#47#56#0" expanded="true" />
           </folding>
@@ -965,8 +959,25 @@ labels.numpy()</expression-string>
     </entry>
     <entry file="file://$PROJECT_DIR$/data_pre_process/convert_ann_txt_to_label.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2299">
-          <caret line="121" column="16" selection-start-line="121" selection-start-column="16" selection-end-line="121" selection-end-column="16" />
+        <state relative-caret-position="228">
+          <caret line="12" selection-start-line="12" selection-end-line="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_pre_process/cpws_process.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="66">
+          <caret line="39" selection-start-line="39" selection-end-line="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="277">
+          <caret line="37" column="23" lean-forward="true" selection-start-line="37" selection-start-column="23" selection-end-line="37" selection-end-column="23" />
+          <folding>
+            <element signature="e#109#118#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

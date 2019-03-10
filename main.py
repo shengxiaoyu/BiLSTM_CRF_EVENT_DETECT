@@ -29,11 +29,11 @@ def processData():
     # qszProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'起诉状'))
     #
     # #庭审笔录处理
-    tsblProcess = TsblProcess(FLAGS.source_dataset_path2)
-    tsblProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'庭审笔录'),'sentence')
+    # tsblProcess = TsblProcess(FLAGS.source_dataset_path2)
+    # tsblProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'庭审笔录'),'sentence')
 
-    # cpwsProcess = CpwsProcess(FLAGS.source_dataset_path3)
-    # cpwsProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'裁判文书'))
+    cpwsProcess = CpwsProcess(FLAGS.source_dataset_path3)
+    cpwsProcess.segmentAndSave(segmentot,'C:\\Users\\13314\\Desktop\\BERT-EVENT\\sentences')
 
     segmentot.release()
 
