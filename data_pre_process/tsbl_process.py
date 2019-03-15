@@ -35,7 +35,7 @@ class TsblProcess(DataProcess):
                 continue
 
             with open(os.path.join(segment_result_save_path,ah+'.txt'),'a',encoding='utf8') as fw:
-                fw.write('庭审调查：\n')
+                fw.write('\n庭审调查：\n')
                 for paragraph in tsdc:
                     if(mode == 'sentence'):
                     # 分句
@@ -44,32 +44,10 @@ class TsblProcess(DataProcess):
                             for sentence in sentences :
                                 fw.write(sentence.strip())
                                 fw.write('\n')
-                    #lines = []
-                    # 分词
-                    # for sentence in sentences:
-                    #     words = segmentor.segment(sentence)
-                    #     # 去除标点符号
-                    #     words = self.delBdfh(words)
-                    #     if (len(words) == 0):
-                    #         continue
-                    #     lines.append(words)
-
-                    # else:
-                    #     # 分词
-                    #     words = segmentor.segment(paragraph)
-                    #     # 去除标点符号
-                    #     words = self.delBdfh(words)
-                    #     if (len(words) == 0):
-                    #         continue
-                    #     lines.append(words)
-                    #     if (len(lines) > 0):
-                    #         #保存
-                    #         fw = open(os.path.join(segment_result_save_path, ah + '.txt'), 'w', encoding='utf8')
-                    #         for words in lines:
-                    #             fw.write(' '.join(list(words)))
-                    #             fw.write('\n')
-                    #         fw.flush()
-                    #         fw.close()
+                    elif(mode=='paragraph'):
+                        paragraph = paragraph.strip()
+                        if(len(paragraph)>0):
+                            fw.write(paragraph+'\n')
 
     def __getTsdc__(self,path):#获取庭审调查内容
         ajTsbl = os.path.join(path, '庭审笔录')
@@ -154,16 +132,18 @@ class TsblProcess(DataProcess):
 
 
                 #结尾
-                if(paragragh.find('原告举证')!=-1
-                        or (paragragh.find('原告')!=-1 and paragragh.find('证据提交')!=-1)
-                        or (paragragh.find('当事人')!=-1 and paragragh.find('举证')!=-1)
-                        or (paragragh.find('围绕焦点')and paragragh.find('举证')!=-1)
-                        or (paragragh.find('法庭调查')!= -1and paragragh.find('结束')!=-1)
+                if(
+                        # paragragh.find('原告举证')!=-1
+                        # or (paragragh.find('原告')!=-1 and paragragh.find('证据提交')!=-1)
+                        # or (paragragh.find('当事人')!=-1 and paragragh.find('举证')!=-1)
+                        # or (paragragh.find('围绕焦点')and paragragh.find('举证')!=-1)
+                        # or
+                        (paragragh.find('法庭调查')!= -1and paragragh.find('结束')!=-1)
                         or paragragh.find('庭审到此')!=-1
                         or paragragh.find('辩论结束')!=-1
                         or paragragh.find('本院主持')!=-1
-                        or paragragh.find('向法庭提交证据')!=-1
-                        or paragragh.find('有何证据提交法庭')!=-1
+                        # or paragragh.find('向法庭提交证据')!=-1
+                        # or paragragh.find('有何证据提交法庭')!=-1
                         or paragragh.find('休庭')!=-1
                         or paragragh.find('闭庭')!=-1
                         or paragragh.find('今天庭审到此')!=-1

@@ -1,4 +1,5 @@
 import os
+import sys
 
 __doc__ = 'description:起诉状处理'
 __author__ = '13314409603@163.com'
@@ -25,7 +26,7 @@ class QszProcess(DataProcess):
                 with open(os.path.join(segment_result_save_path, ah + '.txt'),'a',encoding='utf8') as fw:
                     # 分句
                     sentences = SentenceSplitter.split(ssly)
-                    fw.write('起诉状事实与理由\n')
+                    fw.write('起诉状事实与理由：\n')
                     for sentence in sentences:
                         fw.write(sentence.strip())
                         fw.write('\n')
@@ -47,7 +48,6 @@ class QszProcess(DataProcess):
                 #         fw.write('\n')
                 #     fw.flush()
                 #     fw.close()
-        return
 
     # 获得单个起诉状内容
     def __get_content_of_one_Qsz__(self,path):
@@ -217,7 +217,19 @@ class sslyEndEnum2(Enum):
     v34 = '望贵院作出公正判决'
     v35 = '恳请法院判准原告的离婚之情'
 
-
+def filterNoTsbl(sourcePath,targetPath):
+    for ah in os.listdir(sourcePath):
+        flag = False
+        with open(os.path.join(sourcePath,ah),'r',encoding='utf8') as f1:
+            content = f1.read()
+            if(content.find('庭审调查：')==-1):
+                flag = True
+        if(flag):
+            os.renames(os.path.join(sourcePath,ah),os.path.join(targetPath,ah))
+            flag = False
 
 if __name__ == '__main__':
-    pass
+    base = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\segment_result'
+    filterNoTsbl(os.path.join(base,'qstsbl'),os.path.join(base,'qsz'))
+
+    sys.exit(0)

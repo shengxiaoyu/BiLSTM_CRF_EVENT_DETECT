@@ -28,13 +28,6 @@ class CpwsProcess(DataProcess):
                     continue
                 fileWriter.write(sentence)
                 fileWriter.write('\n')
-                # words = segmentor.segment(sentence)
-                # # 去除标点符号
-                # words = self.delBdfh(words)
-                # if (len(words) == 0):
-                #     continue
-                # fileWriter.write(' '.join(words))
-                # fileWriter.write('\n')
 
 
         for fileName in os.listdir(self.rootDir):

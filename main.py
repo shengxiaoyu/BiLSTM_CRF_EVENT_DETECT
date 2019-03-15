@@ -24,20 +24,19 @@ def processData():
 
     # qszProcess = QszProcess(FLAGS.source_dataset_path2)
     # qszProcess.segmentAndSave(segmentot, os.path.join(FLAGS.segment_result_save_path, 'qstsbl'))
-    #
-    # # #庭审笔录处理
+    #庭审笔录处理
     # tsblProcess = TsblProcess(FLAGS.source_dataset_path2)
-    # tsblProcess.segmentAndSave(segmentot, os.path.join(FLAGS.segment_result_save_path, 'qstsbl'), 'sentence')
+    # tsblProcess.segmentAndSave(segmentot, os.path.join(FLAGS.segment_result_save_path, 'qstsbl'), 'paragraph')
     #
     #
     # #起诉状处理
-    # qszProcess = QszProcess(FLAGS.source_dataset_path)
-    # qszProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'qstsbl'))
+    qszProcess = QszProcess(FLAGS.source_dataset_path)
+    qszProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'qsz'))
     #
 
 
-    cpwsProcess = CpwsProcess(FLAGS.source_dataset_path3)
-    cpwsProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'cpws'))
+    # cpwsProcess = CpwsProcess(FLAGS.source_dataset_path3)
+    # cpwsProcess.segmentAndSave(segmentot,os.path.join(FLAGS.segment_result_save_path,'cpws'))
 
     segmentot.release()
 
