@@ -34,35 +34,42 @@ class TsblProcess(DataProcess):
                 print(ah + '空')
                 continue
 
-            lines = []
-            for paragraph in tsdc:
-                if(mode == 'sentence'):
+            with open(os.path.join(segment_result_save_path,ah+'.txt'),'a',encoding='utf8') as fw:
+                fw.write('庭审调查：\n')
+                for paragraph in tsdc:
+                    if(mode == 'sentence'):
                     # 分句
-                    sentences = SentenceSplitter.split(paragraph)
+                        sentences = SentenceSplitter.split(paragraph)
+                        if(len(sentences)>0):
+                            for sentence in sentences :
+                                fw.write(sentence.strip())
+                                fw.write('\n')
+                    #lines = []
                     # 分词
-                    for sentence in sentences:
-                        words = segmentor.segment(sentence)
-                        # 去除标点符号
-                        words = self.delBdfh(words)
-                        if (len(words) == 0):
-                            continue
-                        lines.append(words)
-                else:
-                    # 分词
-                    words = segmentor.segment(paragraph)
-                    # 去除标点符号
-                    words = self.delBdfh(words)
-                    if (len(words) == 0):
-                        continue
-                    lines.append(words)
-            if (len(lines) > 0):
-                #保存
-                fw = open(os.path.join(segment_result_save_path, ah + '.txt'), 'w', encoding='utf8')
-                for words in lines:
-                    fw.write(' '.join(list(words)))
-                    fw.write('\n')
-                fw.flush()
-                fw.close()
+                    # for sentence in sentences:
+                    #     words = segmentor.segment(sentence)
+                    #     # 去除标点符号
+                    #     words = self.delBdfh(words)
+                    #     if (len(words) == 0):
+                    #         continue
+                    #     lines.append(words)
+
+                    # else:
+                    #     # 分词
+                    #     words = segmentor.segment(paragraph)
+                    #     # 去除标点符号
+                    #     words = self.delBdfh(words)
+                    #     if (len(words) == 0):
+                    #         continue
+                    #     lines.append(words)
+                    #     if (len(lines) > 0):
+                    #         #保存
+                    #         fw = open(os.path.join(segment_result_save_path, ah + '.txt'), 'w', encoding='utf8')
+                    #         for words in lines:
+                    #             fw.write(' '.join(list(words)))
+                    #             fw.write('\n')
+                    #         fw.flush()
+                    #         fw.close()
 
     def __getTsdc__(self,path):#获取庭审调查内容
         ajTsbl = os.path.join(path, '庭审笔录')
@@ -71,6 +78,8 @@ class TsblProcess(DataProcess):
         result = [] #最终返回结果
 
         for file in os.listdir(ajTsbl):  # 案号//庭审笔录//单个庭审笔录文件
+            if(file.startswith('~$')): #打开文件时出现的一些奇怪文件
+                continue
             theTsdc = []
             content = None
             #获取文件全部内容
@@ -183,6 +192,7 @@ class TsblProcess(DataProcess):
 
     ###获取Doc内容
     def __getDocContent__(self,path):
+
         if(not path.endswith('.doc')):
             return
         #需要先转换为docx

@@ -42,13 +42,12 @@ class CpwsProcess(DataProcess):
             content = self.handler.getContentAndClear()
             # 分句
             if(content!=None):
-                savePath = os.path.join(segment_result_save_path,content.get('AH')+'.txt')
-                savePath = savePath.replace('（','(').replace('）',')')
+                savePath = os.path.join(segment_result_save_path,fileName)
+                # savePath = savePath.replace('（','(').replace('）',')')
                 with open(savePath,'w',encoding='utf8') as f:
-                    if(content.get('YGSCD')!=None):
-                        segmentParasgraphAndSave(content.get('YGSCD'),f)
-                    if(content.get('BGBCD')!=None):
-                        segmentParasgraphAndSave(content.get('BGBCD'),f)
+                    segmentParasgraphAndSave(content.get('YGSCD'),f)
+                    f.write('\n')
+                    segmentParasgraphAndSave(content.get('BGBCD'),f)
 
 
 
@@ -64,14 +63,16 @@ class CpwsHandler(xml.sax.ContentHandler):
         elif(tag == 'YGSCD'):
             self.YGSCD = attributes['value']
         elif(tag == 'BGBCD'):
-            self.BGBCD = attributes['value']
+            bc = attributes['value']
+            if (bc != None and len(bc) != 0 and (bc.find('被告') != -1 and bc.find('辩称') != -1)):
+                self.BGBCD = bc
     def endElement(self,tag):
         pass
     def characters(self,content):
         pass
     def getContentAndClear(self):
         content = None
-        if(self.AH!=None and (self.YGSCD!=None or self.BGBCD!=None)):
+        if(self.AH!=None and self.YGSCD!=None and self.BGBCD!=None):
             content =  {'AH':self.AH,
                 'YGSCD':self.YGSCD,
                 'BGBCD':self.BGBCD}

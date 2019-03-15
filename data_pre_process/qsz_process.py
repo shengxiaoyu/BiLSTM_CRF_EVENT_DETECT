@@ -22,24 +22,31 @@ class QszProcess(DataProcess):
             if(ssly==None):
                 print(ah+' '+content)
             else:
-                # 分句
-                sentences = SentenceSplitter.split(ssly)
-                lines = []
-                for str in sentences:
-                    # 分词
-                    words = segmentor.segment(str)
-                    # 去除标点符号
-                    words = self.delBdfh(words)
-                    if (len(words) == 0):
-                        continue
-                    lines.append(words)
-                if(len(lines)>0):
-                    fw = open(os.path.join(segment_result_save_path, ah + '.txt'), 'w', encoding='utf8')
-                    for words in lines:
-                        fw.write(' '.join(list(words)))
+                with open(os.path.join(segment_result_save_path, ah + '.txt'),'a',encoding='utf8') as fw:
+                    # 分句
+                    sentences = SentenceSplitter.split(ssly)
+                    fw.write('起诉状事实与理由\n')
+                    for sentence in sentences:
+                        fw.write(sentence.strip())
                         fw.write('\n')
-                    fw.flush()
-                    fw.close()
+
+                # sentences = SentenceSplitter.split(ssly)
+                # lines = []
+                # for str in sentences:
+                #     # 分词
+                #     words = segmentor.segment(str)
+                #     # 去除标点符号
+                #     words = self.delBdfh(words)
+                #     if (len(words) == 0):
+                #         continue
+                #     lines.append(words)
+                # if(len(lines)>0):
+                #     fw = open(os.path.join(segment_result_save_path, ah + '.txt'), 'w', encoding='utf8')
+                #     for words in lines:
+                #         fw.write(' '.join(list(words)))
+                #         fw.write('\n')
+                #     fw.flush()
+                #     fw.close()
         return
 
     # 获得单个起诉状内容

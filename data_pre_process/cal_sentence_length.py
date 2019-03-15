@@ -50,5 +50,5 @@ def an2Index(path):
 
 
 if __name__ == '__main__':
-    an2Index('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\segment_result\\庭审笔录')
+    an2Index('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\segment_result\\qstsbl')
     sys.exit(0)
