@@ -34,17 +34,6 @@ def getMax(rate):
         if(SUMS[index]/SUMS[-1]>=rate):
             return index
 
-#将案号转为indxe 文件名称
-def an2Index(path):
-    if(not os.path.exists(path)):
-        return
-    elif(os.path.isdir(path)):
-        for file in os.listdir(path):
-            an2Index(os.path.join(path,file))
-    else:
-        global COUNT
-        os.renames(path,os.path.join(os.path.dirname(path),str(COUNT)+'.txt'))
-        COUNT += 1
 
 
 

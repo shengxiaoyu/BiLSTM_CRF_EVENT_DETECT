@@ -8,6 +8,59 @@ __author__ = '13314409603@163.com'
 
 import os
 
+#将案号转为indxe 文件名称,brat文件名不能含中文
+def an2Index(path):
+    if(not os.path.exists(path)):
+        return
+    elif(os.path.isdir(path)):
+        for file in os.listdir(path):
+            an2Index(os.path.join(path,file))
+    else:
+        global COUNT
+        os.renames(path,os.path.join(os.path.dirname(path),str(COUNT)+'.txt'))
+        COUNT += 1
+
+
+
+
+#获取触发词集 从.ann文件夹
+def getTriggerSet(path,events_triggers):
+    #处理单个文件
+    def handleSingleFile(path,events_triggers):
+        event_entitys = []
+        entitys = {}
+        with open(path,'r',encoding='utf8') as f:
+            for line in f.readlines():
+                if(line.startswith('T')):
+                    entity = Entity(line)
+                    entitys[entity.id] = entity
+                elif(line.startswith('E')):
+                    event_entitys.append(Relation(line))
+        for event_entity in event_entitys:
+            triggerId = event_entity.getParameters()[0][1]
+            trigger = entitys.get(triggerId)
+            triggers = events_triggers.get(trigger.getType())
+            if(triggers == None):
+                triggers = set([])
+            triggers.add(trigger.getValue())
+            events_triggers[trigger.getType()] = triggers
+    if(os.path.isdir(path)):
+        for fileName in os.listdir(path):
+            getTriggerSet(os.path.join(path,fileName),events_triggers)
+    elif(path.endswith('.ann')):
+        handleSingleFile(path,events_triggers)
+
+#将触发词写入文件
+def writeTriggerToFile(events_triggers,savePath):
+    savePath = os.path.join(savePath,'triggers')
+    if(not os.path.exists(savePath)):
+        os.mkdir(savePath)
+    for event_triggers in events_triggers.items():
+        with open(os.path.join(savePath,event_triggers[0]+'.txt'),'w',encoding='utf8') as f:
+            for trigger in event_triggers[1]:
+                f.write(trigger+'\n')
+
+
 #将源文件和标注文件合一
 def formLabelData(originFilePath,labelFilePath,savePath,mode='char'):
     for annName in os.listdir(labelFilePath):
@@ -92,7 +145,7 @@ def formLabelData(originFilePath,labelFilePath,savePath,mode='char'):
 #表示标注体ID为T1，标注体类型为Person，标注范围为[17,19)，标注的值为“双方”
 class Entity(object):
     def __init__(self,str):
-        splits = str.split('\t')
+        splits = str.strip().split('\t')
         self.id = splits[0]
         self.type = splits[1].split()[0]
         self.beginIndex = int(splits[1].split()[1])
@@ -111,6 +164,18 @@ class Entity(object):
         return self.value
     def getName(self):
         return self.name
+    def getType(self):
+        return self.type
+
+class Event(object):
+    def __init__(self,id):
+        self.id = id
+        self.arguments = []
+        self.triiger = None
+    def setTrigger(self,entity):
+        self.triiger = entity
+    def addArgument(self,entity):
+        self.arguments.append(entity)
 
 # 记录一个事件的关系，源数据形如：E1	Marry:T2 Time:T3 Participant:T1
 # 表示事件Marry:T2,有参数Time:T3和Participant:T1
@@ -123,10 +188,13 @@ class Relation(object):
         return self.parameters
 
 if __name__ == '__main__':
-    formLabelData('C:\\Users\\13314\Desktop\\Bi-LSTM+CRF\\segment_result\\起诉状',
-                  'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled',
-                  'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\NERdata\\dev', 'word')
-
+    # formLabelData('C:\\Users\\13314\Desktop\\Bi-LSTM+CRF\\segment_result\\起诉状',
+    #               'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled',
+    #               'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\NERdata\\dev', 'word')
+    events_triggers = dict()
+    brat_base_path = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\brat'
+    getTriggerSet(brat_base_path,events_triggers)
+    writeTriggerToFile(events_triggers,brat_base_path)
     print ('end')
     sys.exit(0)
     pass
