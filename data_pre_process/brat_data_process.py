@@ -102,8 +102,8 @@ def writeTriggerToFile(events_triggers,savePath):
 #将源文件和标注文件合一
 def formLabelData(originFilePath,labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,stop_words_path):
     # 分词器
-    segmentot = Segmentor()
-    segmentot.load_with_lexicon(segmentor_model_path, segmentor_user_dict_path)
+    segmentor = Segmentor()
+    segmentor.load_with_lexicon(segmentor_model_path, segmentor_user_dict_path)
     #遍历每个.ann文件
     for annName in os.listdir(labelFilePath):
         if(annName.find('.ann')==-1):
@@ -196,7 +196,7 @@ def formLabelData(originFilePath,labelFilePath,savePath,segmentor_model_path,seg
                         if(labeled[index].find('O')!=-1):
                             labeled[index] = entity.getType()
                     coursor = endCoursor
-            words = list(segmentot.segment(''.join(event.getSentences())))
+            words = list(segmentor.segment(''.join(event.getSentences())))
             tags = list(map(lambda x:'O' if(x!='\r\n') else x,words))
             labelAEntity(words,tags,event.getTrigger(),event.getBeginLineIndex())
             for argument in event.getArguments():
@@ -226,7 +226,7 @@ def formLabelData(originFilePath,labelFilePath,savePath,segmentor_model_path,seg
                 fw.write('\r\n')
                 fw.write(' '.join(event.getTags()))
                 fw.write('\r\n')
-    segmentot.release()
+    segmentor.release()
 
 #构造停用词表，否定词不能作为停用词去掉
 def stopWords(path):

@@ -31,24 +31,6 @@ class QszProcess(DataProcess):
                         fw.write(sentence.strip())
                         fw.write('\n')
 
-                # sentences = SentenceSplitter.split(ssly)
-                # lines = []
-                # for str in sentences:
-                #     # 分词
-                #     words = segmentor.segment(str)
-                #     # 去除标点符号
-                #     words = self.delBdfh(words)
-                #     if (len(words) == 0):
-                #         continue
-                #     lines.append(words)
-                # if(len(lines)>0):
-                #     fw = open(os.path.join(segment_result_save_path, ah + '.txt'), 'w', encoding='utf8')
-                #     for words in lines:
-                #         fw.write(' '.join(list(words)))
-                #         fw.write('\n')
-                #     fw.flush()
-                #     fw.close()
-
     # 获得单个起诉状内容
     def __get_content_of_one_Qsz__(self,path):
         # 单个案件地址
