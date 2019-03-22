@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import sys
 
 __doc__ = 'description将brat生成的ann文件和源文件.txt结合，生成人工标注的样子的文件'
 __author__ = '13314409603@163.com'
 
 
 import os
-
+import sys
+import math
+from pyltp import Segmentor
 #将案号转为indxe 文件名称,brat文件名不能含中文
 def an2Index(path):
     if(not os.path.exists(path)):
@@ -20,7 +21,45 @@ def an2Index(path):
         os.renames(path,os.path.join(os.path.dirname(path),str(COUNT)+'.txt'))
         COUNT += 1
 
+#获得所有标注类型
+def getLabels(bratPath):
+    labels = []
+    configPath = os.path.join(os.path.join(bratPath,'config'),'annotation.conf')
+    isEntity = '1'
+    isEvent = '2'
+    mode = None
+    with open(configPath,'r',encoding='utf8') as f:
+        for line in f.readlines():
+            if(len(line.strip())==0 or line.strip().startswith('#')):
+                continue
+            if(line.startswith('[entities]')):
+                mode = isEntity
+                continue
+            if(line.startswith('[relations]') or line.startswith('[attributes]')):
+                mode = None
+                continue
+            if(line.startswith('[events]')):
+                mode = isEvent
+                continue
 
+            #参数
+            if(mode == isEntity):
+                labels.append(line.strip())
+
+            #触发词
+            elif(mode == isEvent):
+                if(line.startswith('\t')):
+                    labels.append(line.strip().split('\t')[0])
+    with open(os.path.join(bratPath,'labels.txt'),'w',encoding='utf8') as fw:
+        fw.write('O\n')
+        newLabels = []
+        BIList =list(map(lambda x:['B_'+x,'I_'+x],labels))
+        list(map(lambda x:newLabels.extend(x),BIList))
+
+        fw.write('\n'.join(newLabels))
+        # fw.write('\n'.join(
+        #     list(map(lambda list:newLabels.extend(list),
+        #              map(lambda x:['B_'+x,'I_'+x],labels)))))
 
 
 #获取触发词集 从.ann文件夹
@@ -49,7 +88,6 @@ def getTriggerSet(path,events_triggers):
             getTriggerSet(os.path.join(path,fileName),events_triggers)
     elif(path.endswith('.ann')):
         handleSingleFile(path,events_triggers)
-
 #将触发词写入文件
 def writeTriggerToFile(events_triggers,savePath):
     savePath = os.path.join(savePath,'triggers')
@@ -62,17 +100,22 @@ def writeTriggerToFile(events_triggers,savePath):
 
 
 #将源文件和标注文件合一
-def formLabelData(originFilePath,labelFilePath,savePath,mode='char'):
+def formLabelData(originFilePath,labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path):
+    # 分词器
+    segmentot = Segmentor()
+    segmentot.load_with_lexicon(segmentor_model_path, segmentor_user_dict_path)
+    #遍历每个.ann文件
     for annName in os.listdir(labelFilePath):
-        #查看源文件是否存在
+        if(annName.find('.ann')==-1):
+            continue
+        #查看源文件是否存在，如果不存在直接跳过
         originFile = os.path.join(originFilePath, annName.replace('.ann', '.txt'))
         if (not os.path.exists(originFile)):
             continue
 
-        #先读取ann文件，获取标注记录
-        relations = []
-        entitiesDict = {}
-        entities = []
+        #读取ann文件，获取标注记录
+        relations = [] #存储事件和参数关系Relation
+        entitiesDict = {} #存储参数实体Entity
         with open(os.path.join(labelFilePath,annName), 'r', encoding='utf8') as fLabel:
             for line in fLabel.readlines():
                 if (line.startswith('T')):
@@ -81,64 +124,94 @@ def formLabelData(originFilePath,labelFilePath,savePath,mode='char'):
                 if (line.startswith('E')):
                     relations.append(Relation(line))
 
-        #根据初始化的relations和entitiesDict完善entites的name，并加入entities
+        events = [] #存储事件
+
+        #根据初始化的relations和entitiesDict完善entites的name，构造event
         for relation in relations:
-            eventName = None
-            for index,paramter in enumerate(relation.getParameters()):
+            event = None
+            for index,paramter in enumerate(relation.getParameters()): #形如[['Marry','T3'],['Time','T1']]
                 if(index==0):#第一个是描述事件触发词的entity
-                    eventName = paramter[0]
+                    #构造事件object
+                    event = Event(relation.id,paramter[0])
+                    #获得触发词对应的entity
                     entity = entitiesDict.get(paramter[1])
-                    entity.setName(eventName+'_trigger')
-                    entities.append(entity)
+                    #设置触发词的名称：事件类型_Trigger
+                    entity.setName(paramter[0]+'_Trigger')
+                    #填入触发词
+                    event.setTrigger(entity)
                 else:
+                    #事件参数处理
                     entity = entitiesDict.get(paramter[1])
-                    entity.setName(eventName+'_'+paramter[0])
-                    entities.append(entity)
-        #并按beginIndex排序
-        entities.sort(key=lambda x:x.getBegin())
+                    entity.setName(event.getType()+'_'+paramter[0])
+                    event.addArgument(entity)
+            events.append(event)
 
-        #读取源文件并将构造完备的标注文件内容
-        newConten=''
-        with open(originFile,'r',encoding='utf8') as fData:
-            fileIndex = 0 #记录文件字符索引位置
-            entityIndex = 0 #记录entity在entities中的索引
-            line = fData.readline()
-            # 标注行,初始化所有词对应的都为O
-            labelLine = ['O' for _ in line.split()]
-            while(True):#形如：原 被告 双方 系 夫妻 关系
-                if(entityIndex<len(entities) and
-                        entities[entityIndex].getBegin()-fileIndex>=0 and
-                        entities[entityIndex].getBegin()-fileIndex<len(line)):#说明这一行中有标注数据
-                    entity = entities[entityIndex]
-                    begin = entity.getBegin() - fileIndex
-                    end = entity.getEnd() - fileIndex
-                    if(end>=len(line)):#默认整个标注体都在一行，不存在一个标注体跨行的情况
-                        end = -1
-                    value = line[begin:end]
-                    assert entity.getValue().startswith(value) #entity里面的value一定是包含实际取到的value
-                    firtIndex = len(line[:begin].strip().split()) #标注开始词的索引
-                    if(begin!=0 and line[begin-1:begin]!=' '):#有可能标注的头部是属于一个词的部分，比如：名毛 雨泽，此时标注从“毛”开始，这时需要从“名毛”开始标注
-                        firtIndex -= 1
-                    length = len(value.split()) #要标注几个词
-                    for i in range(length):
-                        labelLine[i+firtIndex] = entity.getName()
-                    entityIndex += 1 #更新标注索引，下一个标注
-                else:
-                    newConten += line
-                    if(not line.endswith('\n')): #最后一行可能末尾没有换行符
-                        newConten += '\n'
-                    newConten += (' '.join(labelLine) + '\n')  # 将新的标注行加入
+        #将事件按标注索引最小位排序
+        events.sort(key=lambda x:x.getBegin())
 
-                    fileIndex += (len(line)+1) #更新文件字符索引，在brat生成的配置文件中，换行符占2位
-                    line = fData.readline()#换行
-                    if(not line): #文件结束
+
+        #把每个事件涉及的原文语句填入
+        for event in events:
+            eventBeginLineIndex = 0
+            with open(originFile, 'r', encoding='utf8') as fData:
+                cursor = 0
+                for line in fData.readlines():
+                    line = line.replace('\n','\r\n')
+                    beginIndexOfTheLine = cursor
+                    endIndexOfTheLine = cursor+len(line)
+
+                    # 标注起止范围都在在当前句子内
+                    if(endIndexOfTheLine<=event.beginIndex):
+                        cursor = endIndexOfTheLine
+                        continue
+                    if (beginIndexOfTheLine <= event.beginIndex and event.beginIndex <= endIndexOfTheLine
+                    and beginIndexOfTheLine<=event.endIndex and event.endIndex<=endIndexOfTheLine):
+                        event.addSentence(line)
+                        event.setBeginLineIndex(beginIndexOfTheLine)
                         break
-                    labelLine = ['O' for _ in line.split()]
-        print(newConten)
+                    # 只有起始范围在当前句子
+                    elif (beginIndexOfTheLine <= event.beginIndex and event.beginIndex <= endIndexOfTheLine and
+                    endIndexOfTheLine<event.endIndex):
+                        event.addSentence(line)
+                        event.setBeginLineIndex(beginIndexOfTheLine)
+                        #只有截止范围在当前句子
+                    elif(event.beginIndex<beginIndexOfTheLine and beginIndexOfTheLine<=event.endIndex and
+                    event.endIndex<=endIndexOfTheLine):
+                        event.addSentence(line)
+                        break
+                    cursor = endIndexOfTheLine
 
-        #将新标注文件写入文件：
+        #把每个事件涉及的原句分词并标注
+        for event in events:
+            def labelAEntity(words,labeled,entity,baseIndex):
+                coursor = baseIndex
+                for index,word in enumerate(words):
+                    beginCoursor = coursor
+                    endCoursor = len(word)+coursor
+                    if((beginCoursor<=entity.getBegin() and entity.getBegin()<endCoursor) or
+                            (beginCoursor<entity.getEnd() and entity.getEnd()<=endCoursor) or
+                            (beginCoursor>=entity.getBegin() and endCoursor<=entity.getEnd())):
+                        #此时待标记entity进入范围，
+                        #考虑标签和分词不对应的情况，一个词被对应到多次标记，因为先标记触发词，所以优先级第一，其余的越靠后越低
+                        if(labeled[index].find('O')!=-1):
+                            labeled[index] = entity.getType()
+                    coursor = endCoursor
+            words = list(segmentot.segment(''.join(event.getSentences())))
+            tags = list(map(lambda x:'O' if(x!='\r\n') else x,words))
+            labelAEntity(words,tags,event.getTrigger(),event.getBeginLineIndex())
+            for argument in event.getArguments():
+                labelAEntity(words,tags,argument,event.getBeginLineIndex())
+            event.setWords(words)
+            event.setTags(tags)
+
+        #存储
         with open(os.path.join(savePath,annName.replace('.ann','.txt')),'w',encoding='utf8') as fw:
-            fw.write(newConten)
+            for event in events:
+                fw.write(' '.join(event.getWords()))
+                fw.write('\r\n')
+                fw.write(' '.join(event.getTags()))
+                fw.write('\r\n')
+    segmentot.release()
 
 
 #记录一个标注体，形如T1   Person 17 19    双方
@@ -147,11 +220,11 @@ class Entity(object):
     def __init__(self,str):
         splits = str.strip().split('\t')
         self.id = splits[0]
-        self.type = splits[1].split()[0]
+        self.type = splits[1].split()[0] #参数类型，比如Person
         self.beginIndex = int(splits[1].split()[1])
         self.endIndex = int(splits[1].split()[2])
         self.value = splits[2]
-        self.name = None
+        self.name = None #参数在具体事件中的名称，比如Participant_Person
     def getId(self):
         return self.id
     def getBegin(self):
@@ -168,15 +241,56 @@ class Entity(object):
         return self.type
 
 class Event(object):
-    def __init__(self,id):
+    def __init__(self,id,type):
         self.id = id
+        self.type = type
         self.arguments = []
-        self.triiger = None
+        self.trigger = None
+
+        #该事件标注索引最小最大位
+        self.beginIndex = sys.maxsize
+        self.endIndex = -1
+        self.sentence = []
+        self.beginLineIndex = 0 #该事件在原文本中涉及范围第一行的起始索引
+
+        self.words = []
+        self.tags = []
+    def addSentence(self,sentence):
+        self.sentence.append(sentence)
+    def setType(self,type):
+        self.type = type
+    def getType(self):
+        return self.type
     def setTrigger(self,entity):
-        self.triiger = entity
+        self.trigger = entity
+        self.beginIndex = min(self.beginIndex,entity.getBegin())
+        self.endIndex = max(self.endIndex,entity.getEnd())
+    def getTrigger(self):
+        return self.trigger
     def addArgument(self,entity):
         self.arguments.append(entity)
-
+        self.beginIndex = min(self.beginIndex,entity.getBegin())
+        self.endIndex = max(self.endIndex,entity.getEnd())
+    def getArguments(self):
+        return self.arguments
+    def getBegin(self):
+        return self.beginIndex
+    def getEnd(self):
+        return self.endIndex
+    def setBeginLineIndex(self,index):
+        self.beginLineIndex = index
+    def getBeginLineIndex(self):
+        return self.beginLineIndex
+    def getSentences(self):
+        return self.sentence
+    def setTags(self,tags):
+        self.tags = tags
+    def getTags(self):
+        return self.tags
+    def setWords(self,words):
+        self.words = words
+    def getWords(self):
+        return self.words
 # 记录一个事件的关系，源数据形如：E1	Marry:T2 Time:T3 Participant:T1
 # 表示事件Marry:T2,有参数Time:T3和Participant:T1
 class Relation(object):
@@ -188,13 +302,20 @@ class Relation(object):
         return self.parameters
 
 if __name__ == '__main__':
-    # formLabelData('C:\\Users\\13314\Desktop\\Bi-LSTM+CRF\\segment_result\\起诉状',
-    #               'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled',
-    #               'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\NERdata\\dev', 'word')
-    events_triggers = dict()
-    brat_base_path = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\brat'
-    getTriggerSet(brat_base_path,events_triggers)
-    writeTriggerToFile(events_triggers,brat_base_path)
+    base_path = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF'
+    brat_base_path = os.path.join(base_path,'brat')
+    ltp_path = os.path.join(base_path,'ltp_data_v3.4.0')
+    formLabelData(os.path.join(brat_base_path,'qszExample'),
+                  os.path.join(brat_base_path,'qszExample'),
+                  os.path.join(base_path,'labeled'),
+                  os.path.join(ltp_path,'cws.model'),
+                  os.path.join(ltp_path,'userDict.txt'))
+
+
+    # events_triggers = dict()
+    # getTriggerSet(os.path.join(brat_base_path,'qszExample'),events_triggers)
+    # writeTriggerToFile(events_triggers,brat_base_path)
+    # getLabels(brat_base_path)
     print ('end')
     sys.exit(0)
     pass

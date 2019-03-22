@@ -58,15 +58,15 @@ def divideFile2(savePath,num,cap):
         maxIndex = (i+1)*cap
         for index, fileName in enumerate(fileNames):
             if(index>=minIndex and index<maxIndex):
-                os.rename(os.path.join(savePath, fileName + '.ann'),os.path.join(newDir, fileName + '.ann'))
+                # os.rename(os.path.join(savePath, fileName + '.ann'),os.path.join(newDir, fileName + '.ann'))
                 os.rename(os.path.join(savePath,fileName+'.txt'),os.path.join(newDir,fileName+'.txt'))
 
 
 
-
+# qstsbl
 
 if __name__ == '__main__':
     # an2Index('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\segment_result\\qstsbl')
     # an2Index('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\segment_result\\qsz')
-    divideFile2('C:\\Users\\13314\\Desktop\\test',2,2)
+    divideFile2('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\segment_result\\qsz',10,100)
     sys.exit(0)
