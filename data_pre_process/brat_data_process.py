@@ -7,7 +7,7 @@ __author__ = '13314409603@163.com'
 
 import os
 import sys
-import math
+from data_pre_process.data_process import BDFH
 from pyltp import Segmentor
 #将案号转为indxe 文件名称,brat文件名不能含中文
 def an2Index(path):
@@ -100,7 +100,7 @@ def writeTriggerToFile(events_triggers,savePath):
 
 
 #将源文件和标注文件合一
-def formLabelData(originFilePath,labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path):
+def formLabelData(originFilePath,labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,stop_words_path):
     # 分词器
     segmentot = Segmentor()
     segmentot.load_with_lexicon(segmentor_model_path, segmentor_user_dict_path)
@@ -204,6 +204,21 @@ def formLabelData(originFilePath,labelFilePath,savePath,segmentor_model_path,seg
             event.setWords(words)
             event.setTags(tags)
 
+
+        #去停用词
+        with open(stop_words_path,'r',encoding='utf8') as f:
+            stopWords = set(f.read().split())
+        for event in events:
+            newWords = []
+            newTags = []
+            for word,tag in zip(event.getWords(),event.getTags()):
+                if (word not in stopWords):
+                    newWords.append(word)
+                    newTags.append(tag)
+            event.setTags(newTags)
+            event.setWords(newWords)
+
+
         #存储
         with open(os.path.join(savePath,annName.replace('.ann','.txt')),'w',encoding='utf8') as fw:
             for event in events:
@@ -213,6 +228,20 @@ def formLabelData(originFilePath,labelFilePath,savePath,segmentor_model_path,seg
                 fw.write('\r\n')
     segmentot.release()
 
+#构造停用词表，否定词不能作为停用词去掉
+def stopWords(path):
+    stopWords = set()
+    stopPath = os.path.join(base_path,'stopWords')
+    for file in os.listdir(stopPath):
+        with open(os.path.join(stopPath,file),'r',encoding='utf8') as f:
+            content = f.read()
+            stopWords = stopWords.union(set(content.split('\n')))
+    negativePath = os.path.join(base_path,'negativeWords')
+    with open(os.path.join(negativePath,'dict_negative.txt'),'r',encoding='utf8') as f:
+        negativeWords = set(map(lambda line:line.split('\t')[0],f.readlines()))
+    stopWords = stopWords.difference(negativeWords)
+    with open(os.path.join(path,'newStopWords.txt'),'w',encoding='utf8') as fw:
+        fw.write('\n'.join(stopWords))
 
 #记录一个标注体，形如T1   Person 17 19    双方
 #表示标注体ID为T1，标注体类型为Person，标注范围为[17,19)，标注的值为“双方”
@@ -309,8 +338,10 @@ if __name__ == '__main__':
                   os.path.join(brat_base_path,'qszExample'),
                   os.path.join(base_path,'labeled'),
                   os.path.join(ltp_path,'cws.model'),
-                  os.path.join(ltp_path,'userDict.txt'))
+                  os.path.join(ltp_path,'userDict.txt'),
+                  os.path.join(base_path,'newStopWords.txt'))
 
+    # stopWords(base_path)
 
     # events_triggers = dict()
     # getTriggerSet(os.path.join(brat_base_path,'qszExample'),events_triggers)
