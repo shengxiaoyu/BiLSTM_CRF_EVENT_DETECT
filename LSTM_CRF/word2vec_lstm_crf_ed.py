@@ -21,39 +21,25 @@ def initTagsAndWord2Vec(rootdir):
     WV = Word2VecModel(os.path.join(rootdir, 'word2vec'), '', 30).getEmbedded()
     # <pad> -- <pad> fill word2vec and tags
     WV.add('<pad>', np.zeros(WV.vector_size))
+
     TAG_2_ID['<pad>'] = len(TAG_2_ID)
     ID_2_TAG[len(ID_2_TAG)] = '<pad>'
 
-    #读取brat的annotation.conf文件生成tag—id
-    with open(os.path.join(rootdir, 'annotation.conf'),'r',encoding='utf8') as f:
+    #读取根目录下的labelds文件生成tag—id
+    with open(os.path.join(rootdir, 'labels.txt'),'r',encoding='utf8') as f:
         index = 1
         isBegin = False
         for line in f.readlines():
-            if (line.startswith('#') or line.strip()=='' or line==None):
-                continue
-            if(line.startswith('[events]')):
-                isBegin = True
-                continue
-            if(line.startswith('[attributes]')):
-                isEnd = False
-                break
-            if(isBegin):
-                eventAndParamters = line.split('\t')
-                for par in eventAndParamters[1].split(','):
-                    tag = eventAndParamters[0]+'_'+par.split(':')[0]
-                    TAG_2_ID[tag] = index
-                    ID_2_TAG[index] = tag
-                    index += 1
-        #O
-        TAG_2_ID['O'] = index
-        ID_2_TAG[index] = 'O'
+            TAG_2_ID[line.strip()] = index
+            ID_2_TAG[index] = line.strip()
+            index += 1
 
 def paddingAndEmbedding(words,tags,max_sequence_length):
 
     length = len(words)
     #padding or cutting
-    if(len(words)<max_sequence_length):
-        for i in range(len(words),max_sequence_length):
+    if(length<max_sequence_length):
+        for i in range(length,max_sequence_length):
             words.append('<pad>')
             tags.append('<pad>')
     else:
@@ -62,11 +48,12 @@ def paddingAndEmbedding(words,tags,max_sequence_length):
 
     #embedding
     #如果是词汇表中没用的词，则使用<pad>代替
-    for index in range(len(words)):
+    for index in range(max_sequence_length):
         try:
             WV[words[index]]
         except:
             words[index] = '<pad>'
+
     words = [WV[word] for word in words]
     tags = [TAG_2_ID[tag] for tag in tags]
 
@@ -77,7 +64,8 @@ def generator_fn(input_dir,max_sequence_length):
         with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:
             sentence = f.readline()#句子行
             while sentence:
-                label = f.readline()#标记行
+                #标记行
+                label = f.readline()
                 if not label:
                     break
                 words = sentence.strip().split(' ')
@@ -91,7 +79,7 @@ def generator_fn(input_dir,max_sequence_length):
                 if (len(words) != len(tags)):
                     print(input_file, ' words和labels数不匹配：' + sentence + ' words length:' + str(
                         len(words)) + ' labels length:' + str(len(tags)))
-                    sentence = f.readline()
+                    # sentence = f.readline()
                     continue
                 yield paddingAndEmbedding(words,tags,max_sequence_length)
 
@@ -170,6 +158,7 @@ def model_fn(features,labels,mode,params):
                 mode, loss=loss, train_op=train_op)
 
 def main(FLAGS):
+
     # tf.enable_eager_execution()
     # 配置哪块gpu可见
     os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.device_map

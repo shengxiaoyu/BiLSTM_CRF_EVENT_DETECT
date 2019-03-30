@@ -57,9 +57,6 @@ def getLabels(bratPath):
         list(map(lambda x:newLabels.extend(x),BIList))
 
         fw.write('\n'.join(newLabels))
-        # fw.write('\n'.join(
-        #     list(map(lambda list:newLabels.extend(list),
-        #              map(lambda x:['B_'+x,'I_'+x],labels)))))
 
 
 #获取触发词集 从.ann文件夹
@@ -68,8 +65,10 @@ def getTriggerSet(path,events_triggers):
     def handleSingleFile(path,events_triggers):
         event_entitys = []
         entitys = {}
+        print(path)
         with open(path,'r',encoding='utf8') as f:
             for line in f.readlines():
+                # print(line)
                 if(line.startswith('T')):
                     entity = Entity(line)
                     entitys[entity.id] = entity
@@ -94,29 +93,43 @@ def writeTriggerToFile(events_triggers,savePath):
     if(not os.path.exists(savePath)):
         os.mkdir(savePath)
     for event_triggers in events_triggers.items():
+        oneEventPath = os.path.join(savePath,event_triggers[0]+'.txt')
+        newTriggers = event_triggers[1]
+        if(os.path.exists(oneEventPath)):
+            with open(oneEventPath,'r',encoding='utf8') as f:
+                oldTriggers = set(f.read().strip().split('\n'))
+                newTriggers = newTriggers.union(oldTriggers)
         with open(os.path.join(savePath,event_triggers[0]+'.txt'),'w',encoding='utf8') as f:
             for trigger in event_triggers[1]:
                 f.write(trigger+'\n')
 
 
 #将源文件和标注文件合一
-def formLabelData(originFilePath,labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,stop_words_path):
+def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,stop_words_path):
     # 分词器
     segmentor = Segmentor()
     segmentor.load_with_lexicon(segmentor_model_path, segmentor_user_dict_path)
-    #遍历每个.ann文件
-    for annName in os.listdir(labelFilePath):
-        if(annName.find('.ann')==-1):
-            continue
-        #查看源文件是否存在，如果不存在直接跳过
-        originFile = os.path.join(originFilePath, annName.replace('.ann', '.txt'))
-        if (not os.path.exists(originFile)):
-            continue
 
-        #读取ann文件，获取标注记录
-        relations = [] #存储事件和参数关系Relation
-        entitiesDict = {} #存储参数实体Entity
-        with open(os.path.join(labelFilePath,annName), 'r', encoding='utf8') as fLabel:
+    def handlderDir(dirPath):
+        for fileName in os.listdir(dirPath):
+            newPath = os.path.join(dirPath, fileName)
+            if (os.path.isdir(newPath)):
+                handlderDir(newPath)
+            else:
+                handlerSingleFile(newPath)
+
+    def handlerSingleFile(filePath):
+        if (filePath.find('.ann') == -1):
+            return
+        # 查看源文件是否存在，如果不存在直接跳过
+        originFile = os.path.join(filePath, filePath.replace('.ann', '.txt'))
+        if (not os.path.exists(originFile)):
+            return
+
+        # 读取ann文件，获取标注记录
+        relations = []  # 存储事件和参数关系Relation
+        entitiesDict = {}  # 存储参数实体Entity
+        with open(filePath, 'r', encoding='utf8') as fLabel:
             for line in fLabel.readlines():
                 if (line.startswith('T')):
                     entity = Entity(line)
@@ -124,108 +137,127 @@ def formLabelData(originFilePath,labelFilePath,savePath,segmentor_model_path,seg
                 if (line.startswith('E')):
                     relations.append(Relation(line))
 
-        events = [] #存储事件
+        events = []  # 存储事件
 
-        #根据初始化的relations和entitiesDict完善entites的name，构造event
+        # 根据初始化的relations和entitiesDict完善entites的name，构造event
         for relation in relations:
             event = None
-            for index,paramter in enumerate(relation.getParameters()): #形如[['Marry','T3'],['Time','T1']]
-                if(index==0):#第一个是描述事件触发词的entity
-                    #构造事件object
-                    event = Event(relation.id,paramter[0])
-                    #获得触发词对应的entity
+            for index, paramter in enumerate(relation.getParameters()):  # 形如[['Marry','T3'],['Time','T1']]
+                if (index == 0):  # 第一个是描述事件触发词的entity
+                    # 构造事件object
+                    event = Event(relation.id, paramter[0])
+                    # 获得触发词对应的entity
                     entity = entitiesDict.get(paramter[1])
-                    #设置触发词的名称：事件类型_Trigger
-                    entity.setName(paramter[0]+'_Trigger')
-                    #填入触发词
+                    # 设置触发词的名称：事件类型_Trigger
+                    entity.setName(paramter[0] + '_Trigger')
+                    # 填入触发词
                     event.setTrigger(entity)
                 else:
-                    #事件参数处理
+                    # 事件参数处理
                     entity = entitiesDict.get(paramter[1])
-                    entity.setName(event.getType()+'_'+paramter[0])
+                    entity.setName(event.getType() + '_' + paramter[0])
                     event.addArgument(entity)
             events.append(event)
 
-        #将事件按标注索引最小位排序
-        events.sort(key=lambda x:x.getBegin())
+        # 将事件按标注索引最小位排序
+        events.sort(key=lambda x: x.getBegin())
 
-
-        #把每个事件涉及的原文语句填入
+        # 把每个事件涉及的原文语句填入
         for event in events:
-            eventBeginLineIndex = 0
+            # eventBeginLineIndex = 0
             with open(originFile, 'r', encoding='utf8') as fData:
                 cursor = 0
                 for line in fData.readlines():
-                    line = line.replace('\n','\r\n')
+                    line = line.replace('\n', '\r\n')
                     beginIndexOfTheLine = cursor
-                    endIndexOfTheLine = cursor+len(line)
+                    endIndexOfTheLine = cursor + len(line)
 
                     # 标注起止范围都在在当前句子内
-                    if(endIndexOfTheLine<=event.beginIndex):
+                    if (endIndexOfTheLine <= event.beginIndex):
                         cursor = endIndexOfTheLine
                         continue
                     if (beginIndexOfTheLine <= event.beginIndex and event.beginIndex <= endIndexOfTheLine
-                    and beginIndexOfTheLine<=event.endIndex and event.endIndex<=endIndexOfTheLine):
+                            and beginIndexOfTheLine <= event.endIndex and event.endIndex <= endIndexOfTheLine):
                         event.addSentence(line)
                         event.setBeginLineIndex(beginIndexOfTheLine)
                         break
                     # 只有起始范围在当前句子
                     elif (beginIndexOfTheLine <= event.beginIndex and event.beginIndex <= endIndexOfTheLine and
-                    endIndexOfTheLine<event.endIndex):
+                          endIndexOfTheLine < event.endIndex):
                         event.addSentence(line)
                         event.setBeginLineIndex(beginIndexOfTheLine)
-                        #只有截止范围在当前句子
-                    elif(event.beginIndex<beginIndexOfTheLine and beginIndexOfTheLine<=event.endIndex and
-                    event.endIndex<=endIndexOfTheLine):
+                        # 只有截止范围在当前句子
+                    elif (event.beginIndex < beginIndexOfTheLine and beginIndexOfTheLine <= event.endIndex and
+                          event.endIndex <= endIndexOfTheLine):
                         event.addSentence(line)
                         break
                     cursor = endIndexOfTheLine
 
-        #把每个事件涉及的原句分词并标注
+        # 把每个事件涉及的原句分词并标注
         for event in events:
-            def labelAEntity(words,labeled,entity,baseIndex):
+            def labelAEntity(words, labeled, entity, baseIndex):
                 coursor = baseIndex
-                for index,word in enumerate(words):
+                isBegin = True
+                for index, word in enumerate(words):
                     beginCoursor = coursor
-                    endCoursor = len(word)+coursor
-                    if((beginCoursor<=entity.getBegin() and entity.getBegin()<endCoursor) or
-                            (beginCoursor<entity.getEnd() and entity.getEnd()<=endCoursor) or
-                            (beginCoursor>=entity.getBegin() and endCoursor<=entity.getEnd())):
-                        #此时待标记entity进入范围，
-                        #考虑标签和分词不对应的情况，一个词被对应到多次标记，因为先标记触发词，所以优先级第一，其余的越靠后越低
-                        if(labeled[index].find('O')!=-1):
-                            labeled[index] = entity.getType()
+                    endCoursor = len(word) + coursor
+                    if ((beginCoursor <= entity.getBegin() and entity.getBegin() < endCoursor) or
+                            (beginCoursor < entity.getEnd() and entity.getEnd() <= endCoursor) or
+                            (beginCoursor >= entity.getBegin() and endCoursor <= entity.getEnd())):
+                        # 此时待标记entity进入范围，
+                        # 考虑标签和分词不对应的情况，一个词被对应到多次标记，因为先标记触发词，所以优先级第一，其余的越靠后越低
+                        if (labeled[index].find('O') != -1):
+                            if(isBegin):
+                                labeled[index] = 'B_'+entity.getType()
+                                isBegin = False
+                            else:
+                                labeled[index] = 'I_'+entity.getType()
+
                     coursor = endCoursor
+
             words = list(segmentor.segment(''.join(event.getSentences())))
-            tags = list(map(lambda x:'O' if(x!='\r\n') else x,words))
-            labelAEntity(words,tags,event.getTrigger(),event.getBeginLineIndex())
+            tags = list(map(lambda x: 'O' if (x != '\r\n') else x, words))
+            labelAEntity(words, tags, event.getTrigger(), event.getBeginLineIndex())
             for argument in event.getArguments():
-                labelAEntity(words,tags,argument,event.getBeginLineIndex())
+                labelAEntity(words, tags, argument, event.getBeginLineIndex())
             event.setWords(words)
             event.setTags(tags)
 
-
-        #去停用词
-        with open(stop_words_path,'r',encoding='utf8') as f:
+        # 去停用词
+        with open(stop_words_path, 'r', encoding='utf8') as f:
             stopWords = set(f.read().split())
         for event in events:
             newWords = []
             newTags = []
-            for word,tag in zip(event.getWords(),event.getTags()):
-                if (word not in stopWords):
+            for word, tag in zip(event.getWords(), event.getTags()):
+                if (word not in stopWords and word!='\r\n'):
                     newWords.append(word)
                     newTags.append(tag)
+            if(len(newWords)!=len(newTags)):
+                print("error")
             event.setTags(newTags)
             event.setWords(newWords)
 
-
-        #存储
-        with open(os.path.join(savePath,annName.replace('.ann','.txt')),'w',encoding='utf8') as fw:
+        # 存储
+        theSavePath = ''
+        if(filePath.find('qsz')!=-1):
+            theSavePath = os.path.join(savePath,'qsz_'+os.path.basename(filePath).replace('.ann', '.txt'))
+        if (filePath.find('cpws') != -1):
+            theSavePath = os.path.join(savePath,'cpws'+os.path.basename(filePath).replace('.ann', '.txt'))
+        if (filePath.find('qstsbl') != -1):
+            theSavePath = os.path.join(savePath,'qstsbl'+os.path.basename(filePath).replace('.ann', '.txt'))
+        with open(theSavePath, 'w', encoding='utf8') as fw:
             for event in events:
                 fw.write(' '.join(event.getWords()))
-                fw.write('\r\n')
+                fw.write('\n')
                 fw.write(' '.join(event.getTags()))
-                fw.write('\r\n')
+                fw.write('\n')
+
+    if(os.path.isdir(labelFilePath)):
+        handlderDir(labelFilePath)
+    else:
+        handlerSingleFile(labelFilePath)
+
     segmentor.release()
 
 #构造停用词表，否定词不能作为停用词去掉
@@ -334,19 +366,19 @@ if __name__ == '__main__':
     base_path = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF'
     brat_base_path = os.path.join(base_path,'brat')
     ltp_path = os.path.join(base_path,'ltp_data_v3.4.0')
-    formLabelData(os.path.join(brat_base_path,'qszExample'),
-                  os.path.join(brat_base_path,'qszExample'),
+    formLabelData(
+                  os.path.join(brat_base_path,'labeled'),
                   os.path.join(base_path,'labeled'),
                   os.path.join(ltp_path,'cws.model'),
                   os.path.join(ltp_path,'userDict.txt'),
                   os.path.join(base_path,'newStopWords.txt'))
-
-    # stopWords(base_path)
-
-    # events_triggers = dict()
-    # getTriggerSet(os.path.join(brat_base_path,'qszExample'),events_triggers)
-    # writeTriggerToFile(events_triggers,brat_base_path)
+    #
+    # # stopWords(base_path)
+    #
     # getLabels(brat_base_path)
+    # events_triggers = dict()
+    # getTriggerSet(os.path.join(brat_base_path,'labled'),events_triggers)
+    # writeTriggerToFile(events_triggers,brat_base_path)
     print ('end')
     sys.exit(0)
     pass
