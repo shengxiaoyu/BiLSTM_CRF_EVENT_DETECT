@@ -6,7 +6,7 @@ __author__ = '13314409603@163.com'
 import os
 import docx
 import sys
-from win32com import client as wc
+# from win32com import client as wc
 from data_pre_process.data_process import DataProcess
 from enum import Enum
 from pyltp import SentenceSplitter
@@ -23,7 +23,7 @@ UNKNOWN = Enum('UNKNOWN',('答','均答'))
 class TsblProcess(DataProcess):
     def __init__(self,root_dir):
         self.root_dir = root_dir
-        self.docTool = wc.Dispatch('Word.Application')
+        # self.docTool = wc.Dispatch('Word.Application')
 
     def segmentAndSave(self,segmentor,segment_result_save_path,mode):
         for ah in os.listdir(self.root_dir):#单个案件
