@@ -7,7 +7,6 @@ __author__ = '13314409603@163.com'
 
 import os
 import sys
-from data_pre_process.data_process import BDFH
 from pyltp import Segmentor
 #将案号转为indxe 文件名称,brat文件名不能含中文
 def an2Index(path):

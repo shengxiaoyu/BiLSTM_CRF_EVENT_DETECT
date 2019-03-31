@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 from pyltp import SentenceSplitter, Segmentor
 
 __doc__ = 'description:封装word2vec模型训练'
@@ -6,7 +8,7 @@ __author__ = '13314409603@163.com'
 import os
 from gensim.models import Word2Vec
 from gensim.models.word2vec import PathLineSentences
-import numpy as np
+
 
 class Word2VecModel(object):
     def __init__(self,model_save_path,train_data_save_path,size,window=5,min_count=1,workers=4):

@@ -3,9 +3,6 @@
 import os
 import sys
 
-import numpy as np
-import csv
-
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
 
