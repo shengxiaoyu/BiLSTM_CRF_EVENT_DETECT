@@ -360,24 +360,21 @@ class Relation(object):
         self.parameters = list(map(lambda str:str.split(':'),splits[1].split())) #[[Marray,T2].[Time,T3}...]
     def getParameters(self):
         return self.parameters
+def main():
+    #base_path = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF'
+    base_path = '/root/lstm_crf/data'
+    brat_base_path = os.path.join(base_path, 'brat')
+    ltp_path = os.path.join(base_path, 'ltp_data_v3.4.0')
+    formLabelData(
+        os.path.join(brat_base_path, 'labeled'),
+        os.path.join(base_path, 'labeled'),
+        os.path.join(ltp_path, 'cws.model'),
+        os.path.join(ltp_path, 'userDict.txt'),
+        os.path.join(base_path, 'newStopWords.txt'))
+
 
 if __name__ == '__main__':
-    base_path = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF'
-    brat_base_path = os.path.join(base_path,'brat')
-    ltp_path = os.path.join(base_path,'ltp_data_v3.4.0')
-    formLabelData(
-                  os.path.join(brat_base_path,'labeled'),
-                  os.path.join(base_path,'labeled'),
-                  os.path.join(ltp_path,'cws.model'),
-                  os.path.join(ltp_path,'userDict.txt'),
-                  os.path.join(base_path,'newStopWords.txt'))
-    #
-    # # stopWords(base_path)
-    #
-    # getLabels(brat_base_path)
-    # events_triggers = dict()
-    # getTriggerSet(os.path.join(brat_base_path,'labled'),events_triggers)
-    # writeTriggerToFile(events_triggers,brat_base_path)
+
     print ('end')
     sys.exit(0)
     pass
