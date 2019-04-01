@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from tensorflow import Tensor
 
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
 
 import tensorflow as tf
+from tf_metrics import recall,f1,precision
 import os
 import functools
 from Word2Vec.my_word2vec import Word2VecModel
 import numpy as np
-
+from sklearn_crfsuite.metrics import flat_classification_report
 
 WV = None
 TAG_2_ID = {}
@@ -36,25 +36,28 @@ def initTagsAndWord2Vec(rootdir):
             ID_2_TAG[index] = line.strip()
             index += 1
 
-def paddingAndEmbedding(fileName,words,tags,max_sequence_length):
+def paddingAndEmbedding(fileName,words,tags,max_sequence_length,noPaddind):
 
     length = len(words)
-    #padding or cutting
-    if(length<max_sequence_length):
-        for i in range(length,max_sequence_length):
-            words.append('<pad>')
-            tags.append('<pad>')
-    else:
-        words = words[:max_sequence_length]
-        tags = tags[:max_sequence_length]
 
-    #embedding
-    #如果是词汇表中没用的词，则使用<pad>代替
-    for index in range(max_sequence_length):
+    # embedding
+    # 如果是词汇表中没有的词，则使用<pad>代替
+    for index in range(length):
         try:
             WV[words[index]]
         except:
             words[index] = '<pad>'
+
+    #padding or cutting
+    if(length<max_sequence_length):
+        if(not noPaddind):
+            for i in range(length,max_sequence_length):
+                words.append('<pad>')
+                tags.append('<pad>')
+    else:
+        words = words[:max_sequence_length]
+        tags = tags[:max_sequence_length]
+
 
     words = [WV[word] for word in words]
     try:
@@ -64,7 +67,8 @@ def paddingAndEmbedding(fileName,words,tags,max_sequence_length):
 
     return (words,min(length,max_sequence_length)),tags
 
-def generator_fn(input_dir,max_sequence_length):
+def generator_fn(input_dir,max_sequence_length,noPadding=False):
+    result = []
     for input_file in os.listdir(input_dir):
         with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:
             sentence = f.readline()#句子行
@@ -84,9 +88,9 @@ def generator_fn(input_dir,max_sequence_length):
                 if (len(words) != len(tags)):
                     print(input_file, ' words和labels数不匹配：' + sentence + ' words length:' + str(
                         len(words)) + ' labels length:' + str(len(tags)))
-                    # sentence = f.readline()
                     continue
-                yield paddingAndEmbedding(input_file,words,tags,max_sequence_length)
+                result.append(paddingAndEmbedding(input_file,words,tags,max_sequence_length,noPadding))
+    return result
 
 def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length):
     global WV
@@ -98,7 +102,7 @@ def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length):
         output_types=types
     )
     if shuffe:
-        dataset = dataset.shuffle(buffer_size=1000).repeat(num_epochs)
+        dataset = dataset.shuffle(buffer_size=20000).repeat(num_epochs)
 
     dataset = dataset.batch(batch_size)
     return dataset
@@ -153,11 +157,12 @@ def model_fn(features,labels,mode,params):
             print('评估。。。')
             # Metrics
             weights = tf.sequence_mask(lengths, maxlen=params['max_sequence_length'])
+            indices = [item[1] for item in TAG_2_ID.items() if (item[0]!='<pad>'and item[0]!='O')]
             metrics = {
                 'acc': tf.metrics.accuracy(labels, pred_ids, weights),
-                # 'precision': precision(labels, pred_ids, num_tags, indices, weights),
-                # 'recall': recall(labels, pred_ids, num_tags, indices, weights),
-                # 'f1': f1(labels, pred_ids, num_tags, indices, weights),
+                'precision': precision(labels, pred_ids, len(TAG_2_ID), indices, weights),
+                'recall': recall(labels, pred_ids, len(TAG_2_ID), indices, weights),
+                'f1': f1(labels, pred_ids, len(TAG_2_ID), indices, weights),
             }
             for metric_name, op in metrics.items():
                 tf.summary.scalar(metric_name, op[1])
@@ -169,9 +174,7 @@ def model_fn(features,labels,mode,params):
             print('训练。。。')
             train_op = tf.train.AdamOptimizer(learning_rate=params['learning_rate']).minimize(
                 loss, global_step=tf.train.get_or_create_global_step())
-            return tf.estimator.EstimatorSpec(
-                mode, loss=loss, train_op=train_op)
-            # return None
+            return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=train_op)
 
 #训练、评估、预测
 def main(FLAGS):
@@ -237,20 +240,19 @@ def main(FLAGS):
     # estimator
     if FLAGS.ifTrain :
         print('获取训练数据。。。')
-        train_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'train2')),
+        train_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'train')),
                                        shuffe=True, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
-        # train_data = train_inpf()
-        # for val in train_data:
-        #     if(val[0][0].get_shape().dims[1]!=51):
-        #         print(val)
-        #     if val[1].get_shape().dims[1] != 51:
-        #         print(val)
+        train_total = len(list(train_inpf()))
+        print('训练总数：'+str(train_total))
+        num_train_steps = train_total/FLAGS.batch_size*FLAGS.num_epochs
+        print('训练steps:'+str(num_train_steps))
         print('获取评估数据。。。')
         eval_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'dev')),
                                       shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         hook = tf.contrib.estimator.stop_if_no_increase_hook(
             estimator, 'f1', 500, min_steps=8000, run_every_secs=120)
-
+        dev_total = len(list(eval_inpf()))
+        print('评估总数：' + str(dev_total))
         train_spec = tf.estimator.TrainSpec(input_fn=train_inpf,hooks=[hook])
         eval_spec = tf.estimator.EvalSpec(input_fn=eval_inpf)
         print('开始训练+评估。。。')
@@ -260,22 +262,27 @@ def main(FLAGS):
         print('获取预测数据。。。')
         test_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
+        # predict_total = len(list(test_inpf()))
+
         predictions = estimator.predict(input_fn=test_inpf)
-        targets = generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),max_sequence_length = FLAGS.max_sequence_length)
-        predictions = filter(lambda x:x != TAG_2_ID['<pad>'],predictions)
-        for target,predict in zip(targets,predictions):
-            (_,length),tags = target
-            labels = "人工标记："
-            output = "预测结果："
-            pre_ids = predict['pre_ids']
-            # for tag_id,pre_tag in zip(tags,predict['pre_ids']):
-            #     labels += ID_2_TAG[tag_id]
-            #     output += ID_2_TAG[pre_tag]
-            for index in range(length):
-                labels += ID_2_TAG[tags[index]]
-                output += ID_2_TAG[pre_ids[index]]
-            print('\n'.join([labels,output]))
-            print('\n')
+        inputs = generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),max_sequence_length = FLAGS.max_sequence_length)
+        targets = [x[1] for x in inputs]
+        print('预测总数：' + str(len(targets)))
+        pred = [x['pre_ids'] for x in list(predictions)]
+        report = flat_classification_report(y_pred=pred,y_true=targets)
+        print(report)
+        # predictions = filter(lambda x:x != TAG_2_ID['<pad>'],predictions)
+        with open(os.path.join(output_dir,'predict_result.txt'),'w',encoding='utf8') as fw:
+            fw.write(str(report))
+            for target,predict in zip(inputs,pred):
+                (_,length),tags = target
+                labels = [ID_2_TAG[tags[i]] for i in range(length)]
+                outputs = [ID_2_TAG[predict[i]] for i in range(length)]
+                fw.write('人工标记： '+' '.join(labels))
+                fw.write('\n')
+                fw.write('预测结构： '+' '.join(outputs))
+                fw.write('\n')
+                fw.write('\n')
 if __name__ == '__main__':
     # tf.enable_eager_execution()
     # rootdir = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\'

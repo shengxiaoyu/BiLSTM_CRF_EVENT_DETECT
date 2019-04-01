@@ -108,7 +108,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
     # 分词器
     segmentor = Segmentor()
     segmentor.load_with_lexicon(segmentor_model_path, segmentor_user_dict_path)
-
+    eventsType = {}
     def handlderDir(dirPath):
         for fileName in os.listdir(dirPath):
             newPath = os.path.join(dirPath, fileName)
@@ -118,10 +118,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 handlerSingleFile(newPath)
 
     def handlerSingleFile(filePath):
-        # if(filePath.find('1023958.ann')!= -1):
-        #     print(filePath)
-        # else:
-        #     return
+        print(filePath)
         if (filePath.find('.ann') == -1):
             return
         # 查看源文件是否存在，如果不存在直接跳过
@@ -242,7 +239,11 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 print("error")
             event.setTags(newTags)
             event.setWords(newWords)
-
+            eventType = event.getType()
+            if (eventType in eventsType):
+                eventsType[eventType] += 1
+            else:
+                eventsType[eventType] = 1
         # 存储
         theSavePath = ''
         if(filePath.find('qsz')!=-1):
@@ -251,12 +252,13 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
             theSavePath = os.path.join(savePath,'cpws'+os.path.basename(filePath).replace('.ann', '.txt'))
         if (filePath.find('qstsbl') != -1):
             theSavePath = os.path.join(savePath,'qstsbl'+os.path.basename(filePath).replace('.ann', '.txt'))
-        with open(theSavePath, 'w', encoding='utf8') as fw:
-            for event in events:
-                fw.write(' '.join(event.getWords()))
-                fw.write('\n')
-                fw.write(' '.join(event.getTags()))
-                fw.write('\n')
+        # with open(theSavePath, 'w', encoding='utf8') as fw:
+        #     for event in events:
+        #
+        #         fw.write(' '.join(event.getWords()))
+        #         fw.write('\n')
+        #         fw.write(' '.join(event.getTags()))
+        #         fw.write('\n')
 
     if(os.path.isdir(labelFilePath)):
         handlderDir(labelFilePath)
@@ -264,6 +266,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
         handlerSingleFile(labelFilePath)
 
     segmentor.release()
+    print(eventsType)
 
 #构造停用词表，否定词不能作为停用词去掉
 def stopWords(base_path):
@@ -384,4 +387,3 @@ if __name__ == '__main__':
     print ('end')
     main()
     sys.exit(0)
-    pass
