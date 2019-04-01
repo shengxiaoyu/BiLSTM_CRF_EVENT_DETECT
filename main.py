@@ -57,26 +57,29 @@ def testWore2vec():
 
 
 def main():
+
+    #构造参数
     rootPath = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\'
     # rootPath = '/root/lstm_crf/data'
+    ltpPath = os.path.join(rootPath,'ltp_data_v3.4.0')
     parser = argparse.ArgumentParser(description='Bi-LSTM+CRF')
-    parser.add_argument('--root_dir', help='rootdir', default=rootPath)
-    parser.add_argument('--mode', help='trainortestorpredict', default='train')
-    # parser.add_argument('--mode', help='trainortestorpredict', default='predict')
-    parser.add_argument('--dropout_rate', help='dropoutrate', default=0.9)
-    parser.add_argument('--learning_rate', help='learningrate', default=0.001)
-    parser.add_argument('--hidden_units', help='hiddenunits', default=100)
-    parser.add_argument('--num_layers', help='numoflayers', default=1)
-    parser.add_argument('--max_sequence_length', help='maxlengthofsequence', default=55)
-    parser.add_argument('--labeled_data_path', help='labeleddatapath', default=os.path.join(rootPath, 'labeled'))
-    parser.add_argument('--batch_size', help='batchsize', default=5)
-    parser.add_argument('--num_epochs', help='numofepochs', default=10)
-    parser.add_argument('--device_map', help='whichdevicetosee', default='CPU:0')
+    parser.add_argument('--root_dir', help='root dir', default=rootPath)
+    parser.add_argument('--ifTrain', help='train and dev', default=False)
+    parser.add_argument('--ifPredict', help='predict', default=True)
+    parser.add_argument('--dropout_rate', help='dropout rate', default=0.9)
+    parser.add_argument('--learning_rate', help='learning rate', default=0.001)
+    parser.add_argument('--hidden_units', help='hidden units', default=100)
+    parser.add_argument('--num_layers', help='num of layers', default=1)
+    parser.add_argument('--max_sequence_length', help='max length of sequence', default=51)
+    parser.add_argument('--labeled_data_path', help='labeled data path', default=os.path.join(rootPath, 'labeled'))
+    parser.add_argument('--batch_size', help='batch size', default=5)
+    parser.add_argument('--num_epochs', help='num of epochs', default=2)
+    parser.add_argument('--device_map', help='which device to see', default='CPU:0')
 
-    parser.add_argument('--segmentor_model_path', help='segmentormodelpath',
-                        default=rootPath + 'ltp_data_v3.4.0\\cws.model')
-    parser.add_argument('--segmentor_user_dict_path', help='segmentoruserdictionarypath',
-                        default=rootPath + 'ltp_data_v3.4.0\\userDict.txt')
+    parser.add_argument('--segmentor_model_path', help='segmentor model path',
+                        default=os.path.join(ltpPath,'cws.model'))
+    parser.add_argument('--segmentor_user_dict_path', help='segmentor user dictionary path',
+                        default=os.path.join(ltpPath,'userDict.txt'))
 
     parser.add_argument('--word2vec_path', help='word2vecpath', default=os.path.join(rootPath, 'word2vec'))
     parser.add_argument('--embedded_dim', help='wordembeddeddim', default=300)

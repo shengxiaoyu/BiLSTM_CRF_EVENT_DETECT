@@ -118,6 +118,10 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 handlerSingleFile(newPath)
 
     def handlerSingleFile(filePath):
+        # if(filePath.find('1023958.ann')!= -1):
+        #     print(filePath)
+        # else:
+        #     return
         if (filePath.find('.ann') == -1):
             return
         # 查看源文件是否存在，如果不存在直接跳过
@@ -219,6 +223,8 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
             labelAEntity(words, tags, event.getTrigger(), event.getBeginLineIndex())
             for argument in event.getArguments():
                 labelAEntity(words, tags, argument, event.getBeginLineIndex())
+            if(len(words)!=len(tags)):
+                print(filePath+': \n'+words+'\n'+tags)
             event.setWords(words)
             event.setTags(tags)
 
@@ -229,7 +235,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
             newWords = []
             newTags = []
             for word, tag in zip(event.getWords(), event.getTags()):
-                if (word not in stopWords and word!='\r\n'):
+                if (word not in stopWords and word.find('\n')==-1 and word.find('\r')==-1):
                     newWords.append(word)
                     newTags.append(tag)
             if(len(newWords)!=len(newTags)):
@@ -260,7 +266,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
     segmentor.release()
 
 #构造停用词表，否定词不能作为停用词去掉
-def stopWords(path):
+def stopWords(base_path):
     stopWords = set()
     stopPath = os.path.join(base_path,'stopWords')
     for file in os.listdir(stopPath):
@@ -271,7 +277,7 @@ def stopWords(path):
     with open(os.path.join(negativePath,'dict_negative.txt'),'r',encoding='utf8') as f:
         negativeWords = set(map(lambda line:line.split('\t')[0],f.readlines()))
     stopWords = stopWords.difference(negativeWords)
-    with open(os.path.join(path,'newStopWords.txt'),'w',encoding='utf8') as fw:
+    with open(os.path.join(base_path,'newStopWords.txt'),'w',encoding='utf8') as fw:
         fw.write('\n'.join(stopWords))
 
 #记录一个标注体，形如T1   Person 17 19    双方
@@ -361,8 +367,8 @@ class Relation(object):
     def getParameters(self):
         return self.parameters
 def main():
-    #base_path = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF'
-    base_path = '/root/lstm_crf/data'
+    base_path = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF'
+    # base_path = '/root/lstm_crf/data'
     brat_base_path = os.path.join(base_path, 'brat')
     ltp_path = os.path.join(base_path, 'ltp_data_v3.4.0')
     formLabelData(
@@ -376,5 +382,6 @@ def main():
 if __name__ == '__main__':
 
     print ('end')
+    main()
     sys.exit(0)
     pass

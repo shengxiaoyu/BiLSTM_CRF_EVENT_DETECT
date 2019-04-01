@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from tensorflow import Tensor
+
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
 
@@ -19,22 +21,22 @@ ID_2_TAG = {}
 def initTagsAndWord2Vec(rootdir):
     global WV,TAG_2_ID,ID_2_TAG
     WV = Word2VecModel(os.path.join(rootdir, 'word2vec'), '', 30).getEmbedded()
-    # <pad> -- <pad> fill word2vec and tags
+    # <pad> -- <pad> fill word2vec and tags，添加一个<pad>-向量为0的，用于填充
     WV.add('<pad>', np.zeros(WV.vector_size))
 
+    #把<pad>也加入tag字典
     TAG_2_ID['<pad>'] = len(TAG_2_ID)
     ID_2_TAG[len(ID_2_TAG)] = '<pad>'
 
     #读取根目录下的labelds文件生成tag—id
     with open(os.path.join(rootdir, 'labels.txt'),'r',encoding='utf8') as f:
         index = 1
-        isBegin = False
         for line in f.readlines():
             TAG_2_ID[line.strip()] = index
             ID_2_TAG[index] = line.strip()
             index += 1
 
-def paddingAndEmbedding(words,tags,max_sequence_length):
+def paddingAndEmbedding(fileName,words,tags,max_sequence_length):
 
     length = len(words)
     #padding or cutting
@@ -55,9 +57,12 @@ def paddingAndEmbedding(words,tags,max_sequence_length):
             words[index] = '<pad>'
 
     words = [WV[word] for word in words]
-    tags = [TAG_2_ID[tag] for tag in tags]
+    try:
+        tags = [TAG_2_ID[tag] for tag in tags]
+    except:
+        print('这个文件tag无法找到正确索引，请检查:'+fileName)
 
-    return (words,length),tags
+    return (words,min(length,max_sequence_length)),tags
 
 def generator_fn(input_dir,max_sequence_length):
     for input_file in os.listdir(input_dir):
@@ -81,7 +86,7 @@ def generator_fn(input_dir,max_sequence_length):
                         len(words)) + ' labels length:' + str(len(tags)))
                     # sentence = f.readline()
                     continue
-                yield paddingAndEmbedding(words,tags,max_sequence_length)
+                yield paddingAndEmbedding(input_file,words,tags,max_sequence_length)
 
 def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length):
     global WV
@@ -100,25 +105,30 @@ def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length):
 
 def model_fn(features,labels,mode,params):
     is_training = (mode ==  tf.estimator.ModeKeys.TRAIN)
+    #传入的features: ((句子每个单词向量，句子真实长度），句子每个tag索引).batchSize为5
     features,lengths = features
 
     # LSTM
-
+    print('构造LSTM层')
     #？
     t = tf.transpose(features, perm=[1, 0, 2])
     lstm_cell_fw = tf.contrib.rnn.LSTMBlockFusedCell(params['hidden_units'])
-    # lstm_cell_bw = tf.contrib.rnn.LSTMBlockFusedCell(params['hidden_units'])
-    lstm_cell_bw = tf.contrib.rnn.TimeReversedFusedRNN(lstm_cell_fw)
+    lstm_cell_bw = tf.contrib.rnn.LSTMBlockFusedCell(params['hidden_units'])
+    lstm_cell_bw = tf.contrib.rnn.TimeReversedFusedRNN(lstm_cell_bw)
+
+    print('LSTM联合层')
     output_fw, _ = lstm_cell_fw(t, dtype=tf.float32, sequence_length=lengths)
     output_bw, _ = lstm_cell_bw(t, dtype=tf.float32, sequence_length=lengths)
     output = tf.concat([output_fw, output_bw], axis=-1)
 
+    print('dropout')
     #?
     output = tf.transpose(output, perm=[1, 0, 2])
     output = tf.layers.dropout(output, rate=params['dropout_rate'], training=is_training)
     #activation= softmax?
     logits = tf.layers.dense(output, len(TAG_2_ID))
 
+    print('CRF层')
     # CRF
     crf_params = tf.get_variable("crf", [len(TAG_2_ID), len(TAG_2_ID)], dtype=tf.float32)
     pred_ids, _ = tf.contrib.crf.crf_decode(logits, crf_params, lengths)
@@ -126,46 +136,53 @@ def model_fn(features,labels,mode,params):
 
     if mode == tf.estimator.ModeKeys.PREDICT:
         # Predictions
+        print('预测。。。')
         predictions = {
             'pre_ids':pred_ids,
         }
         return tf.estimator.EstimatorSpec(mode, predictions=predictions)
     else:
         # Loss
+        print('loss计算')
         log_likelihood, _ = tf.contrib.crf.crf_log_likelihood(
             logits, labels, lengths, crf_params)
         loss = tf.reduce_mean(-log_likelihood)
 
-        # Metrics
-        weights = tf.sequence_mask(lengths,maxlen=params['max_sequence_length'])
-        metrics = {
-            'acc': tf.metrics.accuracy(labels, pred_ids, weights),
-            # 'precision': precision(labels, pred_ids, num_tags, indices, weights),
-            # 'recall': recall(labels, pred_ids, num_tags, indices, weights),
-            # 'f1': f1(labels, pred_ids, num_tags, indices, weights),
-        }
-        for metric_name, op in metrics.items():
-            tf.summary.scalar(metric_name, op[1])
-
         if mode == tf.estimator.ModeKeys.EVAL:
+            # return None ;
+            print('评估。。。')
+            # Metrics
+            weights = tf.sequence_mask(lengths, maxlen=params['max_sequence_length'])
+            metrics = {
+                'acc': tf.metrics.accuracy(labels, pred_ids, weights),
+                # 'precision': precision(labels, pred_ids, num_tags, indices, weights),
+                # 'recall': recall(labels, pred_ids, num_tags, indices, weights),
+                # 'f1': f1(labels, pred_ids, num_tags, indices, weights),
+            }
+            for metric_name, op in metrics.items():
+                tf.summary.scalar(metric_name, op[1])
+
             return tf.estimator.EstimatorSpec(
                 mode, loss=loss, eval_metric_ops=metrics)
 
-        elif mode == tf.estimator.ModeKeys.TRAIN:
+        else:
+            print('训练。。。')
             train_op = tf.train.AdamOptimizer(learning_rate=params['learning_rate']).minimize(
                 loss, global_step=tf.train.get_or_create_global_step())
             return tf.estimator.EstimatorSpec(
                 mode, loss=loss, train_op=train_op)
+            # return None
 
+#训练、评估、预测
 def main(FLAGS):
 
-    # tf.enable_eager_execution()
+    tf.enable_eager_execution()
     # 配置哪块gpu可见
-    os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.device_map
+    # os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.device_map
 
     # 在re train 的时候，才删除上一轮产出的文件，在predicted 的时候不做clean
     output_dir = os.path.join(FLAGS.root_dir,'output')
-    if FLAGS.mode =='train':
+    if FLAGS.ifTrain:
         if os.path.exists(output_dir):
             def del_file(path):
                 ls = os.listdir(path)
@@ -177,6 +194,7 @@ def main(FLAGS):
                         os.remove(c_path)
 
             try:
+                print('清除历史训练记录')
                 del_file(output_dir)
             except Exception as e:
                 print(e)
@@ -184,9 +202,13 @@ def main(FLAGS):
                 exit(-1)
     # check output dir exists
     if not os.path.exists(output_dir):
+        print('创建output文件夹')
         os.mkdir(output_dir)
 
+
+    print('初始化标签-ID字典，33')
     initTagsAndWord2Vec(FLAGS.root_dir)
+
 
     session_config = tf.ConfigProto(
             # 是否打印使用设备的记录
@@ -210,19 +232,32 @@ def main(FLAGS):
         'learning_rate':FLAGS.learning_rate,
     }
 
+    print('构造estimator')
     estimator = tf.estimator.Estimator(model_fn,config=run_config,params=params)
     # estimator
-    if FLAGS.mode == 'train' :
-        train_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'train')),
+    if FLAGS.ifTrain :
+        print('获取训练数据。。。')
+        train_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'train2')),
                                        shuffe=True, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
+        # train_data = train_inpf()
+        # for val in train_data:
+        #     if(val[0][0].get_shape().dims[1]!=51):
+        #         print(val)
+        #     if val[1].get_shape().dims[1] != 51:
+        #         print(val)
+        print('获取评估数据。。。')
         eval_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'dev')),
-                                      shuffe=True, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
+                                      shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         hook = tf.contrib.estimator.stop_if_no_increase_hook(
             estimator, 'f1', 500, min_steps=8000, run_every_secs=120)
+
         train_spec = tf.estimator.TrainSpec(input_fn=train_inpf,hooks=[hook])
         eval_spec = tf.estimator.EvalSpec(input_fn=eval_inpf)
+        print('开始训练+评估。。。')
         tf.estimator.train_and_evaluate(estimator,train_spec,eval_spec)
-    if FLAGS.mode =='predict':
+
+    if FLAGS.ifPredict:
+        print('获取预测数据。。。')
         test_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         predictions = estimator.predict(input_fn=test_inpf)

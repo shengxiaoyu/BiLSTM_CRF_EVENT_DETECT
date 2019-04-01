@@ -36,4 +36,6 @@ def getMax(rate):
 
 
 if __name__ == '__main__':
+    calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\train')
+    print(getMax(0.95))
     sys.exit(0)
