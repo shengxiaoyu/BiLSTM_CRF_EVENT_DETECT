@@ -104,7 +104,7 @@ def writeTriggerToFile(events_triggers,savePath):
 
 
 #将源文件和标注文件合一
-def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,stop_words_path,labels_path):
+def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,stop_words_path,labels_path,mode=1):
     # 分词器
     segmentor = Segmentor()
     segmentor.load_with_lexicon(segmentor_model_path, segmentor_user_dict_path)
@@ -121,7 +121,10 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
             if (os.path.isdir(newPath)):
                 handlderDir(newPath)
             else:
-                handlerSingleFile2(newPath)
+                if (mode == 1):
+                    handlerSingleFile(labelFilePath)
+                elif (mode == 2):
+                    handlerSingleFile2(labelFilePath)
 
     def labelAEntity(words, labeled, entity, baseIndex):
         coursor = baseIndex
@@ -147,6 +150,8 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                             label = 'O'
                         labeled[index] = label
             coursor = endCoursor
+
+    # 分割成一个句子只标注一个事件
     def handlerSingleFile(filePath):
         if (filePath.find('.ann') == -1):
             return
@@ -266,6 +271,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 fw.write(' '.join(event.getTags()))
                 fw.write('\n')
 
+    #一个句子可以标注多个事件
     def handlerSingleFile2(filePath):
         if (filePath.find('.ann') == -1):
             return
@@ -374,7 +380,11 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
     if(os.path.isdir(labelFilePath)):
         handlderDir(labelFilePath)
     else:
-        handlerSingleFile2(labelFilePath)
+        if(mode==1):
+            handlerSingleFile(labelFilePath)
+        elif(mode==2):
+            handlerSingleFile2(labelFilePath)
+
 
     segmentor.release()
     print(eventsType)
@@ -491,7 +501,7 @@ def main():
         os.path.join(ltp_path, 'cws.model'),
         os.path.join(ltp_path, 'userDict.txt'),
         os.path.join(base_path, 'newStopWords.txt'),
-        os.path.join(base_path,'labels.txt'))
+        os.path.join(base_path,'labels.txt'),1)
 
 
 if __name__ == '__main__':

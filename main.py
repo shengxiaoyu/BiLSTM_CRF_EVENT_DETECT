@@ -55,39 +55,45 @@ def testWore2vec():
     print(wv.most_similar('生育'))
     print(wv.most_similar('诉讼'))
 
-
-def train():
-    #构造参数
+def getParser():
+    # 构造参数
     rootPath = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\'
     # rootPath = '/root/lstm_crf/data'
-    ltpPath = os.path.join(rootPath,'ltp_data_v3.4.0')
+    ltpPath = os.path.join(rootPath, 'ltp_data_v3.4.0')
     parser = argparse.ArgumentParser(description='Bi-LSTM+CRF')
     parser.add_argument('--root_dir', help='root dir', default=rootPath)
-    parser.add_argument('--ifTrain', help='train and dev', default=True)
+    parser.add_argument('--ifTrain', help='train and dev', default=False)
     parser.add_argument('--ifPredict', help='predict', default=True)
     parser.add_argument('--dropout_rate', help='dropout rate', default=0.9)
     parser.add_argument('--learning_rate', help='learning rate', default=0.001)
     parser.add_argument('--hidden_units', help='hidden units', default=100)
     parser.add_argument('--num_layers', help='num of layers', default=1)
-    parser.add_argument('--max_sequence_length', help='max length of sequence', default=51)
-    parser.add_argument('--labeled_data_path', help='labeled data path', default=os.path.join(rootPath, 'labeled'))
+    parser.add_argument('--sentence_mode',
+                        help='one sentence one event is Spe,one sentence may have many events is Full', default='Spe')
+    parser.add_argument('--labeled_data_path', help='labeled data path',
+                        default=os.path.join(os.path.join(rootPath, 'labeled'), parser.get_default('sentence_mode')))
+    parser.add_argument('--max_sequence_length', help='max length of sequence', default= 51 if parser.get_default('sentence_mode')=='Spe' else 40)  # Full - 40,Spe-51
     parser.add_argument('--batch_size', help='batch size', default=5)
     parser.add_argument('--num_epochs', help='num of epochs', default=2)
     parser.add_argument('--device_map', help='which device to see', default='CPU:0')
-
     parser.add_argument('--segmentor_model_path', help='segmentor model path',
-                        default=os.path.join(ltpPath,'cws.model'))
+                        default=os.path.join(ltpPath, 'cws.model'))
     parser.add_argument('--segmentor_user_dict_path', help='segmentor user dictionary path',
-                        default=os.path.join(ltpPath,'userDict.txt'))
-
+                        default=os.path.join(ltpPath, 'userDict.txt'))
     parser.add_argument('--word2vec_path', help='word2vecpath', default=os.path.join(rootPath, 'word2vec'))
     parser.add_argument('--embedded_dim', help='wordembeddeddim', default=300)
-
     FLAGS, args = parser.parse_known_args()
-    # processData()
-    # trainWord2Vec(None)
-    # testWore2vec()
+    return FLAGS ;
+
+def train():
+    FLAGS = getParser()
+    FLAGS.ifTrain = True
     run.main(FLAGS)
+
+def predict():
+    FLAGS.ifTrain = False
+    FLAGS.ifPredict = True
+
 if __name__=='__main__':
     train()
     sys.exit(0)

@@ -184,7 +184,7 @@ def main(FLAGS):
     # os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.device_map
 
     # 在re train 的时候，才删除上一轮产出的文件，在predicted 的时候不做clean
-    output_dir = os.path.join(FLAGS.root_dir,'output')
+    output_dir = os.path.join(FLAGS.root_dir,'output_'+FLAGS.sentence_mode)
     if FLAGS.ifTrain:
         if os.path.exists(output_dir):
             def del_file(path):
@@ -240,14 +240,14 @@ def main(FLAGS):
     # estimator
     if FLAGS.ifTrain :
         print('获取训练数据。。。')
-        train_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'Ftrain')),
+        train_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'train')),
                                        shuffe=True, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         train_total = len(list(train_inpf()))
         print('训练总数：'+str(train_total))
         num_train_steps = train_total/FLAGS.batch_size*FLAGS.num_epochs
         print('训练steps:'+str(num_train_steps))
         print('获取评估数据。。。')
-        eval_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'Fdev')),
+        eval_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'dev')),
                                       shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         hook = tf.contrib.estimator.stop_if_no_increase_hook(
             estimator, 'f1', 500, min_steps=8000, run_every_secs=120)
@@ -260,7 +260,7 @@ def main(FLAGS):
 
     if FLAGS.ifPredict:
         print('获取预测数据。。。')
-        test_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'Ftest')),
+        test_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         # predict_total = len(list(test_inpf()))
 
