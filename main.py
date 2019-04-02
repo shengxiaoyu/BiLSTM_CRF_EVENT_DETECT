@@ -56,15 +56,14 @@ def testWore2vec():
     print(wv.most_similar('诉讼'))
 
 
-def main():
-
+def train():
     #构造参数
     rootPath = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\'
     # rootPath = '/root/lstm_crf/data'
     ltpPath = os.path.join(rootPath,'ltp_data_v3.4.0')
     parser = argparse.ArgumentParser(description='Bi-LSTM+CRF')
     parser.add_argument('--root_dir', help='root dir', default=rootPath)
-    parser.add_argument('--ifTrain', help='train and dev', default=False)
+    parser.add_argument('--ifTrain', help='train and dev', default=True)
     parser.add_argument('--ifPredict', help='predict', default=True)
     parser.add_argument('--dropout_rate', help='dropout rate', default=0.9)
     parser.add_argument('--learning_rate', help='learning rate', default=0.001)
@@ -90,5 +89,5 @@ def main():
     # testWore2vec()
     run.main(FLAGS)
 if __name__=='__main__':
-    main()
+    train()
     sys.exit(0)

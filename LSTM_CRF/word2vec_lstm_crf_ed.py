@@ -36,7 +36,7 @@ def initTagsAndWord2Vec(rootdir):
             ID_2_TAG[index] = line.strip()
             index += 1
 
-def paddingAndEmbedding(fileName,words,tags,max_sequence_length,noPaddind):
+def paddingAndEmbedding(fileName,words,tags,max_sequence_length,noEmbedding):
 
     length = len(words)
 
@@ -50,16 +50,16 @@ def paddingAndEmbedding(fileName,words,tags,max_sequence_length,noPaddind):
 
     #padding or cutting
     if(length<max_sequence_length):
-        if(not noPaddind):
-            for i in range(length,max_sequence_length):
-                words.append('<pad>')
-                tags.append('<pad>')
+        for i in range(length,max_sequence_length):
+            words.append('<pad>')
+            tags.append('<pad>')
     else:
         words = words[:max_sequence_length]
         tags = tags[:max_sequence_length]
 
-
-    words = [WV[word] for word in words]
+    #根据noEmbedding参数确定是否进行转向量化
+    if(not noEmbedding):
+        words = [WV[word] for word in words]
     try:
         tags = [TAG_2_ID[tag] for tag in tags]
     except:
@@ -67,7 +67,7 @@ def paddingAndEmbedding(fileName,words,tags,max_sequence_length,noPaddind):
 
     return (words,min(length,max_sequence_length)),tags
 
-def generator_fn(input_dir,max_sequence_length,noPadding=False):
+def generator_fn(input_dir,max_sequence_length,noEmbedding=False):
     result = []
     for input_file in os.listdir(input_dir):
         with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:
@@ -89,7 +89,7 @@ def generator_fn(input_dir,max_sequence_length,noPadding=False):
                     print(input_file, ' words和labels数不匹配：' + sentence + ' words length:' + str(
                         len(words)) + ' labels length:' + str(len(tags)))
                     continue
-                result.append(paddingAndEmbedding(input_file,words,tags,max_sequence_length,noPadding))
+                result.append(paddingAndEmbedding(input_file,words,tags,max_sequence_length,noEmbedding))
     return result
 
 def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length):
@@ -240,14 +240,14 @@ def main(FLAGS):
     # estimator
     if FLAGS.ifTrain :
         print('获取训练数据。。。')
-        train_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'train')),
+        train_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'Ftrain')),
                                        shuffe=True, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         train_total = len(list(train_inpf()))
         print('训练总数：'+str(train_total))
         num_train_steps = train_total/FLAGS.batch_size*FLAGS.num_epochs
         print('训练steps:'+str(num_train_steps))
         print('获取评估数据。。。')
-        eval_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'dev')),
+        eval_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'Fdev')),
                                       shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         hook = tf.contrib.estimator.stop_if_no_increase_hook(
             estimator, 'f1', 500, min_steps=8000, run_every_secs=120)
@@ -260,27 +260,35 @@ def main(FLAGS):
 
     if FLAGS.ifPredict:
         print('获取预测数据。。。')
-        test_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),
+        test_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'Ftest')),
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         # predict_total = len(list(test_inpf()))
 
         predictions = estimator.predict(input_fn=test_inpf)
-        inputs = generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),max_sequence_length = FLAGS.max_sequence_length)
-        targets = [x[1] for x in inputs]
+        # inputs = generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'Ftest')),max_sequence_length = FLAGS.max_sequence_length)
+        pred_true = generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'Ftest')),max_sequence_length = FLAGS.max_sequence_length,noEmbedding=True)
+
+        #取真实的tags
+        targets = [x[1] for x in pred_true]
         print('预测总数：' + str(len(targets)))
+        #预测结果
         pred = [x['pre_ids'] for x in list(predictions)]
+        #预测分析
         report = flat_classification_report(y_pred=pred,y_true=targets)
         print(report)
-        # predictions = filter(lambda x:x != TAG_2_ID['<pad>'],predictions)
+
         with open(os.path.join(output_dir,'predict_result.txt'),'w',encoding='utf8') as fw:
             fw.write(str(report))
-            for target,predict in zip(inputs,pred):
-                (_,length),tags = target
+            for target,predict in zip(pred_true,pred):
+                (words,length),tags = target
+                words = [words[i] for i in range(length)]
                 labels = [ID_2_TAG[tags[i]] for i in range(length)]
                 outputs = [ID_2_TAG[predict[i]] for i in range(length)]
+                fw.write('原 文 ：'+' '.join(words))
+                fw.write('\n')
                 fw.write('人工标记： '+' '.join(labels))
                 fw.write('\n')
-                fw.write('预测结构： '+' '.join(outputs))
+                fw.write('预测结果： '+' '.join(outputs))
                 fw.write('\n')
                 fw.write('\n')
 if __name__ == '__main__':
