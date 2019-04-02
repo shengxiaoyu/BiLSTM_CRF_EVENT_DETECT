@@ -160,6 +160,9 @@ def model_fn(features,labels,mode,params):
             indices = [item[1] for item in TAG_2_ID.items() if (item[0]!='<pad>'and item[0]!='O')]
             metrics = {
                 'acc': tf.metrics.accuracy(labels, pred_ids, weights),
+                # 'precision': tf.metrics.precision(labels,pred_ids,weights),
+                # 'recall': tf.metrics.recall(labels,pred_ids,weights),
+                # 'auc': tf.metrics.auc(labels,pred_ids,weights)
                 'precision': precision(labels, pred_ids, len(TAG_2_ID), indices, weights),
                 'recall': recall(labels, pred_ids, len(TAG_2_ID), indices, weights),
                 'f1': f1(labels, pred_ids, len(TAG_2_ID), indices, weights),
@@ -266,7 +269,7 @@ def main(FLAGS):
 
         predictions = estimator.predict(input_fn=test_inpf)
         # inputs = generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'Ftest')),max_sequence_length = FLAGS.max_sequence_length)
-        pred_true = generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'Ftest')),max_sequence_length = FLAGS.max_sequence_length,noEmbedding=True)
+        pred_true = generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),max_sequence_length = FLAGS.max_sequence_length,noEmbedding=True)
 
         #取真实的tags
         targets = [x[1] for x in pred_true]
