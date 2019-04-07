@@ -8,6 +8,7 @@ __author__ = '13314409603@163.com'
 import os
 import sys
 from pyltp import Segmentor
+import pandas as pd
 #将案号转为indxe 文件名称,brat文件名不能含中文
 def an2Index(path):
     if(not os.path.exists(path)):
@@ -122,9 +123,9 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 handlderDir(newPath)
             else:
                 if (mode == 1):
-                    handlerSingleFile(labelFilePath)
+                    handlerSingleFile(newPath)
                 elif (mode == 2):
-                    handlerSingleFile2(labelFilePath)
+                    handlerSingleFile2(newPath)
 
     def labelAEntity(words, labeled, entity, baseIndex):
         coursor = baseIndex
@@ -243,10 +244,20 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
         for event in events:
             newWords = []
             newTags = []
+            ifDropBegin = False
             for word, tag in zip(event.getWords(), event.getTags()):
-                if (word not in stopWords and word.find('\n')==-1 and word.find('\r')==-1):
+                #修复如果一个词是某类标签的B_tag,此时删掉了就会影响CRF层捕捉B作为词组开头的特征，
+                if(word in stopWords or word.find('\n')!=-1 or word.find('\r')!=-1):
+                    if(tag.find('B_')!=-1):
+                        ifDropBegin = True
+                else:
                     newWords.append(word)
-                    newTags.append(tag)
+                    if(ifDropBegin):
+                        newTags.append(tag.replace('I_','B_'))
+                        ifDropBegin = False
+                    else:
+                        newTags.append(tag)
+
             if(len(newWords)!=len(newTags)):
                 print("error")
             event.setTags(newTags)

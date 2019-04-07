@@ -63,7 +63,8 @@ def getParser():
     parser = argparse.ArgumentParser(description='Bi-LSTM+CRF')
     parser.add_argument('--root_dir', help='root dir', default=rootPath)
     parser.add_argument('--ifTrain', help='train and dev', default=False)
-    parser.add_argument('--ifPredict', help='predict', default=True)
+    parser.add_argument('--ifTest', help='test', default=False)
+    parser.add_argument('--ifPredict',help='predict input sentence',default=False)
     parser.add_argument('--dropout_rate', help='dropout rate', default=0.9)
     parser.add_argument('--learning_rate', help='learning rate', default=0.001)
     parser.add_argument('--hidden_units', help='hidden units', default=100)
@@ -88,15 +89,22 @@ def getParser():
 def train():
     FLAGS = getParser()
     FLAGS.ifTrain = True
+    FLAGS.ifTest = True
     run.main(FLAGS)
-
-def predict():
+def test():
     FLAGS = getParser()
     FLAGS.ifTrain = False
-    FLAGS.ifPredict = True
+    FLAGS.ifTest = True
     run.main(FLAGS)
+
+def predict(sentence):
+    FLAGS = getParser()
+    FLAGS.ifTrain = False
+    FLAGS.ifTest = False
+    FLAGS.ifPredict = True
+    run.main(FLAGS,sentence)
 
 if __name__=='__main__':
     train()
-    # predict()
+    # predict('被告季某辩称，原告所陈述的事实理由不正确，原被告于2009年农历正月认识，××××年××月××日生育一女，婚后为了抚养小孩发生了争吵，被告也曾不小心碰伤了原告。')
     sys.exit(0)

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from pyltp import Segmentor
 
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
@@ -11,36 +12,66 @@ import functools
 from Word2Vec.my_word2vec import Word2VecModel
 import numpy as np
 from sklearn_crfsuite.metrics import flat_classification_report
+import pandas as pd
+from pyltp import Postagger
 
 WV = None
 TAG_2_ID = {}
 ID_2_TAG = {}
 
+POSTAGGER = Postagger()
+POS_2_ID = {}
+ID_2_POS = {}
+
 
 
 def initTagsAndWord2Vec(rootdir):
-    global WV,TAG_2_ID,ID_2_TAG
-    WV = Word2VecModel(os.path.join(rootdir, 'word2vec'), '', 30).getEmbedded()
-    # <pad> -- <pad> fill word2vec and tags，添加一个<pad>-向量为0的，用于填充
-    WV.add('<pad>', np.zeros(WV.vector_size))
-
-    #把<pad>也加入tag字典
+    initTags(os.path.join(rootdir, 'labels.txt'))
+    initWord2Vec(os.path.join(rootdir, 'word2vec'))
+    initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
+    initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
+def initTags(lablePath):
+    global TAG_2_ID, ID_2_TAG
+    # 把<pad>也加入tag字典
     TAG_2_ID['<pad>'] = len(TAG_2_ID)
     ID_2_TAG[len(ID_2_TAG)] = '<pad>'
-
-    #读取根目录下的labelds文件生成tag—id
-    with open(os.path.join(rootdir, 'labels.txt'),'r',encoding='utf8') as f:
+    # 读取根目录下的labelds文件生成tag—id
+    with open(lablePath, 'r', encoding='utf8') as f:
         index = 1
         for line in f.readlines():
             TAG_2_ID[line.strip()] = index
             ID_2_TAG[index] = line.strip()
             index += 1
+def initWord2Vec(word2vec_model_path):
+    global WV
+    WV = Word2VecModel(word2vec_model_path, '', 30).getEmbedded()
+    # <pad> -- <pad> fill word2vec and tags，添加一个<pad>-向量为0的，用于填充
+    WV.add('<pad>', np.zeros(WV.vector_size))
+def initPosTag(pos_tag_path):
+    global POS_2_ID,ID_2_POS
+    posDict = pd.read_csv(pos_tag_path)
+    for id,pos in zip(posDict['Index'],posDict['Tag']):
+        POS_2_ID[pos]=id
+        ID_2_POS[id] = pos
+    POS_2_ID['<pad>'] = 0
+    ID_2_POS[0] = '<pad>'
+def initPyltpModel(ltp_path):
+    global POSTAGGER
+    #初始化词性标注模型
+    POSTAGGER.load(os.path.join(ltp_path,'pos.model'))
+
+
+def release():
+    POSTAGGER.release()
 
 def paddingAndEmbedding(fileName,words,tags,max_sequence_length,noEmbedding):
 
     length = len(words)
 
-    # embedding
+    # 获取pos标签
+    postags = POSTAGGER.postag(words)
+
+
     # 如果是词汇表中没有的词，则使用<pad>代替
     for index in range(length):
         try:
@@ -53,11 +84,18 @@ def paddingAndEmbedding(fileName,words,tags,max_sequence_length,noEmbedding):
         for i in range(length,max_sequence_length):
             words.append('<pad>')
             tags.append('<pad>')
+            postags.append('<pad>')
     else:
         words = words[:max_sequence_length]
         tags = tags[:max_sequence_length]
+        postags = postags[:max_sequence_length]
 
-    #根据noEmbedding参数确定是否进行转向量化
+    #postag 转id
+    postags = [POS_2_ID[pos] for pos in postags]
+    #转one-hot
+    postags = [[1 if i==id else 0 for i in POS_2_ID.values()] for id in postags]
+
+    #根据noEmbedding参数确定是否进行向量化
     if(not noEmbedding):
         words = [WV[word] for word in words]
     try:
@@ -65,7 +103,10 @@ def paddingAndEmbedding(fileName,words,tags,max_sequence_length,noEmbedding):
     except:
         print('这个文件tag无法找到正确索引，请检查:'+fileName)
 
-    return (words,min(length,max_sequence_length)),tags
+
+
+
+    return (words,min(length,max_sequence_length),postags),tags
 
 def generator_fn(input_dir,max_sequence_length,noEmbedding=False):
     result = []
@@ -93,16 +134,16 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False):
     return result
 
 def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length):
-    global WV
-    shapes = (([max_sequence_length,WV.vector_size],()),[max_sequence_length])
-    types = ((tf.float32,tf.int32),tf.int32)
+    global WV,POS_2_ID
+    shapes = (([max_sequence_length,WV.vector_size],(),[max_sequence_length,len(POS_2_ID)]),[max_sequence_length])
+    types = ((tf.float32,tf.int32,tf.float32),tf.int32)
     dataset = tf.data.Dataset.from_generator(
         functools.partial(generator_fn,input_dir=input_dir,max_sequence_length = max_sequence_length),
         output_shapes=shapes,
         output_types=types
     )
     if shuffe:
-        dataset = dataset.shuffle(buffer_size=20000).repeat(num_epochs)
+        dataset = dataset.shuffle(buffer_size=10000).repeat(num_epochs)
 
     dataset = dataset.batch(batch_size)
     return dataset
@@ -110,11 +151,12 @@ def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length):
 def model_fn(features,labels,mode,params):
     is_training = (mode ==  tf.estimator.ModeKeys.TRAIN)
     #传入的features: ((句子每个单词向量，句子真实长度），句子每个tag索引).batchSize为5
-    features,lengths = features
+    features,lengths,postags = features
 
     # LSTM
     print('构造LSTM层')
     #？
+
     t = tf.transpose(features, perm=[1, 0, 2])
     lstm_cell_fw = tf.contrib.rnn.LSTMBlockFusedCell(params['hidden_units'])
     lstm_cell_bw = tf.contrib.rnn.LSTMBlockFusedCell(params['hidden_units'])
@@ -122,18 +164,25 @@ def model_fn(features,labels,mode,params):
 
     print('LSTM联合层')
     output_fw, _ = lstm_cell_fw(t, dtype=tf.float32, sequence_length=lengths)
-    output_bw, _ = lstm_cell_bw(t, dtype=tf.float32, sequence_length=lengths)
-    output = tf.concat([output_fw, output_bw], axis=-1)
+    output_bw, _ = lstm_cell_bw(t, dtype=tf.float32, sequence_length=lengths) #shape 49*batch_size*100
+    output = tf.concat([output_fw, output_bw], axis=-1) #40*batch_size*200
 
     print('dropout')
     #?
-    output = tf.transpose(output, perm=[1, 0, 2])
+    output = tf.transpose(output, perm=[1, 0, 2]) #batch_size*40*200
     output = tf.layers.dropout(output, rate=params['dropout_rate'], training=is_training)
-    #activation= softmax?
-    logits = tf.layers.dense(output, len(TAG_2_ID))
+
+    # 添加POS特征
+    print('添加POS特征')
+    output_pos = tf.concat([output, postags], axis=-1)
+
+    #全连接层
+    logits = tf.layers.dense(output_pos, len(TAG_2_ID)) #batch_size*40*len(tags)
+
 
     print('CRF层')
     # CRF
+
     crf_params = tf.get_variable("crf", [len(TAG_2_ID), len(TAG_2_ID)], dtype=tf.float32)
     pred_ids, _ = tf.contrib.crf.crf_decode(logits, crf_params, lengths)
 
@@ -179,8 +228,8 @@ def model_fn(features,labels,mode,params):
                 loss, global_step=tf.train.get_or_create_global_step())
             return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=train_op)
 
-#训练、评估、预测
-def main(FLAGS):
+#训练、评估、预测,sentece:要预测的句子
+def main(FLAGS,sentence=None):
 
     tf.enable_eager_execution()
     # 配置哪块gpu可见
@@ -261,14 +310,12 @@ def main(FLAGS):
         print('开始训练+评估。。。')
         tf.estimator.train_and_evaluate(estimator,train_spec,eval_spec)
 
-    if FLAGS.ifPredict:
+    if FLAGS.ifTest:
         print('获取预测数据。。。')
         test_inpf = functools.partial(input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
-        # predict_total = len(list(test_inpf()))
 
         predictions = estimator.predict(input_fn=test_inpf)
-        # inputs = generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'Ftest')),max_sequence_length = FLAGS.max_sequence_length)
         pred_true = generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),max_sequence_length = FLAGS.max_sequence_length,noEmbedding=True)
 
         #取真实的tags
@@ -283,7 +330,7 @@ def main(FLAGS):
         with open(os.path.join(output_dir,'predict_result.txt'),'w',encoding='utf8') as fw:
             fw.write(str(report))
             for target,predict in zip(pred_true,pred):
-                (words,length),tags = target
+                (words,length,postags),tags = target
                 words = [words[i] for i in range(length)]
                 labels = [ID_2_TAG[tags[i]] for i in range(length)]
                 outputs = [ID_2_TAG[predict[i]] for i in range(length)]
@@ -294,6 +341,77 @@ def main(FLAGS):
                 fw.write('预测结果： '+' '.join(outputs))
                 fw.write('\n')
                 fw.write('\n')
+
+    if FLAGS.ifPredict and sentence:
+
+        #初始化触发词集
+        triggerDict = {}
+        triggerDir = os.path.join(FLAGS.root_dir,'triggers')
+        for triggerFile in os.listdir(triggerDir):
+            with open(os.path.join(triggerDir,triggerFile),'r',encoding='utf8') as f:
+                content = f.read()
+            triggerDict[triggerFile.split('.')[0]] = set(content.split('\n'))
+
+        triggerContained = ''
+        for oneKindTrigger in triggerDict.items():
+            triggerType = oneKindTrigger[0]
+            for word in oneKindTrigger[1]:
+                if(sentence.find(word)!=-1):
+                    triggerContained = triggerContained + (triggerType+':'+word)
+                    break
+            if(len(triggerType)==0):
+                print('预测语句内无关注事实')
+                return
+
+        # 分词器
+        segmentor = Segmentor()
+        segmentor.load_with_lexicon(FLAGS.segmentor_model_path, FLAGS.segmentor_user_dict_path)
+        words = segmentor.segment(sentence)
+        segmentor.release()
+
+        # 去停用词
+        # 停用词集
+        with open(os.path.join(FLAGS.root_dir, 'newStopWords.txt'), 'r', encoding='utf8') as f:
+            stopWords = set(f.read().split())
+        newWords = []
+        for word in list(words):
+            if (word not in stopWords):
+                newWords.append(word)
+
+        length = len(newWords)
+        # pad or fill
+        if (length < FLAGS.max_sequence_length):
+            for i in range(length, FLAGS.max_sequence_length):
+                newWords.append('<pad>')
+        else:
+            newWords = newWords[:FLAGS.max_sequence_length]
+
+        # embedding
+        embedding = [WV[word] for word in newWords]
+        one = ((embedding, min(length, FLAGS.max_sequence_length)), [0 for _ in range(FLAGS.max_sequence_length)])
+
+
+        def generator_single_input():
+            return [one]
+        #构造dataset
+        def predict_input_fn():
+            shapes = (([FLAGS.max_sequence_length, WV.vector_size], ()), [FLAGS.max_sequence_length])
+            types = ((tf.float32, tf.int32), tf.int32)
+            dataset = tf.data.Dataset.from_generator(functools.partial(generator_single_input),output_shapes=shapes,output_types=types)
+            return dataset.batch(FLAGS.batch_size)
+        predictions = estimator.predict(input_fn=predict_input_fn)
+        predictions = [x['pre_ids'] for x in list(predictions)][0]
+
+        predictions = [ID_2_TAG[id] for id in predictions]
+
+        print(sentence)
+        print(' '.join(newWords[0:length]))
+        print(' '.join(predictions[0:length]))
+
+        release()
+        return predictions
+    release()
+
 if __name__ == '__main__':
     # tf.enable_eager_execution()
     # rootdir = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\'
