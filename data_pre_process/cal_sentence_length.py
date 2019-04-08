@@ -2,14 +2,20 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-
+from pyltp import Segmentor
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
+
+base_dir =  'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF'
+ltpPath = os.path.join(base_dir, 'ltp_data_v3.4.0')
 
 MAX_LENGTH = 1000
 LENGTHS = [0 for _ in range(MAX_LENGTH)]
 SUMS = [0 for _ in range(MAX_LENGTH)]
 COUNT = 1
+
+# segmentor = Segmentor()
+# segmentor.load_with_lexicon(os.path.join(ltpPath,'cws.model'), os.path.join(ltpPath,'userDict.txt'))
 #统计句子长度分布
 def calSentenceLength(path):
     if(os.path.isdir(path)):
@@ -31,13 +37,74 @@ def getMax(rate):
         if(SUMS[index]/SUMS[-1]>=rate):
             return index
 
+TRIGGERs = []
+ARGUs = []
+EVENTs = {}
+def initTags():
+    global ARGUs,TRIGGERs
+    with open(os.path.join(base_dir,'argumentLabels.txt'), 'r', encoding='utf8') as f:
+        for line in f.readlines():
+            ARGUs.append(line.strip())
+    #获取触发词tag
+    with open(os.path.join(base_dir,'triggerLabels.txt'), 'r', encoding='utf8') as f:
+        for line in f.readlines():
+            TRIGGERs.append(line.strip())
+#统计各类事件参数位置分布
+def calEventArguDis(path):
+    def handlerSingleFile(path):
+        with open(path,'r',encoding='utf8') as f:
+            sentence = f.readline()
+            while(sentence):
+                label = f.readline()
+                pos = f.readline()
+                tags = label.split()
+                #触发词
+                trigger = None
+                triggerIndex = None
+                for index,tag in enumerate(tags):
+                    if(tag in TRIGGERs ):
+                        trigger = tag[2:]#去掉B_,I_
+                        triggerIndex = index
+                        if(trigger not in EVENTs):
+                            EVENTs[trigger] = {}
+                if(not trigger):
+                    sentence = f.readline()
+                    continue
+                #遍历参数
+                for index,tag in enumerate(tags):
+                    if(tag in ARGUs and tag!='O'):
+                        argu = tag[2:] #去掉B_,I_
+                        if(argu not in EVENTs[trigger]):
+                            EVENTs[trigger][argu] = {}
+                        pos = index-triggerIndex
+                        if(pos not in EVENTs[trigger][argu]):
+                            EVENTs[trigger][argu][pos] = 1
+                        else:
+                            EVENTs[trigger][argu][pos] += 1
+                sentence = f.readline()
 
-
+    if(os.path.isdir(path)):
+        for file in os.listdir(path):
+            calEventArguDis(os.path.join(path,file))
+    else:
+        handlerSingleFile(path)
 
 
 if __name__ == '__main__':
     # calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Full')
     # print(getMax(0.95))
-    calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe')
-    print(getMax(0.95))
+    # calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe')
+    # print(getMax(0.95))
+    initTags()
+    calEventArguDis(os.path.join(os.path.join(base_dir,'labeled'),'Spe'))
+    print(EVENTs)
+    trigger_argu_dis_path = os.path.join(base_dir,'trigger_argus')
+    if (not os.path.exists(trigger_argu_dis_path)):
+        os.mkdir(trigger_argu_dis_path)
+    for (trigger,arugs) in EVENTs.items():
+        for(argu,pos_count) in arugs.items():
+            with open(os.path.join(trigger_argu_dis_path,trigger+'_'+argu+'.txt'),'w',encoding='utf8') as f:
+                for (pos,count) in pos_count.items():
+                    f.write(str(pos)+'\t'+str(count)+'\n')
+
     sys.exit(0)

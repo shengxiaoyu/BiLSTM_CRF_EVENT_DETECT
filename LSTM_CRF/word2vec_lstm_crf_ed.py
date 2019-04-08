@@ -365,27 +365,6 @@ def main(FLAGS,sentence=None):
                 fw.write('\n')
 
     if FLAGS.ifPredict and sentence:
-
-        #初始化触发词集
-        triggerDict = {}
-        triggerDir = os.path.join(FLAGS.root_dir,'triggers')
-        for triggerFile in os.listdir(triggerDir):
-            with open(os.path.join(triggerDir,triggerFile),'r',encoding='utf8') as f:
-                content = f.read()
-            triggerDict[triggerFile.split('.')[0]] = set(content.split('\n'))
-
-        #判断释放含触发词
-        triggerContained = ''
-        for oneKindTrigger in triggerDict.items():
-            triggerType = oneKindTrigger[0]
-            for word in oneKindTrigger[1]:
-                if(sentence.find(word)!=-1):
-                    triggerContained = triggerContained + (triggerType+':'+word)
-                    break
-            if(len(triggerType)==0):
-                print('预测语句内无关注事实')
-                return
-
         #分词、获取pos标签、去停用词
         words = SEGMENTOR.segment(sentence)
         postags = POSTAGGER.postag(words)
