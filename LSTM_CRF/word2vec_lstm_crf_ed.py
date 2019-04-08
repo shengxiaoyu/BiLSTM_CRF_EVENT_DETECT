@@ -16,28 +16,39 @@ import pandas as pd
 from pyltp import Postagger
 
 WV = None
+
 TAG_2_ID = {}
 ID_2_TAG = {}
 
 POSTAGGER = Postagger()
 POS_2_ID = {}
-ID_2_POS = {}
+# 分词器
+SEGMENTOR = Segmentor()
+STOP_WORDS=set()
 
 
 
 def initTagsAndWord2Vec(rootdir):
-    initTags(os.path.join(rootdir, 'labels.txt'))
+    initTags(os.path.join(rootdir,'triggerLabels.txt'),os.path.join(rootdir, 'argumentLabels.txt'))
     initWord2Vec(os.path.join(rootdir, 'word2vec'))
     initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
     initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
-def initTags(lablePath):
+    initStopWords(os.path.join(rootdir, 'newStopWords.txt'))
+def initTags(triggerLablePath,argumentLabelPath):
     global TAG_2_ID, ID_2_TAG
     # 把<pad>也加入tag字典
     TAG_2_ID['<pad>'] = len(TAG_2_ID)
     ID_2_TAG[len(ID_2_TAG)] = '<pad>'
     # 读取根目录下的labelds文件生成tag—id
-    with open(lablePath, 'r', encoding='utf8') as f:
-        index = 1
+    index = 1
+    #获取参数tag
+    with open(argumentLabelPath, 'r', encoding='utf8') as f:
+        for line in f.readlines():
+            TAG_2_ID[line.strip()] = index
+            ID_2_TAG[index] = line.strip()
+            index += 1
+    #获取触发词tag
+    with open(triggerLablePath, 'r', encoding='utf8') as f:
         for line in f.readlines():
             TAG_2_ID[line.strip()] = index
             ID_2_TAG[index] = line.strip()
@@ -48,29 +59,25 @@ def initWord2Vec(word2vec_model_path):
     # <pad> -- <pad> fill word2vec and tags，添加一个<pad>-向量为0的，用于填充
     WV.add('<pad>', np.zeros(WV.vector_size))
 def initPosTag(pos_tag_path):
-    global POS_2_ID,ID_2_POS
+    global POS_2_ID
     posDict = pd.read_csv(pos_tag_path)
     for id,pos in zip(posDict['Index'],posDict['Tag']):
         POS_2_ID[pos]=id
-        ID_2_POS[id] = pos
     POS_2_ID['<pad>'] = 0
-    ID_2_POS[0] = '<pad>'
 def initPyltpModel(ltp_path):
-    global POSTAGGER
+    global POSTAGGER,SEGMENTOR
     #初始化词性标注模型
     POSTAGGER.load(os.path.join(ltp_path,'pos.model'))
+    SEGMENTOR.load_with_lexicon(os.path.join(ltp_path,'cws.model'), os.path.join(ltp_path,'userDict.txt'))
+def initStopWords(path):
+    # 停用词集
+    global STOP_WORDS
+    with open(path, 'r', encoding='utf8') as f:
+        STOP_WORDS = set(f.read().split())
 
-
-def release():
-    POSTAGGER.release()
-
-def paddingAndEmbedding(fileName,words,tags,max_sequence_length,noEmbedding):
-
+def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedding):
+    # print(fileName)
     length = len(words)
-
-    # 获取pos标签
-    postags = POSTAGGER.postag(words)
-
 
     # 如果是词汇表中没有的词，则使用<pad>代替
     for index in range(length):
@@ -79,21 +86,28 @@ def paddingAndEmbedding(fileName,words,tags,max_sequence_length,noEmbedding):
         except:
             words[index] = '<pad>'
 
+    # 如果出现非pos标签，则使用<pad>代替
+    for index in range(length):
+        try:
+            POS_2_ID[posTags[index]]
+        except:
+            posTags[index] = '<pad>'
+
     #padding or cutting
     if(length<max_sequence_length):
         for i in range(length,max_sequence_length):
             words.append('<pad>')
             tags.append('<pad>')
-            postags.append('<pad>')
+            posTags.append('<pad>')
     else:
         words = words[:max_sequence_length]
         tags = tags[:max_sequence_length]
-        postags = postags[:max_sequence_length]
+        posTags = posTags[:max_sequence_length]
 
     #postag 转id
-    postags = [POS_2_ID[pos] for pos in postags]
+    posTags = [POS_2_ID[pos] for pos in posTags]
     #转one-hot
-    postags = [[1 if i==id else 0 for i in POS_2_ID.values()] for id in postags]
+    posTags = [[1 if i==id else 0 for i in POS_2_ID.values()] for id in posTags]
 
     #根据noEmbedding参数确定是否进行向量化
     if(not noEmbedding):
@@ -103,42 +117,50 @@ def paddingAndEmbedding(fileName,words,tags,max_sequence_length,noEmbedding):
     except:
         print('这个文件tag无法找到正确索引，请检查:'+fileName)
 
+    return (words,min(length,max_sequence_length),posTags),tags
+def release():
+    POSTAGGER.release()
+    SEGMENTOR.release()
 
-
-
-    return (words,min(length,max_sequence_length),postags),tags
-
-def generator_fn(input_dir,max_sequence_length,noEmbedding=False):
+def generator_fn(input_dir,max_sequence_length,noEmbedding=False,one_sentence_words_posTags=None,):
     result = []
-    for input_file in os.listdir(input_dir):
-        with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:
-            sentence = f.readline()#句子行
-            while sentence:
-                #标记行
-                label = f.readline()
-                if not label:
-                    break
-                words = sentence.strip().split(' ')
-                words = list(filter(lambda word:word!='',words))
+    if(one_sentence_words_posTags):
+        tags = ['O' for _ in range(len(one_sentence_words_posTags[0]))]
+        result.append(paddingAndEmbedding('sentence', one_sentence_words_posTags[0], tags, one_sentence_words_posTags[1], max_sequence_length, noEmbedding))
+    elif(input_dir):
+        for input_file in os.listdir(input_dir):
+            with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:
+                sentence = f.readline()#句子行
+                while sentence:
+                    #标记行
+                    label = f.readline()
+                    pos = f.readline()
+                    if not label:
+                        break
+                    words = sentence.strip().split(' ')
+                    words = list(filter(lambda word:word!='',words))
 
-                tags = label.strip().split(' ')
-                tags = list(filter(lambda word:word!='',tags))
+                    tags = label.strip().split(' ')
+                    tags = list(filter(lambda word:word!='',tags))
 
-                sentence = f.readline()
+                    posTags = pos.strip().split(' ')
+                    posTags = list(filter(lambda word:word!='',posTags))
 
-                if (len(words) != len(tags)):
-                    print(input_file, ' words和labels数不匹配：' + sentence + ' words length:' + str(
-                        len(words)) + ' labels length:' + str(len(tags)))
-                    continue
-                result.append(paddingAndEmbedding(input_file,words,tags,max_sequence_length,noEmbedding))
+                    sentence = f.readline()
+
+                    if (len(words) != len(tags) or len(tags)!=len(posTags)):
+                        print(input_file, ' words、labels、pos数不匹配：' + sentence + ' words length:' + str(
+                            len(words)) + ' labels length:' + str(len(tags))+' pos length:'+str(len(posTags)))
+                        continue
+                    result.append(paddingAndEmbedding(input_file,words,tags,posTags,max_sequence_length,noEmbedding))
     return result
 
-def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length):
+def input_fn(input_dir,one_sentence_words_posTags,shuffe,num_epochs,batch_size,max_sequence_length):
     global WV,POS_2_ID
     shapes = (([max_sequence_length,WV.vector_size],(),[max_sequence_length,len(POS_2_ID)]),[max_sequence_length])
     types = ((tf.float32,tf.int32,tf.float32),tf.int32)
     dataset = tf.data.Dataset.from_generator(
-        functools.partial(generator_fn,input_dir=input_dir,max_sequence_length = max_sequence_length),
+        functools.partial(generator_fn,input_dir=input_dir,one_sentence_words_posTags=one_sentence_words_posTags,max_sequence_length = max_sequence_length),
         output_shapes=shapes,
         output_types=types
     )
@@ -352,6 +374,7 @@ def main(FLAGS,sentence=None):
                 content = f.read()
             triggerDict[triggerFile.split('.')[0]] = set(content.split('\n'))
 
+        #判断释放含触发词
         triggerContained = ''
         for oneKindTrigger in triggerDict.items():
             triggerType = oneKindTrigger[0]
@@ -363,53 +386,32 @@ def main(FLAGS,sentence=None):
                 print('预测语句内无关注事实')
                 return
 
-        # 分词器
-        segmentor = Segmentor()
-        segmentor.load_with_lexicon(FLAGS.segmentor_model_path, FLAGS.segmentor_user_dict_path)
-        words = segmentor.segment(sentence)
-        segmentor.release()
+        #分词、获取pos标签、去停用词
+        words = SEGMENTOR.segment(sentence)
+        postags = POSTAGGER.postag(words)
 
         # 去停用词
-        # 停用词集
-        with open(os.path.join(FLAGS.root_dir, 'newStopWords.txt'), 'r', encoding='utf8') as f:
-            stopWords = set(f.read().split())
         newWords = []
-        for word in list(words):
-            if (word not in stopWords):
+        newPosTags = []
+        for word, pos in zip(words, postags):
+            if (word not in STOP_WORDS):
                 newWords.append(word)
+                newPosTags.append(pos)
 
-        length = len(newWords)
-        # pad or fill
-        if (length < FLAGS.max_sequence_length):
-            for i in range(length, FLAGS.max_sequence_length):
-                newWords.append('<pad>')
-        else:
-            newWords = newWords[:FLAGS.max_sequence_length]
-
-        # embedding
-        embedding = [WV[word] for word in newWords]
-        one = ((embedding, min(length, FLAGS.max_sequence_length)), [0 for _ in range(FLAGS.max_sequence_length)])
-
-
-        def generator_single_input():
-            return [one]
-        #构造dataset
-        def predict_input_fn():
-            shapes = (([FLAGS.max_sequence_length, WV.vector_size], ()), [FLAGS.max_sequence_length])
-            types = ((tf.float32, tf.int32), tf.int32)
-            dataset = tf.data.Dataset.from_generator(functools.partial(generator_single_input),output_shapes=shapes,output_types=types)
-            return dataset.batch(FLAGS.batch_size)
-        predictions = estimator.predict(input_fn=predict_input_fn)
+        pre_inf = functools.partial(input_fn, input_dir=None,one_sentence_words_posTags=[newWords,newPosTags],
+                                      shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
+                                      max_sequence_length=FLAGS.max_sequence_length)
+        predictions = estimator.predict(input_fn=pre_inf)
         predictions = [x['pre_ids'] for x in list(predictions)][0]
 
         predictions = [ID_2_TAG[id] for id in predictions]
 
-        print(sentence)
-        print(' '.join(newWords[0:length]))
-        print(' '.join(predictions[0:length]))
 
+        print(sentence)
+        print(' '.join(newWords))
+        print(' '.join(predictions[0:len(newWords)]))
         release()
-        return predictions
+        return newWords,predictions
     release()
 
 if __name__ == '__main__':

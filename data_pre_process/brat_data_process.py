@@ -8,6 +8,7 @@ __author__ = '13314409603@163.com'
 import os
 import sys
 from pyltp import Segmentor
+from pyltp import Postagger
 import pandas as pd
 #将案号转为indxe 文件名称,brat文件名不能含中文
 def an2Index(path):
@@ -105,10 +106,16 @@ def writeTriggerToFile(events_triggers,savePath):
 
 
 #将源文件和标注文件合一
-def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,stop_words_path,labels_path,mode=1):
+def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,pos_model_path,stop_words_path,labels_path,mode=1):
+    if(mode==1):
+        savePath = os.path.join(savePath,'Spe')
+    else:
+        savePath = os.path.join(savePath,'Full')
     # 分词器
     segmentor = Segmentor()
     segmentor.load_with_lexicon(segmentor_model_path, segmentor_user_dict_path)
+    postagger = Postagger()
+    postagger.load(pos_model_path)
     #停用词集
     with open(stop_words_path, 'r', encoding='utf8') as f:
         stopWords = set(f.read().split())
@@ -127,40 +134,8 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 elif (mode == 2):
                     handlerSingleFile2(newPath)
 
-    def labelAEntity(words, labeled, entity, baseIndex):
-        coursor = baseIndex
-        isBegin = True
-        for index, word in enumerate(words):
-            beginCoursor = coursor
-            endCoursor = len(word) + coursor
-            if ((beginCoursor <= entity.getBegin() and entity.getBegin() < endCoursor) or
-                    (beginCoursor < entity.getEnd() and entity.getEnd() <= endCoursor) or
-                    (beginCoursor >= entity.getBegin() and endCoursor <= entity.getEnd())):
-                # 此时待标记entity进入范围，
-                # 考虑标签和分词不对应的情况，一个词被对应到多次标记，因为先标记触发词，所以优先级第一，其余的越靠后越低
-                if (labeled[index].find('O') != -1):
-                    if(isBegin):
-                        label = 'B_'+entity.getType()
-                        if(label not in labedWords): #如果不是关注集里的标注类型，则设为O
-                            label = 'O'
-                        labeled[index] = label
-                        isBegin = False
-                    else:
-                        label =  'I_'+entity.getType()
-                        if(label not in labedWords):#如果不是关注集里的标注类型，则设为O
-                            label = 'O'
-                        labeled[index] = label
-            coursor = endCoursor
-
-    # 分割成一个句子只标注一个事件
-    def handlerSingleFile(filePath):
-        if (filePath.find('.ann') == -1):
-            return
-        # 查看源文件是否存在，如果不存在直接跳过
-        originFile = os.path.join(filePath, filePath.replace('.ann', '.txt'))
-        if (not os.path.exists(originFile)):
-            return
-
+    #获取event列表，其中包括每个事件含有的原文句子
+    def getEvents(filePath,originFile):
         # 读取ann文件，获取标注记录
         relations = []  # 存储事件和参数关系Relation
         entitiesDict = {}  # 存储参数实体Entity
@@ -227,46 +202,108 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                         event.addSentence(line)
                         break
                     cursor = endIndexOfTheLine
+        return events
+
+        # 标注单个事件参数或者trigger触发词
+    def labelAEntity(words, labeled, entity, baseIndex):
+        coursor = baseIndex
+        isBegin = True
+        for index, word in enumerate(words):
+            beginCoursor = coursor
+            endCoursor = len(word) + coursor
+            if ((beginCoursor <= entity.getBegin() and entity.getBegin() < endCoursor) or
+                    (beginCoursor < entity.getEnd() and entity.getEnd() <= endCoursor) or
+                    (beginCoursor >= entity.getBegin() and endCoursor <= entity.getEnd())):
+                # 此时待标记entity进入范围，
+                # 考虑标签和分词不对应的情况，一个词被对应到多次标记，因为先标记触发词，所以优先级第一，其余的越靠后越低
+                if (labeled[index].find('O') != -1):
+                    if (isBegin):
+                        label = 'B_' + entity.getType()
+                        if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
+                            label = 'O'
+                        labeled[index] = label
+                        isBegin = False
+                    else:
+                        label = 'I_' + entity.getType()
+                        if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
+                            label = 'O'
+                        labeled[index] = label
+            coursor = endCoursor
+
+        #去停用词
+    def delStopWords(words,tags,postags):
+        newWords=[]
+        newTags=[]
+        newPosTags=[]
+        ifDropBegin = False
+        for word,tag,pos in zip(words,tags,postags):
+            if (word not in stopWords):
+                newWords.append(word)
+                if(ifDropBegin):
+                    newTags.append(tag.replace('I_','B_'))
+                    ifDropBegin = False
+                else:
+                    newTags.append(tag)
+                newPosTags.append(pos)
+            else:#考虑如果把B_作为开始标志的词去掉时，需要把下一个I_改为B_
+                if(tag.find('B_')!=-1):
+                    ifDropBegin = True
+        return newWords,newTags,newPosTags
+
+    # 分割成一个句子只标注一个事件
+    def handlerSingleFile(filePath):
+        if (filePath.find('.ann') == -1):
+            return
+        # 查看源文件是否存在，如果不存在直接跳过
+        originFile = os.path.join(filePath, filePath.replace('.ann', '.txt'))
+        if (not os.path.exists(originFile)):
+            return
+
+        #获取事件list
+        events = getEvents(filePath,originFile)
 
         # 把每个事件涉及的原句分词并标注
         for event in events:
             words = list(segmentor.segment(''.join(event.getSentences())))
             tags = list(map(lambda x: 'O' if (x != '\r\n') else x, words))
+            posTags = list(postagger.postag(words))
             labelAEntity(words, tags, event.getTrigger(), event.getBeginLineIndex())
             for argument in event.getArguments():
                 labelAEntity(words, tags, argument, event.getBeginLineIndex())
-            if(len(words)!=len(tags)):
+            if(len(words)!=len(tags) or len(words)!=len(posTags)):
                 print(filePath+': \n'+words+'\n'+tags)
+
+            #去停用词
+            words,tags,posTags = delStopWords(words,tags,posTags)
             event.setWords(words)
             event.setTags(tags)
+            event.setPosTags(posTags)
 
-        # 去停用词
+
+        # 去换行符
         for event in events:
             newWords = []
             newTags = []
-            ifDropBegin = False
-            for word, tag in zip(event.getWords(), event.getTags()):
-                #修复如果一个词是某类标签的B_tag,此时删掉了就会影响CRF层捕捉B作为词组开头的特征，
-                if(word in stopWords or word.find('\n')!=-1 or word.find('\r')!=-1):
-                    if(tag.find('B_')!=-1):
-                        ifDropBegin = True
+            newPosTags = []
+            for word, tag,posTag in zip(event.getWords(), event.getTags(),event.getPosTags()):
+                if (word.find('\n') != -1 or word.find('\r') != -1):
+                    continue
                 else:
                     newWords.append(word)
-                    if(ifDropBegin):
-                        newTags.append(tag.replace('I_','B_'))
-                        ifDropBegin = False
-                    else:
-                        newTags.append(tag)
+                    newTags.append(tag)
+                    newPosTags.append(posTag)
 
-            if(len(newWords)!=len(newTags)):
+            if (len(newWords) != len(newTags)):
                 print("error")
             event.setTags(newTags)
             event.setWords(newWords)
+            event.setPosTags(newPosTags)
             eventType = event.getType()
             if (eventType in eventsType):
                 eventsType[eventType] += 1
             else:
                 eventsType[eventType] = 1
+
         # 存储
         theSavePath = ''
         if(filePath.find('qsz')!=-1):
@@ -281,6 +318,8 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 fw.write('\n')
                 fw.write(' '.join(event.getTags()))
                 fw.write('\n')
+                fw.write(' '.join(event.getPosTags()))
+                fw.write('\n')
 
     #一个句子可以标注多个事件
     def handlerSingleFile2(filePath):
@@ -291,41 +330,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
         if (not os.path.exists(originFile)):
             return
 
-        # 读取ann文件，获取标注记录
-        relations = []  # 存储事件和参数关系Relation
-        entitiesDict = {}  # 存储参数实体Entity
-        with open(filePath, 'r', encoding='utf8') as fLabel:
-            for line in fLabel.readlines():
-                if (line.startswith('T')):
-                    entity = Entity(line)
-                    entitiesDict[entity.getId()] = entity
-                if (line.startswith('E')):
-                    relations.append(Relation(line))
-
-        events = []  # 存储事件
-
-        # 根据初始化的relations和entitiesDict完善entites的name，构造event
-        for relation in relations:
-            event = None
-            for index, paramter in enumerate(relation.getParameters()):  # 形如[['Marry','T3'],['Time','T1']]
-                if (index == 0):  # 第一个是描述事件触发词的entity
-                    # 构造事件object
-                    event = Event(relation.id, paramter[0])
-                    # 获得触发词对应的entity
-                    entity = entitiesDict.get(paramter[1])
-                    # 设置触发词的名称：事件类型_Trigger
-                    entity.setName(paramter[0] + '_Trigger')
-                    # 填入触发词
-                    event.setTrigger(entity)
-                else:
-                    # 事件参数处理
-                    entity = entitiesDict.get(paramter[1])
-                    entity.setName(event.getType() + '_' + paramter[0])
-                    event.addArgument(entity)
-            events.append(event)
-
-        # 将事件按标注索引最小位排序
-        events.sort(key=lambda x: x.getBegin())
+        events = getEvents(filePath,originFile)
 
         #在源文件上标注标签
         #获取源文件，并将换行符置为2个位置形式
@@ -335,6 +340,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
         #分词，构造标签list
         content = list(segmentor.segment(content))
         tags = list(map(lambda x:'O'if(x!='\r\n') else x,content))
+        posTags = list(postagger.postag(content))
 
         #针对每个事件将标签填入
         for event in events:
@@ -344,18 +350,21 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 labelAEntity(content,tags,argument,0)
 
         #去停用词
+        content,tags,posTags=delStopWords(content,tags,posTags)
         newContent = []
         newTags = []
-        for word, tag in zip(content,tags):
-            if (word not in stopWords): #因为使用原文标注，所以直接去掉\r保留\n分段
-                if(word=='\r'): #考虑\r\n被分词的情况，如果\r单独存在，则直接舍掉，
-                    continue
-                if(word.find('\r')!=-1):#如果\r和其他词在一起，则只去掉\r，包括\r\n在一起的情况
-                    word = word.replace('\r','')
-                    tag = tag.replace('\r','')
-                newContent.append(word)
-                newTags.append(tag)
-
+        newPosTags = []
+        #在全文里面要保留\n区别换行
+        for word,tag,posTag in zip(content,tags,posTags):
+            if(word=='\r'): #考虑\r\n被分词的情况，如果\r单独存在，则直接舍掉，
+                continue
+            if(word.find('\r')!=-1):#如果\r和其他词在一起，则只去掉\r，包括\r\n在一起的情况
+                word = word.replace('\r','')
+                tag = tag.replace('\r','')
+                posTag = posTag.replace('\r','')
+            newContent.append(word)
+            newTags.append(tag)
+            newPosTags.append(posTag)
         # 存储
         theSavePath = ''
         if (filePath.find('qsz') != -1):
@@ -369,20 +378,25 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
         with open(theSavePath, 'w', encoding='utf8') as fw:
             wordsLine = []
             tagsLine = []
+            posTagsLine = []
             hasTag = False
-            for word,tag in zip(newContent,newTags):
+            for word,tag,posTag in zip(newContent,newTags,newPosTags):
                 if (word.find('\n')!=-1):
                     if (hasTag and len(wordsLine)>1): #有可能去停用词之后一行没有内容了，只剩一个\n，这是不用再写入
                         fw.write(' '.join(wordsLine))
                         fw.write('\n')
                         fw.write(' '.join(tagsLine))
                         fw.write('\n')
+                        fw.write(' '.join(posTagsLine))
+                        fw.write('\n')
                     hasTag= False
                     wordsLine = []
                     tagsLine = []
+                    posTagsLine = []
                     continue
                 wordsLine.append(word)
                 tagsLine.append(tag)
+                posTagsLine.append(posTag)
                 if(tag !='O' and tag!='<pad>' and tag !='\n'): #如果是全为O的行去掉
                     hasTag = True
 
@@ -456,6 +470,7 @@ class Event(object):
 
         self.words = []
         self.tags = []
+        self.posTags = []
     def addSentence(self,sentence):
         self.sentence.append(sentence)
     def setType(self,type):
@@ -492,6 +507,10 @@ class Event(object):
         self.words = words
     def getWords(self):
         return self.words
+    def setPosTags(self,posTags):
+        self.posTags = posTags
+    def getPosTags(self):
+        return self.posTags
 # 记录一个事件的关系，源数据形如：E1	Marry:T2 Time:T3 Participant:T1
 # 表示事件Marry:T2,有参数Time:T3和Participant:T1
 class Relation(object):
@@ -511,6 +530,7 @@ def main():
         os.path.join(base_path, 'labeled'),
         os.path.join(ltp_path, 'cws.model'),
         os.path.join(ltp_path, 'userDict.txt'),
+        os.path.join(ltp_path, 'pos.model'),
         os.path.join(base_path, 'newStopWords.txt'),
         os.path.join(base_path,'labels.txt'),1)
 

@@ -74,7 +74,7 @@ def getParser():
     parser.add_argument('--labeled_data_path', help='labeled data path',
                         default=os.path.join(os.path.join(rootPath, 'labeled'), parser.get_default('sentence_mode')))
     parser.add_argument('--max_sequence_length', help='max length of sequence', default= 51 if parser.get_default('sentence_mode')=='Spe' else 40)  # Full - 40,Spe-51
-    parser.add_argument('--batch_size', help='batch size', default=5)
+    parser.add_argument('--batch_size', help='batch size', default=32)
     parser.add_argument('--num_epochs', help='num of epochs', default=2)
     parser.add_argument('--device_map', help='which device to see', default='CPU:0')
     parser.add_argument('--segmentor_model_path', help='segmentor model path',
@@ -104,7 +104,32 @@ def predict(sentence):
     FLAGS.ifPredict = True
     run.main(FLAGS,sentence)
 
+#抽取事件、参数
+def extractEvent(sentence):
+    triggers = []
+    FLAGS = getParser()
+    # 获取触发词tag
+    with open(os.path.join(FLAGS.root_dir,'triggerLabels.txt'), 'r', encoding='utf8') as f:
+        for line in f.readlines():
+            triggers.append(line.strip())
+    FLAGS.ifTrain = False
+    FLAGS.ifTest = False
+    FLAGS.ifPredict = True
+    words,tags = run.main(FLAGS, sentence)
+    print(' '.join(words))
+    print(' '.join(tags))
+    events = []
+    arguments = []
+    for word,tag in zip(words,tags):
+        if(tag in triggers):
+            events.append(word)
+        elif(tag !='O'):
+            arguments.append(word)
+    print(' '.join(events))
+    print(' '.join(arguments))
 if __name__=='__main__':
     train()
     # predict('被告季某辩称，原告所陈述的事实理由不正确，原被告于2009年农历正月认识，××××年××月××日生育一女，婚后为了抚养小孩发生了争吵，被告也曾不小心碰伤了原告。')
+
+    # predict('原、被告于2007年11月于网上相识恋爱，200 8年3月17日登记结婚，××××年××月××日生育女儿戴某乙，2012 年6月1日生育女儿罗某乙。')
     sys.exit(0)
