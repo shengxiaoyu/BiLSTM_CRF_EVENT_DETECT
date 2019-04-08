@@ -20,8 +20,6 @@ WV = None
 TAG_2_ID = {}
 ID_2_TAG = {}
 
-POSTAGGER = Postagger()
-POS_2_ID = {}
 # 分词器
 SEGMENTOR = Segmentor()
 STOP_WORDS=set()
@@ -31,7 +29,6 @@ STOP_WORDS=set()
 def initTagsAndWord2Vec(rootdir):
     initTags(os.path.join(rootdir,'triggerLabels.txt'),os.path.join(rootdir, 'argumentLabels.txt'))
     initWord2Vec(os.path.join(rootdir, 'word2vec'))
-    initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
     initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
     initStopWords(os.path.join(rootdir, 'newStopWords.txt'))
 def initTags(triggerLablePath,argumentLabelPath):
@@ -58,16 +55,9 @@ def initWord2Vec(word2vec_model_path):
     WV = Word2VecModel(word2vec_model_path, '', 30).getEmbedded()
     # <pad> -- <pad> fill word2vec and tags，添加一个<pad>-向量为0的，用于填充
     WV.add('<pad>', np.zeros(WV.vector_size))
-def initPosTag(pos_tag_path):
-    global POS_2_ID
-    posDict = pd.read_csv(pos_tag_path)
-    for id,pos in zip(posDict['Index'],posDict['Tag']):
-        POS_2_ID[pos]=id
-    POS_2_ID['<pad>'] = 0
 def initPyltpModel(ltp_path):
-    global POSTAGGER,SEGMENTOR
-    #初始化词性标注模型
-    POSTAGGER.load(os.path.join(ltp_path,'pos.model'))
+    global SEGMENTOR
+    #初始化模型
     SEGMENTOR.load_with_lexicon(os.path.join(ltp_path,'cws.model'), os.path.join(ltp_path,'userDict.txt'))
 def initStopWords(path):
     # 停用词集
@@ -75,7 +65,7 @@ def initStopWords(path):
     with open(path, 'r', encoding='utf8') as f:
         STOP_WORDS = set(f.read().split())
 
-def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedding):
+def paddingAndEmbedding(fileName,words,tags,max_sequence_length,noEmbedding):
     # print(fileName)
     length = len(words)
 
@@ -86,28 +76,16 @@ def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedd
         except:
             words[index] = '<pad>'
 
-    # 如果出现非pos标签，则使用<pad>代替
-    for index in range(length):
-        try:
-            POS_2_ID[posTags[index]]
-        except:
-            posTags[index] = '<pad>'
 
     #padding or cutting
     if(length<max_sequence_length):
         for i in range(length,max_sequence_length):
             words.append('<pad>')
             tags.append('<pad>')
-            posTags.append('<pad>')
     else:
         words = words[:max_sequence_length]
         tags = tags[:max_sequence_length]
-        posTags = posTags[:max_sequence_length]
 
-    #postag 转id
-    posTags = [POS_2_ID[pos] for pos in posTags]
-    #转one-hot
-    posTags = [[1 if i==id else 0 for i in POS_2_ID.values()] for id in posTags]
 
     #根据noEmbedding参数确定是否进行向量化
     if(not noEmbedding):
@@ -117,16 +95,15 @@ def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedd
     except:
         print('这个文件tag无法找到正确索引，请检查:'+fileName)
 
-    return (words,min(length,max_sequence_length),posTags),tags
+    return (words,min(length,max_sequence_length)),tags
 def release():
-    POSTAGGER.release()
     SEGMENTOR.release()
 
-def generator_fn(input_dir,max_sequence_length,noEmbedding=False,one_sentence_words_posTags=None,):
+def generator_fn(input_dir,max_sequence_length,noEmbedding=False,one_sentence_words=None,):
     result = []
-    if(one_sentence_words_posTags):
-        tags = ['O' for _ in range(len(one_sentence_words_posTags[0]))]
-        result.append(paddingAndEmbedding('sentence', one_sentence_words_posTags[0], tags, one_sentence_words_posTags[1], max_sequence_length, noEmbedding))
+    if(one_sentence_words):
+        tags = ['O' for _ in range(len(one_sentence_words))]
+        result.append(paddingAndEmbedding('sentence', one_sentence_words, tags, max_sequence_length, noEmbedding))
     elif(input_dir):
         for input_file in os.listdir(input_dir):
             with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:
@@ -152,15 +129,15 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,one_sentence_wo
                         print(input_file, ' words、labels、pos数不匹配：' + sentence + ' words length:' + str(
                             len(words)) + ' labels length:' + str(len(tags))+' pos length:'+str(len(posTags)))
                         continue
-                    result.append(paddingAndEmbedding(input_file,words,tags,posTags,max_sequence_length,noEmbedding))
+                    result.append(paddingAndEmbedding(input_file,words,tags,max_sequence_length,noEmbedding))
     return result
 
-def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,one_sentence_words_posTags=None):
+def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,one_sentence_words=None):
     global WV,POS_2_ID
-    shapes = (([max_sequence_length,WV.vector_size],(),[max_sequence_length,len(POS_2_ID)]),[max_sequence_length])
-    types = ((tf.float32,tf.int32,tf.float32),tf.int32)
+    shapes = (([max_sequence_length,WV.vector_size],()),[max_sequence_length])
+    types = ((tf.float32,tf.int32),tf.int32)
     dataset = tf.data.Dataset.from_generator(
-        functools.partial(generator_fn,input_dir=input_dir,one_sentence_words_posTags=one_sentence_words_posTags,max_sequence_length = max_sequence_length),
+        functools.partial(generator_fn,input_dir=input_dir,one_sentence_words=one_sentence_words,max_sequence_length = max_sequence_length),
         output_shapes=shapes,
         output_types=types
     )
@@ -172,8 +149,8 @@ def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,one_sent
 
 def model_fn(features,labels,mode,params):
     is_training = (mode ==  tf.estimator.ModeKeys.TRAIN)
-    #传入的features: ((句子每个单词向量，句子真实长度），句子每个tag索引).batchSize为5
-    features,lengths,postags = features
+    #传入的features: ((句子每个单词向量，句子真实长度），句子每个tag索引).batchSize为
+    features,lengths = features
 
     # LSTM
     print('构造LSTM层')
@@ -194,12 +171,8 @@ def model_fn(features,labels,mode,params):
     output = tf.transpose(output, perm=[1, 0, 2]) #batch_size*40*200
     output = tf.layers.dropout(output, rate=params['dropout_rate'], training=is_training)
 
-    # 添加POS特征
-    print('添加POS特征')
-    output_pos = tf.concat([output, postags], axis=-1)
-
     #全连接层
-    logits = tf.layers.dense(output_pos, len(TAG_2_ID)) #batch_size*40*len(tags)
+    logits = tf.layers.dense(output, len(TAG_2_ID)) #batch_size*40*len(tags)
 
 
     print('CRF层')
@@ -352,7 +325,7 @@ def main(FLAGS,sentence=None):
         with open(os.path.join(output_dir,'predict_result.txt'),'w',encoding='utf8') as fw:
             fw.write(str(report))
             for target,predict in zip(pred_true,pred):
-                (words,length,postags),tags = target
+                (words,length),tags = target
                 words = [words[i] for i in range(length)]
                 labels = [ID_2_TAG[tags[i]] for i in range(length)]
                 outputs = [ID_2_TAG[predict[i]] for i in range(length)]
@@ -388,17 +361,14 @@ def main(FLAGS,sentence=None):
 
         #分词、获取pos标签、去停用词
         words = SEGMENTOR.segment(sentence)
-        postags = POSTAGGER.postag(words)
 
         # 去停用词
         newWords = []
-        newPosTags = []
-        for word, pos in zip(words, postags):
+        for word in words:
             if (word not in STOP_WORDS):
                 newWords.append(word)
-                newPosTags.append(pos)
 
-        pre_inf = functools.partial(input_fn, input_dir=None,one_sentence_words_posTags=[newWords,newPosTags],
+        pre_inf = functools.partial(input_fn, input_dir=None,one_sentence_words=newWords,
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
                                       max_sequence_length=FLAGS.max_sequence_length)
         predictions = estimator.predict(input_fn=pre_inf)
