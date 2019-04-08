@@ -155,7 +155,7 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,one_sentence_wo
                     result.append(paddingAndEmbedding(input_file,words,tags,posTags,max_sequence_length,noEmbedding))
     return result
 
-def input_fn(input_dir,one_sentence_words_posTags,shuffe,num_epochs,batch_size,max_sequence_length):
+def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,one_sentence_words_posTags=None):
     global WV,POS_2_ID
     shapes = (([max_sequence_length,WV.vector_size],(),[max_sequence_length,len(POS_2_ID)]),[max_sequence_length])
     types = ((tf.float32,tf.int32,tf.float32),tf.int32)
