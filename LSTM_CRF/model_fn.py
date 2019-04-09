@@ -5,18 +5,17 @@ __author__ = '13314409603@163.com'
 
 import tensorflow as tf
 from tf_metrics import recall, f1, precision
-
 import LSTM_CRF.config_center as CONFIG
 
 
 def model_fn(features,labels,mode,params):
     is_training = (mode ==  tf.estimator.ModeKeys.TRAIN)
     #传入的features: ((句子每个单词向量，句子真实长度），句子每个tag索引).batchSize为5
-    features,lengths,postags = features
+    features,lengths,postags,triggerFlags = features
     # LSTM
     print('构造LSTM层')
-    #？
 
+    #转换为lstm时间序列输入
     t = tf.transpose(features, perm=[1, 0, 2])
     lstm_cell_fw = tf.contrib.rnn.LSTMBlockFusedCell(params['hidden_units'])
     lstm_cell_bw = tf.contrib.rnn.LSTMBlockFusedCell(params['hidden_units'])
@@ -26,15 +25,17 @@ def model_fn(features,labels,mode,params):
     output_fw, _ = lstm_cell_fw(t, dtype=tf.float32, sequence_length=lengths)
     output_bw, _ = lstm_cell_bw(t, dtype=tf.float32, sequence_length=lengths) #shape 49*batch_size*100
     output = tf.concat([output_fw, output_bw], axis=-1) #40*batch_size*200
-
-    print('dropout')
-    #?
+    #转换回正常输出
     output = tf.transpose(output, perm=[1, 0, 2]) #batch_size*40*200
+    print('dropout')
     output = tf.layers.dropout(output, rate=params['dropout_rate'], training=is_training)
 
     # 添加POS特征
     print('添加POS特征')
     output_pos = tf.concat([output, postags], axis=-1)
+
+    #添加是否是触发词特征
+    output_pos = tf.concat([output,triggerFlags],axis=-1)
 
     #全连接层
     logits = tf.layers.dense(output_pos, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
@@ -69,9 +70,6 @@ def model_fn(features,labels,mode,params):
             indices = [item[1] for item in CONFIG.TAG_2_ID.items() if (item[0]!='<pad>'and item[0]!='O')]
             metrics = {
                 'acc': tf.metrics.accuracy(labels, pred_ids, weights),
-                # 'precision': tf.metrics.precision(labels,pred_ids,weights),
-                # 'recall': tf.metrics.recall(labels,pred_ids,weights),
-                # 'auc': tf.metrics.auc(labels,pred_ids,weights)
                 'precision': precision(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
                 'recall': recall(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
                 'f1': f1(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),

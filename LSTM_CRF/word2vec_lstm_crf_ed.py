@@ -7,7 +7,7 @@ __author__ = '13314409603@163.com'
 import functools
 import os
 
-
+import numpy as np
 import tensorflow as tf
 from sklearn_crfsuite.metrics import flat_classification_report
 import LSTM_CRF.config_center as CONFIG
@@ -118,7 +118,7 @@ def main(FLAGS,sentences=None):
         with open(os.path.join(output_dir,'predict_result.txt'),'w',encoding='utf8') as fw:
             fw.write(str(report))
             for target,predict in zip(pred_true,pred):
-                (words,length,postags),tags = target
+                (words,length,_,_),tags = target
                 words = [words[i] for i in range(length)]
                 labels = [CONFIG.ID_2_TAG[tags[i]] for i in range(length)]
                 outputs = [CONFIG.ID_2_TAG[predict[i]] for i in range(length)]
@@ -136,15 +136,25 @@ def main(FLAGS,sentences=None):
             #分词、获取pos标签、去停用词
             words = CONFIG.SEGMENTOR.segment(sentence)
             postags = CONFIG.POSTAGGER.postag(words)
+            tags = ['O' for _ in words]
+
+            #标记触发词
+            triggers = INPUT.findTrigger(sentence)
+            if(triggers==None or len(triggers)==0):
+                continue
+            for tag,beginIndex,endIndex in triggers:
+                words,tags = INPUT.labelTrigger(words,tags,beginIndex,endIndex,tag)
 
             # 去停用词
             newWords = []
             newPosTags = []
-            for word, pos in zip(words, postags):
+            newTags = []
+            for word, pos,tag in zip(words, postags,tags):
                 if (word not in CONFIG.STOP_WORDS):
                     newWords.append(word)
                     newPosTags.append(pos)
-            sentences_words_posTags.append([newWords,newPosTags])
+                    newTags.append(tag)
+            sentences_words_posTags.append([newWords,newPosTags,newTags])
         pre_inf = functools.partial(INPUT.input_fn, input_dir=None,sentences_words_posTags=sentences_words_posTags,
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
                                       max_sequence_length=FLAGS.max_sequence_length)
@@ -163,10 +173,10 @@ def main(FLAGS,sentences=None):
     CONFIG.release()
 
 if __name__ == '__main__':
-    # tf.enable_eager_execution()
-    # rootdir = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\'
-    # initTagsAndWord2Vec(rootdir)
-    # data = input_fn('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\NERdata\\train', True, 1, 5, 50)
-    # for v in data:
-    #     print(v)
+    a = [[1,2,3],[4,5,6]]
+    b = [[7],[8]]
+    a = np.array(a)
+    b = np.array(b)
+    c = tf.concat([a,b],axis=-1)
+    print(c)
     pass

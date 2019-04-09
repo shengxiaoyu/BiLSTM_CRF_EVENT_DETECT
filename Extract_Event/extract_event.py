@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
-import os
-from Config.config_parser import getParser
-import LSTM_CRF.word2vec_lstm_crf_ed as run
-import extract_event.EventModel as EventModel
 from pyltp import SentenceSplitter
+
 import LSTM_CRF.config_center as CONFIG
+import LSTM_CRF.word2vec_lstm_crf_ed as run
+from Config.config_parser import getParser
+import Extract_Event.EventModel as EventModel
+
 root_dir = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF'
 
 #判断是否含有关注事实触发词
@@ -52,11 +53,12 @@ def extractor(paragraph):
         for word in words[beginIndex:endIndex+1]:
             completeWord += word
         # 先把前面的事件确定了
-        event = EventModel.EventFactory(trigger,completeWord, beginIndex, endIndex)
+        event = EventModel.EventFactory(trigger, completeWord, beginIndex, endIndex)
         event.fitArgument(words, tags)
         events.append(event)
 
     for words,tags in predictions:
+
         hasBegin = False
         currentTraigger = None
         beginIndex = 0

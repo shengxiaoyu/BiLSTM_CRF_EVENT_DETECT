@@ -18,18 +18,18 @@ from pyltp import Segmentor
 from Word2Vec.my_word2vec import Word2VecModel
 
 WV = None
-TRIGGER_TAGs = []
-ARGU_TAGs =[]
-TAG_2_ID = {}
-ID_2_TAG = {}
+TRIGGER_TAGs = None
+ARGU_TAGs =None
+TAG_2_ID = None
+ID_2_TAG = None
 TAGs_LEN = 0
-POSTAGGER = Postagger()
-POS_2_ID = {}
+POSTAGGER = None
+POS_2_ID = None
 POSs_LEN = 0
 # 分词器
-SEGMENTOR = Segmentor()
-STOP_WORDS=set()
-TRIGGER_WORDS_DICT = {}
+SEGMENTOR = None
+STOP_WORDS=None
+TRIGGER_WORDS_DICT = None
 
 
 #初始化各类模型以及词集
@@ -43,6 +43,10 @@ def init(rootdir):
 
 def initTags(triggerLablePath,argumentLabelPath):
     global TAG_2_ID, ID_2_TAG,TAGs_LEN,TRIGGER_TAGs,ARGU_TAGs
+    TAG_2_ID={}
+    ID_2_TAG={}
+    TRIGGER_TAGs=[]
+    ARGU_TAGs = []
     # 把<pad>也加入tag字典
     TAG_2_ID['<pad>'] = len(TAG_2_ID)
     ID_2_TAG[len(ID_2_TAG)] = '<pad>'
@@ -70,6 +74,7 @@ def initWord2Vec(word2vec_model_path):
     WV.add('<pad>', np.zeros(WV.vector_size))
 def initPosTag(pos_tag_path):
     global POS_2_ID,POSs_LEN
+    POS_2_ID={}
     posDict = pd.read_csv(pos_tag_path)
     for id,pos in zip(posDict['Index'],posDict['Tag']):
         POS_2_ID[pos]=id
@@ -77,6 +82,8 @@ def initPosTag(pos_tag_path):
     POSs_LEN = len(POS_2_ID)
 def initPyltpModel(ltp_path):
     global POSTAGGER,SEGMENTOR
+    POSTAGGER = Postagger()
+    SEGMENTOR = Segmentor()
     #初始化词性标注模型
     POSTAGGER.load(os.path.join(ltp_path,'pos.model'))
     SEGMENTOR.load_with_lexicon(os.path.join(ltp_path,'cws.model'), os.path.join(ltp_path,'userDict.txt'))
@@ -87,11 +94,12 @@ def initStopWords(path):
         STOP_WORDS = set(f.read().split())
 def initTriggerWords(path):
     global TRIGGER_WORDS_DICT
+    TRIGGER_WORDS_DICT = {}
     # 初始化触发词集
     for triggerFile in os.listdir(path):
         with open(os.path.join(path, triggerFile), 'r', encoding='utf8') as f:
             content = f.read()
-        TRIGGER_WORDS_DICT[triggerFile.split('.')[0]] = set(content.split('\n'))
+        TRIGGER_WORDS_DICT[triggerFile.split('.')[0]] = set(filter(lambda x:False if(x=='') else True,content.split('\n')))
 #释放模型
 def release():
     global POSTAGGER, SEGMENTOR

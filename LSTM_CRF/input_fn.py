@@ -13,13 +13,13 @@ def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedd
     # print(fileName)
     length = len(words)
 
+    #处理意外词
     # 如果是词汇表中没有的词，则使用<pad>代替
     for index in range(length):
         try:
             CONFIG.WV[words[index]]
         except:
             words[index] = '<pad>'
-
     # 如果出现非pos标签，则使用<pad>代替
     for index in range(length):
         try:
@@ -27,20 +27,26 @@ def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedd
         except:
             posTags[index] = '<pad>'
 
+    #构造每个词是否是触发词的特征
+    triggerFlags = [[1] if tag in CONFIG.TRIGGER_TAGs else [0] for tag in tags]
+
+
     #padding or cutting
     if(length<max_sequence_length):
         for i in range(length,max_sequence_length):
             words.append('<pad>')
             tags.append('<pad>')
             posTags.append('<pad>')
+            triggerFlags.append([0])
     else:
         words = words[:max_sequence_length]
         tags = tags[:max_sequence_length]
         posTags = posTags[:max_sequence_length]
+        triggerFlags = triggerFlags[:max_sequence_length]
 
     #postag 转id
-    posTags = [CONFIG.POS_2_ID[pos] for pos in posTags]
     #转one-hot
+    posTags = [CONFIG.POS_2_ID[pos] for pos in posTags]
     posTags = [[1 if i==id else 0 for i in CONFIG.POS_2_ID.values()] for id in posTags]
 
     #根据noEmbedding参数确定是否进行向量化
@@ -51,15 +57,14 @@ def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedd
     except:
         print('这个文件tag无法找到正确索引，请检查:'+fileName)
 
-    return (words,min(length,max_sequence_length),posTags),tags
+    return (words,min(length,max_sequence_length),posTags,triggerFlags),tags
 
 
 def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words_posTags=None,):
     result = []
     if(sentences_words_posTags):
         for one_sentence_words_posTags in sentences_words_posTags:
-            tags = ['O' for _ in range(len(one_sentence_words_posTags[0]))]
-            result.append(paddingAndEmbedding('sentence', one_sentence_words_posTags[0], tags, one_sentence_words_posTags[1], max_sequence_length, noEmbedding))
+            result.append(paddingAndEmbedding('sentence', one_sentence_words_posTags[0], one_sentence_words_posTags[2], one_sentence_words_posTags[1], max_sequence_length, noEmbedding))
     elif(input_dir):
         for input_file in os.listdir(input_dir):
             with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:
@@ -89,8 +94,8 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words
     return result
 
 def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentences_words_posTags=None):
-    shapes = (([max_sequence_length,CONFIG.WV.vector_size],(),[max_sequence_length,len(CONFIG.POS_2_ID)]),[max_sequence_length])
-    types = ((tf.float32,tf.int32,tf.float32),tf.int32)
+    shapes = (([max_sequence_length,CONFIG.WV.vector_size],(),[max_sequence_length,len(CONFIG.POS_2_ID)],[max_sequence_length,1]),[max_sequence_length])
+    types = ((tf.float32,tf.int32,tf.float32,tf.float32),tf.int32)
     dataset = tf.data.Dataset.from_generator(
         functools.partial(generator_fn,input_dir=input_dir,sentences_words_posTags=sentences_words_posTags,max_sequence_length = max_sequence_length),
         output_shapes=shapes,
@@ -102,6 +107,55 @@ def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentence
     dataset = dataset.batch(batch_size)
     return dataset
 
+
+def findTrigger(sentence):
+    triggers = []
+    for tag,words in CONFIG.TRIGGER_WORDS_DICT.items():
+        for word in words:
+            beginIndex = sentence.find(word)
+            if(beginIndex!=-1):
+                endIndex = beginIndex+len(word)
+                triggers.append([tag,beginIndex,endIndex])
+    if(len(triggers)==0):
+        return None
+    #处理相互覆盖的触发词，如果找到的触发词有交集，就取最长的触发词
+    #现用beginIndex排序
+    triggers.sort(key=lambda x:x[1])
+
+    #存储新的触发词
+    newTriggers  = []
+    #当前保留的最新的一个触发词
+    currenctTrigger = triggers[0]
+    for trigger in triggers:
+        if(trigger[1]<currenctTrigger[2]):#如果下一个触发词的beginIndex小于最新触发词，则说明有交集
+            if(trigger[2]-trigger[1]>currenctTrigger[2]-currenctTrigger[1]):
+                currenctTrigger = trigger
+        else:#无交集，则将当前触发词保存，说明该触发词没有覆盖其他触发词
+            newTriggers.append(currenctTrigger)
+            currenctTrigger = trigger
+    newTriggers.append(currenctTrigger)
+    return newTriggers
+# 标注trigger触发词
+def labelTrigger(words, labeled,beginIndex,endIndex,tag):
+    coursor = 0
+    isBegin = True
+    for index, word in enumerate(words):
+        beginCoursor = coursor
+        endCoursor = len(word) + coursor
+        if ((beginCoursor <= beginIndex and beginIndex < endCoursor) or
+                (beginCoursor < endIndex and endIndex <= endCoursor) or
+                (beginCoursor >= beginIndex and endCoursor <= endIndex)):
+            # 此时进入范围
+            if (labeled[index].find('O') != -1):
+                if (isBegin):
+                    label = 'B_' + tag
+                    labeled[index] = label
+                    isBegin = False
+                else:
+                    label = 'I_' + tag
+                    labeled[index] = label
+        coursor = endCoursor
+    return words,labeled
 
 if __name__ == '__main__':
     pass

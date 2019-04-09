@@ -234,5 +234,6 @@ class Credit(baseModel):
         return
     def __str__(self):
         return self.word
+
 if __name__ == '__main__':
     sys.exit(0)
