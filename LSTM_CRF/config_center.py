@@ -5,7 +5,10 @@ __doc__ = 'description,lstm_crf模型的配置中心,包括' \
           'TAG_2_ID,ID_2_TAG' \
           'pos标注模型POSTAGGER,' \
           '分词模型SEGMENTOR,' \
-          '停用词集STOP_WORD'
+          '停用词集STOP_WORD' \
+          '触发词字典TRIGGER_WORDS_DICT' \
+          '触发词tag集TRIGGER_TAGs' \
+          '参数tag集ARGU_TAGs'
 __author__ = '13314409603@163.com'
 import os
 import numpy as np
@@ -15,6 +18,8 @@ from pyltp import Segmentor
 from Word2Vec.my_word2vec import Word2VecModel
 
 WV = None
+TRIGGER_TAGs = []
+ARGU_TAGs =[]
 TAG_2_ID = {}
 ID_2_TAG = {}
 TAGs_LEN = 0
@@ -24,18 +29,20 @@ POSs_LEN = 0
 # 分词器
 SEGMENTOR = Segmentor()
 STOP_WORDS=set()
+TRIGGER_WORDS_DICT = {}
 
 
 #初始化各类模型以及词集
-def initTagsAndWord2Vec(rootdir):
+def init(rootdir):
     initTags(os.path.join(rootdir,'triggerLabels.txt'),os.path.join(rootdir, 'argumentLabels.txt'))
     initWord2Vec(os.path.join(rootdir, 'word2vec'))
     initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
     initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
     initStopWords(os.path.join(rootdir, 'newStopWords.txt'))
+    initTriggerWords(os.path.join(rootdir,'triggers'))
 
 def initTags(triggerLablePath,argumentLabelPath):
-    global TAG_2_ID, ID_2_TAG,TAGs_LEN
+    global TAG_2_ID, ID_2_TAG,TAGs_LEN,TRIGGER_TAGs,ARGU_TAGs
     # 把<pad>也加入tag字典
     TAG_2_ID['<pad>'] = len(TAG_2_ID)
     ID_2_TAG[len(ID_2_TAG)] = '<pad>'
@@ -46,12 +53,14 @@ def initTags(triggerLablePath,argumentLabelPath):
         for line in f.readlines():
             TAG_2_ID[line.strip()] = index
             ID_2_TAG[index] = line.strip()
+            ARGU_TAGs.append(line.strip())
             index += 1
     #获取触发词tag
     with open(triggerLablePath, 'r', encoding='utf8') as f:
         for line in f.readlines():
             TAG_2_ID[line.strip()] = index
             ID_2_TAG[index] = line.strip()
+            TRIGGER_TAGs.append(line.strip())
             index += 1
     TAGs_LEN = len(TAG_2_ID)
 def initWord2Vec(word2vec_model_path):
@@ -76,7 +85,13 @@ def initStopWords(path):
     global STOP_WORDS
     with open(path, 'r', encoding='utf8') as f:
         STOP_WORDS = set(f.read().split())
-
+def initTriggerWords(path):
+    global TRIGGER_WORDS_DICT
+    # 初始化触发词集
+    for triggerFile in os.listdir(path):
+        with open(os.path.join(path, triggerFile), 'r', encoding='utf8') as f:
+            content = f.read()
+        TRIGGER_WORDS_DICT[triggerFile.split('.')[0]] = set(content.split('\n'))
 #释放模型
 def release():
     global POSTAGGER, SEGMENTOR

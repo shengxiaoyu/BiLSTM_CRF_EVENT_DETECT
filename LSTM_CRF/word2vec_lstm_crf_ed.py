@@ -49,8 +49,8 @@ def main(FLAGS,sentences=None):
         os.mkdir(output_dir)
 
 
-    print('初始化标签-ID字典，33')
-    CONFIG.initTagsAndWord2Vec(FLAGS.root_dir)
+    print('初始化标签-ID字典等等')
+    CONFIG.init(FLAGS.root_dir)
 
 
     session_config = tf.ConfigProto(

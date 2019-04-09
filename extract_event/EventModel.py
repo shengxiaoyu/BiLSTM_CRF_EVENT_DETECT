@@ -27,20 +27,6 @@ def EventFactory(trigger,word,beginIndex,EndIndex):
         'Credit':Credit,
     }
     return eventDict[trigger](trigger,word,beginIndex,EndIndex)
-    # if(trigger.find('Know')!=-1):
-    #     return Know(trigger,word,beginIndex,EndIndex)
-    # if(trigger.find('BeInLove')!=-1):
-    #     return BeInLove(trigger,word,beginIndex,EndIndex)
-    # if(trigger.find('Marry')!=-1):
-    #     return Marray(trigger,word,beginIndex,EndIndex)
-    # if(trigger.find('Remarry')!=-1):
-    #     return Remarray(trigger,word,beginIndex,EndIndex)
-    # if(trigger.find('Bear')!=-1):
-    #     return Bear(trigger,word,beginIndex,EndIndex)
-    # if (trigger.find('FamilyConflict') != -1):
-    #     return F(trigger, word, beginIndex, EndIndex)
-    # if (trigger.find('Bear') != -1):
-    #     return Bear(trigger, word, beginIndex, EndIndex)
 
 class baseModel(object):
     def __init__(self,trigger,word,beginIndex,endIndex):
