@@ -72,12 +72,13 @@ def test():
     FLAGS.ifTest = True
     run.main(FLAGS)
 
-def predict(sentence):
+#接收已分好句的句子进行预测抽取
+def predict(sentences):
     FLAGS = getParser()
     FLAGS.ifTrain = False
     FLAGS.ifTest = False
     FLAGS.ifPredict = True
-    return run.main(FLAGS,sentence)
+    return run.main(FLAGS,sentences)
 
 #抽取事件、参数
 def extractEvent(sentence):
@@ -85,7 +86,7 @@ def extractEvent(sentence):
     return
 if __name__=='__main__':
     train()
-    # predict('被告季某辩称，原告所陈述的事实理由不正确，原被告于2009年农历正月认识，××××年××月××日生育一女，婚后为了抚养小孩发生了争吵，被告也曾不小心碰伤了原告。')
+    # predict(['被告季某辩称，原告所陈述的事实理由不正确，原被告于2009年农历正月认识，××××年××月××日生育一女，婚后为了抚养小孩发生了争吵，被告也曾不小心碰伤了原告。'])
 
-    # predict('原、被告于2007年11月于网上相识恋爱，200 8年3月17日登记结婚，××××年××月××日生育女儿戴某乙，2012 年6月1日生育女儿罗某乙。')
+    # predict(['原、被告于2007年11月于网上相识恋爱，200 8年3月17日登记结婚，××××年××月××日生育女儿戴某乙，2012 年6月1日生育女儿罗某乙。'])
     sys.exit(0)

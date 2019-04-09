@@ -122,11 +122,12 @@ def release():
     POSTAGGER.release()
     SEGMENTOR.release()
 
-def generator_fn(input_dir,max_sequence_length,noEmbedding=False,one_sentence_words_posTags=None,):
+def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words_posTags=None,):
     result = []
-    if(one_sentence_words_posTags):
-        tags = ['O' for _ in range(len(one_sentence_words_posTags[0]))]
-        result.append(paddingAndEmbedding('sentence', one_sentence_words_posTags[0], tags, one_sentence_words_posTags[1], max_sequence_length, noEmbedding))
+    if(sentences_words_posTags):
+        for one_sentence_words_posTags in sentences_words_posTags:
+            tags = ['O' for _ in range(len(one_sentence_words_posTags[0]))]
+            result.append(paddingAndEmbedding('sentence', one_sentence_words_posTags[0], tags, one_sentence_words_posTags[1], max_sequence_length, noEmbedding))
     elif(input_dir):
         for input_file in os.listdir(input_dir):
             with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:
@@ -155,12 +156,12 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,one_sentence_wo
                     result.append(paddingAndEmbedding(input_file,words,tags,posTags,max_sequence_length,noEmbedding))
     return result
 
-def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,one_sentence_words_posTags=None):
+def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentences_words_posTags=None):
     global WV,POS_2_ID
     shapes = (([max_sequence_length,WV.vector_size],(),[max_sequence_length,len(POS_2_ID)]),[max_sequence_length])
     types = ((tf.float32,tf.int32,tf.float32),tf.int32)
     dataset = tf.data.Dataset.from_generator(
-        functools.partial(generator_fn,input_dir=input_dir,one_sentence_words_posTags=one_sentence_words_posTags,max_sequence_length = max_sequence_length),
+        functools.partial(generator_fn,input_dir=input_dir,sentences_words_posTags=sentences_words_posTags,max_sequence_length = max_sequence_length),
         output_shapes=shapes,
         output_types=types
     )
@@ -251,7 +252,7 @@ def model_fn(features,labels,mode,params):
             return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=train_op)
 
 #训练、评估、预测,sentece:要预测的句子
-def main(FLAGS,sentence=None):
+def main(FLAGS,sentences=None):
 
     tf.enable_eager_execution()
     # 配置哪块gpu可见
@@ -364,33 +365,36 @@ def main(FLAGS,sentence=None):
                 fw.write('\n')
                 fw.write('\n')
 
-    if FLAGS.ifPredict and sentence:
-        #分词、获取pos标签、去停用词
-        words = SEGMENTOR.segment(sentence)
-        postags = POSTAGGER.postag(words)
+    if FLAGS.ifPredict and sentences:
+        sentences_words_posTags = []
+        for sentence in sentences:
+            #分词、获取pos标签、去停用词
+            words = SEGMENTOR.segment(sentence)
+            postags = POSTAGGER.postag(words)
 
-        # 去停用词
-        newWords = []
-        newPosTags = []
-        for word, pos in zip(words, postags):
-            if (word not in STOP_WORDS):
-                newWords.append(word)
-                newPosTags.append(pos)
-
-        pre_inf = functools.partial(input_fn, input_dir=None,one_sentence_words_posTags=[newWords,newPosTags],
+            # 去停用词
+            newWords = []
+            newPosTags = []
+            for word, pos in zip(words, postags):
+                if (word not in STOP_WORDS):
+                    newWords.append(word)
+                    newPosTags.append(pos)
+            sentences_words_posTags.append([newWords,newPosTags])
+        pre_inf = functools.partial(input_fn, input_dir=None,sentences_words_posTags=sentences_words_posTags,
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
                                       max_sequence_length=FLAGS.max_sequence_length)
         predictions = estimator.predict(input_fn=pre_inf)
-        predictions = [x['pre_ids'] for x in list(predictions)][0]
+        predictions = [x['pre_ids'] for x in list(predictions)]
 
-        predictions = [ID_2_TAG[id] for id in predictions]
-
-
-        print(sentence)
-        print(' '.join(newWords))
-        print(' '.join(predictions[0:len(newWords)]))
+        result = []
+        for one_sentence_words_posTags,pre_ids in zip(sentences_words_posTags,predictions):
+            words = one_sentence_words_posTags[0]
+            pre_tags = [ID_2_TAG[id]for id in pre_ids]
+            result.append([words,pre_tags])
+            print(' '.join(words))
+            print(' '.join(pre_tags[0:len(words)]))
         release()
-        return newWords,predictions
+        return result
     release()
 
 if __name__ == '__main__':
