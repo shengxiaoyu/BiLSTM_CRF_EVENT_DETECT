@@ -39,7 +39,7 @@ def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedd
         posTags = posTags[:max_sequence_length]
 
     #postag 转id
-    posTags = [CONFIG.POS_2_ID[pos] for pos in posTags]
+    posTags = [CONFIG.POS_2_ID[pos] if pos in CONFIG.POS_2_ID else 0 for pos in posTags]
     #转one-hot
     posTags = [[1 if i==id else 0 for i in CONFIG.POS_2_ID.values()] for id in posTags]
 
