@@ -89,22 +89,64 @@ def calEventArguDis(path):
     else:
         handlerSingleFile(path)
 
+#统计各类tag可能的pos标注类型
+def calRelationOfTagAndPos(path):
+    tags_poses = {}
+    def handlerSingleFile(path):
+        with open(path,'r',encoding='utf8') as f:
+            sentence = f.readline()
+            while(sentence):
+                tags = f.readline().strip().split()
+                poses = f.readline().strip().split()
+                for tag,pos in zip(tags,poses):
+                    if(tag!='O'):
+                        if(tag not in tags_poses):
+                            tags_poses[tag] = {}
+                        if(pos not in tags_poses[tag]):
+                            tags_poses[tag][pos] = 0
+                        tags_poses[tag][pos] += 1
+                sentence = f.readline()
+    def handlerDir(path):
+        for subPath in os.listdir(path):
+            newPath = os.path.join(path,subPath)
+            if(os.path.isdir(newPath)):
+                handlerDir(newPath)
+            else:
+                handlerSingleFile(newPath)
+    if(os.path.isdir(path)):
+        handlerDir(path)
+    else:
+        handlerSingleFile(path)
+    print(tags_poses)
+
+    dir = path
+
+    for tag,poses in tags_poses.items():
+        with open(os.path.join(dir,tag+'.txt'),'w',encoding='utf8') as fw:
+            ss = list(poses.items())
+            ss.sort(key=lambda x:x[1])
+            ss.reverse()
+            for pos,count in ss:
+                fw.write(pos+'\t'+str(count)+'\n')
 
 if __name__ == '__main__':
     # calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Full')
     # print(getMax(0.95))
     # calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe')
     # print(getMax(0.95))
-    initTags()
-    calEventArguDis(os.path.join(os.path.join(base_dir,'labeled'),'Spe'))
-    print(EVENTs)
-    trigger_argu_dis_path = os.path.join(base_dir,'trigger_argus')
-    if (not os.path.exists(trigger_argu_dis_path)):
-        os.mkdir(trigger_argu_dis_path)
-    for (trigger,arugs) in EVENTs.items():
-        for(argu,pos_count) in arugs.items():
-            with open(os.path.join(trigger_argu_dis_path,trigger+'_'+argu+'.txt'),'w',encoding='utf8') as f:
-                for (pos,count) in pos_count.items():
-                    f.write(str(pos)+'\t'+str(count)+'\n')
+
+    # initTags()
+    # calEventArguDis(os.path.join(os.path.join(base_dir,'labeled'),'Spe'))
+    # print(EVENTs)
+    # trigger_argu_dis_path = os.path.join(base_dir,'trigger_argus')
+    # if (not os.path.exists(trigger_argu_dis_path)):
+    #     os.mkdir(trigger_argu_dis_path)
+    # for (trigger,arugs) in EVENTs.items():
+    #     for(argu,pos_count) in arugs.items():
+    #         with open(os.path.join(trigger_argu_dis_path,trigger+'_'+argu+'.txt'),'w',encoding='utf8') as f:
+    #             for (pos,count) in pos_count.items():
+    #                 f.write(str(pos)+'\t'+str(count)+'\n')
+
+    calRelationOfTagAndPos('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Full')
 
     sys.exit(0)
