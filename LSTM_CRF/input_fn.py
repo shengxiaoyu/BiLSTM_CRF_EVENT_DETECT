@@ -46,7 +46,8 @@ def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedd
 
     #postag 转id
     #转one-hot
-    posTags = [CONFIG.POS_2_ID[pos] for pos in posTags]
+    posTags = [CONFIG.POS_2_ID[pos] if pos in CONFIG.POS_2_ID else 0 for pos in posTags]
+    #如果id不为0就转为正常的onehot，如果为0就转为全为0的onehot表示，这样去掉<pad>的onehot表示，只留正确意义的pos
     posTags = [[1 if i==id else 0 for i in CONFIG.POS_2_ID.values()] for id in posTags]
 
     #根据noEmbedding参数确定是否进行向量化
@@ -94,7 +95,7 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words
     return result
 
 def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentences_words_posTags=None):
-    shapes = (([max_sequence_length,CONFIG.WV.vector_size],(),[max_sequence_length,len(CONFIG.POS_2_ID)],[max_sequence_length,1]),[max_sequence_length])
+    shapes = (([max_sequence_length,CONFIG.WV.vector_size],(),[max_sequence_length,CONFIG.POSs_LEN],[max_sequence_length,1]),[max_sequence_length])
     types = ((tf.float32,tf.int32,tf.float32,tf.float32),tf.int32)
     dataset = tf.data.Dataset.from_generator(
         functools.partial(generator_fn,input_dir=input_dir,sentences_words_posTags=sentences_words_posTags,max_sequence_length = max_sequence_length),

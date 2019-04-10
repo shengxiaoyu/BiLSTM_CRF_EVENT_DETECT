@@ -78,7 +78,7 @@ def initPosTag(pos_tag_path):
     posDict = pd.read_csv(pos_tag_path)
     for id,pos in zip(posDict['Index'],posDict['Tag']):
         POS_2_ID[pos]=id
-    POS_2_ID['<pad>'] = 0
+    # POS_2_ID['<pad>'] = 0
     POSs_LEN = len(POS_2_ID)
 def initPyltpModel(ltp_path):
     global POSTAGGER,SEGMENTOR
