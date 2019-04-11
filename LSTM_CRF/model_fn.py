@@ -48,6 +48,7 @@ def model_fn(features,labels,mode,params):
     pred_ids, _ = tf.contrib.crf.crf_decode(logits, crf_params, lengths)
 
 
+
     if mode == tf.estimator.ModeKeys.PREDICT:
         # Predictions
         print('预测。。。')

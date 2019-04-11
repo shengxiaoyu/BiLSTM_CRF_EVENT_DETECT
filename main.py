@@ -79,9 +79,20 @@ def predict(sentences):
     FLAGS.ifPredict = True
     return run.main(FLAGS,sentences)
 
+#预测一个文件夹下所有文件内容，构造训练样本给下一层标注模型
+def predictFile(dir):
+    FLAGS = getParser()
+    FLAGS.ifTrain = False
+    FLAGS.ifTest = False
+    FLAGS.ifPredict = False
+    FLAGS.ifPredictFile = True
+    run.main(FLAGS=FLAGS,dir=dir)
+
 if __name__=='__main__':
     # train()
-    test()
-    # predict(['被告季某辩称，原告所陈述的事实理由不正确，原被告于2009年农历正月认识，××××年××月××日生育一女，婚后为了抚养小孩发生了争吵，被告也曾不小心碰伤了原告。'])
+    # test()
+    # predict(['原告 王 某某 诉称 1986年 12月 26日 原告 被告 登记 结婚 婚后 生育 子 女 均 已 成年','原告王某某诉称：1986年12月26日原告与被告登记结婚，婚后生育一子一女，均已成年。'])
     # predict(['原、被告于2007年11月于网上相识恋爱，200 8年3月17日登记结婚，××××年××月××日生育女儿戴某乙，2012 年6月1日生育女儿罗某乙。'])
+    predictFile('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe2\\train')
+    # predictFile('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe2\\dev')
     sys.exit(0)

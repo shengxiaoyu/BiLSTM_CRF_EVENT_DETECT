@@ -65,7 +65,7 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words
     result = []
     if(sentences_words_posTags):
         for one_sentence_words_posTags in sentences_words_posTags:
-            result.append(paddingAndEmbedding('sentence', one_sentence_words_posTags[0], one_sentence_words_posTags[2], one_sentence_words_posTags[1], max_sequence_length, noEmbedding))
+            result.append(paddingAndEmbedding('sentence', one_sentence_words_posTags[0], one_sentence_words_posTags[1], one_sentence_words_posTags[2], max_sequence_length, noEmbedding))
     elif(input_dir):
         for input_file in os.listdir(input_dir):
             with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:
@@ -103,7 +103,7 @@ def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentence
         output_types=types
     )
     if shuffe:
-        dataset = dataset.shuffle(buffer_size=10000).repeat(num_epochs)
+        dataset = dataset.shuffle(buffer_size=15000).repeat(num_epochs)
 
     dataset = dataset.batch(batch_size)
     return dataset
