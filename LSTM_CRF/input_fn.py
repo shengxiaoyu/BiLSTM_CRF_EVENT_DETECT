@@ -65,7 +65,7 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words
     result = []
     if(sentences_words_posTags):
         for one_sentence_words_posTags in sentences_words_posTags:
-            result.append(paddingAndEmbedding('sentence', one_sentence_words_posTags[0], one_sentence_words_posTags[2], one_sentence_words_posTags[1], max_sequence_length, noEmbedding))
+            result.append(paddingAndEmbedding('sentence', one_sentence_words_posTags[0], one_sentence_words_posTags[1], one_sentence_words_posTags[2], max_sequence_length, noEmbedding))
     elif(input_dir):
         for input_file in os.listdir(input_dir):
             with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:

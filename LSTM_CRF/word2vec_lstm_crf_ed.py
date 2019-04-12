@@ -155,7 +155,7 @@ def main(FLAGS,sentences=None,dir=None):
                     newWords.append(word)
                     newPosTags.append(pos)
                     newTags.append(tag)
-            sentences_words_posTags.append([newWords,newPosTags,newTags])
+            sentences_words_posTags.append([newWords,newTags,newPosTags])
         pre_inf = functools.partial(INPUT.input_fn, input_dir=None,sentences_words_posTags=sentences_words_posTags,
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
                                       max_sequence_length=FLAGS.max_sequence_length)
@@ -172,7 +172,6 @@ def main(FLAGS,sentences=None,dir=None):
         CONFIG.release()
         return result
     if (FLAGS.ifPredictFile and dir):
-
         sentences_words_oldTags_posTags_list, full_tags_list = fileGenerator.generator_examples_from_full_file(dir)
         pre_inf = functools.partial(INPUT.input_fn, input_dir=None,
                                     sentences_words_posTags=sentences_words_oldTags_posTags_list,
@@ -188,6 +187,7 @@ def main(FLAGS,sentences=None,dir=None):
             os.mkdir(newDir)
         fw = open(os.path.join(newDir, 'newExample' + str(index) + '.txt'), 'w', encoding='utf8')
         for second_tags, id in full_tags_list:
+            length = min(FLAGS.max_sequence_length,len(second_tags))
             one_sentence_words_posTags = sentences_words_oldTags_posTags_list[id]
             pre_ids = predictions[id]
             words = one_sentence_words_posTags[0]
@@ -197,11 +197,11 @@ def main(FLAGS,sentences=None,dir=None):
                 index += 1
                 fw = open(os.path.join(newDir, 'newExample' + str(index) + '.txt'), 'w', encoding='utf8')
                 count = 1000
-            fw.write(' '.join(words))
+            fw.write(' '.join(words[0:length]))
             fw.write('\n')
-            fw.write(' '.join(pre_tags))
+            fw.write(' '.join(pre_tags[0:length]))
             fw.write('\n')
-            fw.write(' '.join(second_tags))
+            fw.write(' '.join(second_tags[0:length]))
             fw.write('\n')
             count -= 1
         fw.close()
