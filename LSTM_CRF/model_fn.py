@@ -11,7 +11,8 @@ import LSTM_CRF.config_center as CONFIG
 def model_fn(features,labels,mode,params):
     is_training = (mode ==  tf.estimator.ModeKeys.TRAIN)
     #传入的features: ((句子每个单词向量，句子真实长度），句子每个tag索引).batchSize为5
-    features,lengths,postags,triggerFlags = features
+    # features,lengths,postags,triggerFlags = features
+    features,lengths,argu_features,tri_features = features
     # LSTM
     print('构造LSTM层')
 
@@ -30,15 +31,21 @@ def model_fn(features,labels,mode,params):
     print('dropout')
     output = tf.layers.dropout(output, rate=params['dropout_rate'], training=is_training)
 
-    # 添加POS特征
-    print('添加POS特征')
-    output_pos = tf.concat([output, postags], axis=-1)
+    # # 添加POS特征
+    # print('添加POS特征')
+    # output_pos = tf.concat([output, postags], axis=-1)
+    #
+    # #添加是否是触发词特征
+    # output_pos = tf.concat([output,triggerFlags],axis=-1)
 
-    #添加是否是触发词特征
-    output_pos = tf.concat([output,triggerFlags],axis=-1)
+    #添加是否参数特征
+    print('添加是否参数特征')
+    output = tf.concat([output,argu_features],axis=-1)
+    print('添加是否触发词特征')
+    output = tf.concat([output,tri_features],axis=-1)
 
     #全连接层
-    logits = tf.layers.dense(output_pos, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
+    logits = tf.layers.dense(output, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
 
 
     print('CRF层')

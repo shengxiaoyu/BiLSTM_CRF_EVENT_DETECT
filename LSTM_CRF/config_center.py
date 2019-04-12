@@ -23,6 +23,7 @@ ARGU_TAGs =None
 TAG_2_ID = None
 ID_2_TAG = None
 TAGs_LEN = 0
+ARGUs_LEN = 0
 POSTAGGER = None
 POS_2_ID = None
 POSs_LEN = 0
@@ -31,6 +32,13 @@ SEGMENTOR = None
 STOP_WORDS=None
 TRIGGER_WORDS_DICT = None
 
+#第二个模型需要的tags
+NEW_TAG_2_ID = None
+NEW_ID_2_TAG = None
+NEW_TRIGGER_TAGs = None
+NEW_ARGU_TAGs = None
+NEW_ARGU_LEN = 0
+NEW_TRIGGER_LEN = 0
 
 #初始化各类模型以及词集
 def init(rootdir):
@@ -40,9 +48,37 @@ def init(rootdir):
     initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
     initStopWords(os.path.join(rootdir, 'newStopWords.txt'))
     initTriggerWords(os.path.join(rootdir,'triggers'))
+    initNewTags(os.path.join(rootdir,'full_trigger_labels.txt'),os.path.join(rootdir,'full_argu_labels.txt'),)
+
+#初始化第二个模型的标签
+def initNewTags(newTriggerLabelPath,newArgumentLabelPath):
+    global NEW_ARGU_LEN,NEW_ARGU_TAGs,NEW_TRIGGER_LEN,NEW_TRIGGER_TAGs,NEW_TAG_2_ID,NEW_ID_2_TAG
+    NEW_ARGU_TAGs = []
+    NEW_TRIGGER_TAGs = []
+    NEW_TAG_2_ID = {}
+    NEW_ID_2_TAG = {}
+    NEW_TAG_2_ID['<pad>'] = 0
+    NEW_ID_2_TAG[0]='<pad>'
+    index = 1
+    with open(newTriggerLabelPath,'r',encoding='utf8') as f:
+        for line in f.readlines():
+            line = line.strip()
+            NEW_TRIGGER_TAGs.append(line)
+            NEW_TAG_2_ID[line] = index
+            NEW_ID_2_TAG[index] = line
+            index += 1
+    NEW_TRIGGER_LEN = len(NEW_TRIGGER_TAGs)
+    with open(newArgumentLabelPath,'r',encoding='utf8') as f:
+        for line in f.readlines():
+            line = line.strip()
+            NEW_ARGU_TAGs.append(line)
+            NEW_TAG_2_ID[line] = index
+            NEW_ID_2_TAG[index] = line
+            index += 1
+    NEW_ARGU_LEN = len(NEW_ARGU_TAGs)
 
 def initTags(triggerLablePath,argumentLabelPath):
-    global TAG_2_ID, ID_2_TAG,TAGs_LEN,TRIGGER_TAGs,ARGU_TAGs
+    global TAG_2_ID, ID_2_TAG,TAGs_LEN,TRIGGER_TAGs,ARGU_TAGs,ARGUs_LEN
     TAG_2_ID={}
     ID_2_TAG={}
     TRIGGER_TAGs=[]
@@ -59,6 +95,7 @@ def initTags(triggerLablePath,argumentLabelPath):
             ID_2_TAG[index] = line.strip()
             ARGU_TAGs.append(line.strip())
             index += 1
+    ARGUs_LEN = len(ARGU_TAGs)
     #获取触发词tag
     with open(triggerLablePath, 'r', encoding='utf8') as f:
         for line in f.readlines():

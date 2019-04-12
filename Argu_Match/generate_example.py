@@ -82,8 +82,21 @@ def generator_full_tags():
             fw.write('B_' + argu + '\n' + 'I_' + argu + '\n')
         fw.write('O')
 
+def getMaxSentenceLength(path):
+    maxLength = 0
+    for file in os.listdir(path):
+        with open(os.path.join(path,file),'r',encoding='utf8') as f:
+            line = f.readline()
+            while(line):
+                words = f.readline().strip().split()
+                if(len(words)>40):
+                    print(len(words))
+                maxLength = max(maxLength,len(f.readline().strip().split()))
+
+    print(maxLength)
 
 
 if __name__ == '__main__':
-    generator_full_tags()
+    # generator_full_tags()
+    getMaxSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\newExamples\\train')
     sys.exit(0)

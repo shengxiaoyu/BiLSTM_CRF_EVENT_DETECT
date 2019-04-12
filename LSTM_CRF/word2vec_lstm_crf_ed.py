@@ -81,14 +81,14 @@ def main(FLAGS,sentences=None,dir=None):
     # estimator
     if FLAGS.ifTrain :
         print('获取训练数据。。。')
-        train_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'train')),
+        train_inpf = functools.partial(INPUT.input_fn, second_dir=(os.path.join(FLAGS.labeled_data_path, 'train')),
                                        shuffe=True, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         train_total = len(list(train_inpf()))
         print('训练总数：'+str(train_total))
         num_train_steps = train_total/FLAGS.batch_size*FLAGS.num_epochs
         print('训练steps:'+str(num_train_steps))
         print('获取评估数据。。。')
-        eval_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'dev')),
+        eval_inpf = functools.partial(INPUT.input_fn, second_dir=(os.path.join(FLAGS.labeled_data_path, 'dev')),
                                       shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         hook = tf.contrib.estimator.stop_if_no_increase_hook(
             estimator, 'f1', 500, min_steps=8000, run_every_secs=120)
@@ -101,8 +101,8 @@ def main(FLAGS,sentences=None,dir=None):
 
     if FLAGS.ifTest:
         print('获取预测数据。。。')
-        test_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),
-                                      shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
+        test_inpf = functools.partial(INPUT.input_fn, second_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),
+                                      shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
 
         predictions = estimator.predict(input_fn=test_inpf)
         pred_true = INPUT.generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),max_sequence_length = FLAGS.max_sequence_length,noEmbedding=True)
@@ -180,7 +180,6 @@ def main(FLAGS,sentences=None,dir=None):
         #预测
         predictions = estimator.predict(input_fn=pre_inf)
         predictions = [x['pre_ids'] for x in list(predictions)]
-        result = []
         count = 1000
         index = 0
         newDir = os.path.join(dir,'newExamples')
