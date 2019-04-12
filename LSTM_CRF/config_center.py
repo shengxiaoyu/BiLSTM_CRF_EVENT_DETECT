@@ -20,9 +20,11 @@ from Word2Vec.my_word2vec import Word2VecModel
 WV = None
 TRIGGER_TAGs = None
 ARGU_TAGs =None
+ARGU_TAGs_LEN = 0
 TAG_2_ID = None
 ID_2_TAG = None
 TAGs_LEN = 0
+
 POSTAGGER = None
 POS_2_ID = None
 POSs_LEN = 0
@@ -42,7 +44,7 @@ def init(rootdir):
     initTriggerWords(os.path.join(rootdir,'triggers'))
 
 def initTags(triggerLablePath,argumentLabelPath):
-    global TAG_2_ID, ID_2_TAG,TAGs_LEN,TRIGGER_TAGs,ARGU_TAGs
+    global TAG_2_ID, ID_2_TAG,TAGs_LEN,TRIGGER_TAGs,ARGU_TAGs,ARGU_TAGs_LEN
     TAG_2_ID={}
     ID_2_TAG={}
     TRIGGER_TAGs=[]
@@ -58,6 +60,7 @@ def initTags(triggerLablePath,argumentLabelPath):
             TAG_2_ID[line.strip()] = index
             ID_2_TAG[index] = line.strip()
             ARGU_TAGs.append(line.strip())
+            ARGU_TAGs_LEN += 1
             index += 1
     #获取触发词tag
     with open(triggerLablePath, 'r', encoding='utf8') as f:

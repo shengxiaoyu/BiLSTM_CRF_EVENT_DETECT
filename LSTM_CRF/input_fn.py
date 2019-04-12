@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import functools
-import os
 
 __doc__ = 'description:模型输入预处理中心'
 __author__ = '13314409603@163.com'
+import os
+import functools
 import LSTM_CRF.config_center as CONFIG
 import tensorflow as tf
 
