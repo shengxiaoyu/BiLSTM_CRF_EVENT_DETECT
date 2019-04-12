@@ -79,6 +79,15 @@ def predict(sentences):
     FLAGS.ifPredict = True
     return run.main(FLAGS,sentences)
 
+#预测一个文件夹下所有文件内容，构造训练样本给下一层标注模型
+def predictFile(dir):
+    FLAGS = getParser()
+    FLAGS.ifTrain = False
+    FLAGS.ifTest = False
+    FLAGS.ifPredict = False
+    FLAGS.ifPredictFile = True
+    run.main(FLAGS=FLAGS,dir=dir)
+
 if __name__=='__main__':
     train()
     # test()

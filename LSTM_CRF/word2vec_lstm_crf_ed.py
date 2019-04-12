@@ -13,10 +13,11 @@ from sklearn_crfsuite.metrics import flat_classification_report
 import LSTM_CRF.config_center as CONFIG
 import LSTM_CRF.input_fn as INPUT
 import LSTM_CRF.model_fn as MODEL
+import Argu_Match.generate_example as fileGenerator
 
 
 #训练、评估、预测,sentece:要预测的句子
-def main(FLAGS,sentences=None):
+def main(FLAGS,sentences=None,dir=None):
     print(FLAGS)
 
     tf.enable_eager_execution()
@@ -170,6 +171,40 @@ def main(FLAGS,sentences=None):
             print(' '.join(pre_tags[0:len(words)]))
         CONFIG.release()
         return result
+    if (FLAGS.ifPredictFile and dir):
+
+        sentences_words_oldTags_posTags_list, full_tags_list = fileGenerator.generator_examples_from_full_file(dir)
+        pre_inf = functools.partial(INPUT.input_fn, input_dir=None,
+                                    sentences_words_posTags=sentences_words_oldTags_posTags_list,
+                                    shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
+                                    max_sequence_length=FLAGS.max_sequence_length)
+        # 预测
+        predictions = estimator.predict(input_fn=pre_inf)
+        predictions = [x['pre_ids'] for x in list(predictions)]
+        count = 1000
+        index = 0
+        newDir = os.path.join(dir, 'newExamples')
+        if (not os.path.exists(newDir)):
+            os.mkdir(newDir)
+        fw = open(os.path.join(newDir, 'newExample' + str(index) + '.txt'), 'w', encoding='utf8')
+        for second_tags, id in full_tags_list:
+            one_sentence_words_posTags = sentences_words_oldTags_posTags_list[id]
+            pre_ids = predictions[id]
+            words = one_sentence_words_posTags[0]
+            pre_tags = [CONFIG.ID_2_TAG[id] for id in pre_ids]
+            if (count == 0):
+                fw.close()
+                index += 1
+                fw = open(os.path.join(newDir, 'newExample' + str(index) + '.txt'), 'w', encoding='utf8')
+                count = 1000
+            fw.write(' '.join(words))
+            fw.write('\n')
+            fw.write(' '.join(pre_tags))
+            fw.write('\n')
+            fw.write(' '.join(second_tags))
+            fw.write('\n')
+            count -= 1
+        fw.close()
     CONFIG.release()
 
 if __name__ == '__main__':

@@ -129,6 +129,18 @@ def calRelationOfTagAndPos(path):
             for pos,count in ss:
                 fw.write(pos+'\t'+str(count)+'\n')
 
+def getMaxSentenceLength(path):
+    maxLength = 0
+    for file in os.listdir(path):
+        with open(os.path.join(path,file),'r',encoding='utf8') as f:
+            line = f.readline()
+            while(line):
+                words = f.readline().strip().split()
+                if(len(words)>40):
+                    print(len(words))
+                maxLength = max(maxLength,len(f.readline().strip().split()))
+
+    print(maxLength)
 if __name__ == '__main__':
     # calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Full')
     # print(getMax(0.95))
