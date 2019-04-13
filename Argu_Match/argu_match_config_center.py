@@ -20,7 +20,7 @@ def initNewTags(new_trigger_path,new_argu_path):
     NEW_TRIGGER_TAGs = []
     NEW_TAG_2_ID['<pad>'] = 0
     NEW_ID_2_TAG[0] = '<pad>'
-    index = 0
+    index = 1
     with open(new_trigger_path,'r',encoding='utf8') as f:
         for line in f.readlines():
             line = line.strip()

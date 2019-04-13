@@ -123,11 +123,14 @@ def main(FLAGS,sentences=None,dir=None):
         with open(os.path.join(output_dir,'predict_result.txt'),'w',encoding='utf8') as fw:
             fw.write(str(report))
             for target,predict in zip(pred_true,pred):
-                (words,length,_,_),tags = target
+                (words,length,firstTags,_),tags = target
                 words = [words[i] for i in range(length)]
-                labels = [NEW_CONFIG.ID_2_TAG[tags[i]] for i in range(length)]
-                outputs = [NEW_CONFIG.ID_2_TAG[predict[i]] for i in range(length)]
+                firstTags = [firstTags[i] for i in range(length)]
+                labels = [NEW_CONFIG.NEW_ID_2_TAG[tags[i]] for i in range(length)]
+                outputs = [NEW_CONFIG.NEW_ID_2_TAG[predict[i]] for i in range(length)]
                 fw.write('原 文 ：'+' '.join(words))
+                fw.write('\n')
+                fw.write('第一层预测标签：'+' '.join(firstTags))
                 fw.write('\n')
                 fw.write('人工标记： '+' '.join(labels))
                 fw.write('\n')

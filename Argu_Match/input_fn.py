@@ -34,13 +34,7 @@ def paddingAndEmbedding(fileName,words,tags,pre_tags,max_sequence_length,noEmbed
         tags = tags[:max_sequence_length]
         pre_tags = pre_tags[:max_sequence_length]
 
-    #第一层的预测标签转onehot表示
-    oneHotOldTags = []
-    oldTagAll = []
-    oldTagAll.extend(CONFIG.TRIGGER_TAGs)
-    oldTagAll.extend(CONFIG.ARGU_TAGs)
-    for tag in tags:
-        oneHotOldTags.append([1 if tag==oldTag else 0 for oldTag in oldTagAll])
+
 
     #添加是否是所关注的触发词 特征
     triggerFeatures = []
@@ -51,6 +45,16 @@ def paddingAndEmbedding(fileName,words,tags,pre_tags,max_sequence_length,noEmbed
     #根据noEmbedding参数确定是否进行向量化
     if(not noEmbedding):
         words = [CONFIG.WV[word] for word in words]
+        # 第一层的预测标签转onehot表示
+        oneHotOldTags = []
+        oldTagAll = []
+        oldTagAll.extend(CONFIG.TRIGGER_TAGs)
+        oldTagAll.extend(CONFIG.ARGU_TAGs)
+        for tag in tags:
+            oneHotOldTags.append([1 if tag == oldTag else 0 for oldTag in oldTagAll])
+    else:
+        #第一层的预测标签不变
+        oneHotOldTags = tags
     try:
         pre_tags = [NEW_CONFIG.NEW_TAG_2_ID[tag] for tag in pre_tags]
     except:

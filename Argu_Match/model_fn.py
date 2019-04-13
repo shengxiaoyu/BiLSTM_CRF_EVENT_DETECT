@@ -70,9 +70,9 @@ def model_fn(features,labels,mode,params):
             indices = [item[1] for item in NEW_CONFIG.NEW_TAG_2_ID.items() if (item[0]!='<pad>'and item[0]!='O')]
             metrics = {
                 'acc': tf.metrics.accuracy(labels, pred_ids, weights),
-                'precision': precision(labels, pred_ids, NEW_CONFIG.NEW_TAGs_LEN, weights),
-                'recall': recall(labels, pred_ids, NEW_CONFIG.NEW_TAGs_LEN,  weights),
-                'f1': f1(labels, pred_ids, NEW_CONFIG.NEW_TAGs_LEN, weights),
+                'precision': precision(labels, pred_ids, NEW_CONFIG.NEW_TAGs_LEN,indices, weights),
+                'recall': recall(labels, pred_ids, NEW_CONFIG.NEW_TAGs_LEN,indices,  weights),
+                'f1': f1(labels, pred_ids, NEW_CONFIG.NEW_TAGs_LEN,indices, weights),
             }
             for metric_name, op in metrics.items():
                 tf.summary.scalar(metric_name, op[1])
