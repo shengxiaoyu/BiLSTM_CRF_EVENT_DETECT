@@ -106,7 +106,7 @@ def writeTriggerToFile(events_triggers,savePath):
 
 
 #将源文件和标注文件合一
-def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,pos_model_path,stop_words_path,labels_path,mode=1):
+def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,pos_model_path,stop_words_path,trigger_labels_path,argu_labels_path,mode=1):
     if(mode==1):
         savePath = os.path.join(savePath,'Spe')
     else:
@@ -120,8 +120,10 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
     with open(stop_words_path, 'r', encoding='utf8') as f:
         stopWords = set(f.read().split())
     #关注标签集
-    with open(labels_path, 'r', encoding='utf8') as f:
+    with open(trigger_labels_path, 'r', encoding='utf8') as f,open(argu_labels_path,'r',encoding='utf8') as f2:
         labedWords = set(f.read().split())
+        for line in f2.readlines():
+            labedWords.add(line.strip())
     eventsType = {}
     def handlderDir(dirPath):
         for fileName in os.listdir(dirPath):
@@ -219,12 +221,14 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 if (labeled[index].find('O') != -1):
                     if (isBegin):
                         label = 'B_' + entity.getType()
+                        label = 'B_' + entity.getName()
                         if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
                             label = 'O'
                         labeled[index] = label
                         isBegin = False
                     else:
                         label = 'I_' + entity.getType()
+                        label = 'I_' + entity.getName()
                         if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
                             label = 'O'
                         labeled[index] = label
@@ -526,17 +530,23 @@ def main():
     brat_base_path = os.path.join(base_path, 'brat')
     ltp_path = os.path.join(base_path, 'ltp_data_v3.4.0')
     formLabelData(
-        os.path.join(brat_base_path, 'labeled'),
-        os.path.join(base_path, 'labeled'),
-        os.path.join(ltp_path, 'cws.model'),
-        os.path.join(ltp_path, 'userDict.txt'),
-        os.path.join(ltp_path, 'pos.model'),
-        os.path.join(base_path, 'newStopWords.txt'),
-        os.path.join(base_path,'labels.txt'),1)
+        labelFilePath=os.path.join(brat_base_path, 'labeled'),
+        savePath=os.path.join(base_path, 'labeled'),
+        segmentor_model_path=os.path.join(ltp_path, 'cws.model'),
+        segmentor_user_dict_path=os.path.join(ltp_path, 'userDict.txt'),
+        pos_model_path=os.path.join(ltp_path, 'pos.model'),
+        stop_words_path=os.path.join(base_path, 'newStopWords.txt'),
+        # trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
+        # argu_labels_path=os.path.join(base_path,'argumentLabels.txt'),
+        trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
+        argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
+        #mode=1 Spe
+        #mode=2 Full
+        mode=1)
 
 
 if __name__ == '__main__':
 
-    print ('end')
     main()
+    print ('end')
     sys.exit(0)

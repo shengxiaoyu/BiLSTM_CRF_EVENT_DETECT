@@ -24,7 +24,6 @@ ARGU_TAGs_LEN = 0
 TAG_2_ID = None
 ID_2_TAG = None
 TAGs_LEN = 0
-
 POSTAGGER = None
 POS_2_ID = None
 POSs_LEN = 0
@@ -33,6 +32,13 @@ SEGMENTOR = None
 STOP_WORDS=None
 TRIGGER_WORDS_DICT = None
 
+#第二个模型需要的tags
+NEW_TAG_2_ID = None
+NEW_ID_2_TAG = None
+NEW_TRIGGER_TAGs = None
+NEW_ARGU_TAGs = None
+NEW_ARGU_LEN = 0
+NEW_TRIGGER_LEN = 0
 
 #初始化各类模型以及词集
 def init(rootdir):
@@ -62,6 +68,7 @@ def initTags(triggerLablePath,argumentLabelPath):
             ARGU_TAGs.append(line.strip())
             ARGU_TAGs_LEN += 1
             index += 1
+    ARGUs_LEN = len(ARGU_TAGs)
     #获取触发词tag
     with open(triggerLablePath, 'r', encoding='utf8') as f:
         for line in f.readlines():

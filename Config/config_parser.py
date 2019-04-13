@@ -16,6 +16,7 @@ def getParser():
     parser.add_argument('--ifTrain', help='train and dev', default=False)
     parser.add_argument('--ifTest', help='test', default=False)
     parser.add_argument('--ifPredict',help='predict input sentence',default=False)
+    parser.add_argument('--ifPredictFile',help='predict sentence in file or dir',default=False)
     parser.add_argument('--dropout_rate', help='dropout rate', default=0.9)
     parser.add_argument('--learning_rate', help='learning rate', default=0.001)
     parser.add_argument('--hidden_units', help='hidden units', default=100)

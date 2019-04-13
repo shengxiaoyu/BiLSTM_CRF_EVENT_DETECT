@@ -85,7 +85,7 @@ def main(FLAGS,sentences=None,dir=None):
     # estimator
     if FLAGS.ifTrain :
         print('获取训练数据。。。')
-        train_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'train')),
+        train_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'dev')),
                                        shuffe=True, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         train_total = len(list(train_inpf()))
         print('训练总数：'+str(train_total))
@@ -106,7 +106,7 @@ def main(FLAGS,sentences=None,dir=None):
     if FLAGS.ifTest:
         print('获取预测数据。。。')
         test_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),
-                                      shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
+                                      shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
 
         predictions = estimator.predict(input_fn=test_inpf)
         pred_true = INPUT.generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),max_sequence_length = FLAGS.max_sequence_length,noEmbedding=True)
@@ -137,7 +137,6 @@ def main(FLAGS,sentences=None,dir=None):
                 fw.write('预测结果： '+' '.join(outputs))
                 fw.write('\n')
                 fw.write('\n')
-
     # if FLAGS.ifPredict and sentences:
     #     sentences_words_posTags = []
     #     for sentence in sentences:

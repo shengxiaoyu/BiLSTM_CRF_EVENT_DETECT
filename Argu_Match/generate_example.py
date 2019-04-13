@@ -81,7 +81,6 @@ def generator_full_tags():
         for argu in argus:
             fw.write('B_' + argu + '\n' + 'I_' + argu + '\n')
         fw.write('O')
-
 #将spe模型下的单句合并为full下的句子
 def merge(path):
     #会用到trigger集合，需要初始化Trigger_Tags
