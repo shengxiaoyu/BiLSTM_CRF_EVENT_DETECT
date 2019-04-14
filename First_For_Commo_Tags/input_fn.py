@@ -5,7 +5,7 @@ __doc__ = 'description:模型输入预处理中心'
 __author__ = '13314409603@163.com'
 import os
 import functools
-import LSTM_CRF.config_center as CONFIG
+import First_For_Commo_Tags.config_center as CONFIG
 import tensorflow as tf
 
 #对齐和向量化
@@ -158,7 +158,7 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words
     return result
 
 def input_fn(shuffe,num_epochs,batch_size,max_sequence_length,sentences_words_posTags=None,second_dir=None,input_dir=None):
-    shapes = (([max_sequence_length,CONFIG.WV.vector_size],(),[max_sequence_length,CONFIG.ARGUs_LEN],[max_sequence_length,CONFIG.NEW_TRIGGER_LEN]),[max_sequence_length])
+    shapes = (([max_sequence_length,CONFIG.WV.vector_size],(),[max_sequence_length,CONFIG.POSs_LEN],[max_sequence_length,1]),[max_sequence_length])
     types = ((tf.float32,tf.int32,tf.float32,tf.float32),tf.int32)
     dataset = tf.data.Dataset.from_generator(
         functools.partial(generator_fn,input_dir=input_dir,sentences_words_posTags=sentences_words_posTags,max_sequence_length = max_sequence_length,second_dir=second_dir),
@@ -222,4 +222,5 @@ def labelTrigger(words, labeled,beginIndex,endIndex,tag):
     return words,labeled
 
 if __name__ == '__main__':
+
     pass

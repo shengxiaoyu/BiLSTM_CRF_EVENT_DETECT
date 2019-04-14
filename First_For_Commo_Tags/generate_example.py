@@ -3,7 +3,7 @@
 import os
 import sys
 
-import LSTM_CRF.config_center as CONFIG
+import First_For_Commo_Tags.config_center as CONFIG
 from Config.config_parser import getParser
 __doc__ = 'description,将Full'
 __author__ = '13314409603@163.com'

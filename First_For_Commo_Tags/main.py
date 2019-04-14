@@ -9,7 +9,7 @@ import os
 import sys
 from pyltp import Segmentor
 
-import LSTM_CRF.word2vec_lstm_crf_ed as run
+import First_For_Commo_Tags.word2vec_lstm_crf_ed as run
 from Config.config_parser import getParser
 from Word2Vec.my_word2vec import Word2VecModel
 from data_pre_process.cpws_process import CpwsProcess
@@ -89,9 +89,9 @@ def predictFile(dir):
     run.main(FLAGS=FLAGS,dir=dir)
 
 if __name__=='__main__':
-    train()
+    # train()
     # test()
-    # predict(['被告季某辩称，原告所陈述的事实理由不正确，原被告于2009年农历正月认识，××××年××月××日生育一女，婚后为了抚养小孩发生了争吵，被告也曾不小心碰伤了原告。'])
+    predict(['被告季某辩称，原告所陈述的事实理由不正确，原被告于2009年农历正月认识，××××年××月××日生育一女，婚后为了抚养小孩发生了争吵，被告也曾不小心碰伤了原告。'])
     # predict(['原、被告于2007年11月于网上相识恋爱，200 8年3月17日登记结婚，××××年××月××日生育女儿戴某乙，2012 年6月1日生育女儿罗某乙。'])
     # predictFile('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe\\dev')
     # predictFile('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe\\test')

@@ -5,8 +5,8 @@ __author__ = '13314409603@163.com'
 
 import os
 import functools
-import LSTM_CRF.config_center as CONFIG
-import Argu_Match.argu_match_config_center as NEW_CONFIG
+import First_For_Commo_Tags.config_center as CONFIG
+import Second_For_Fine_Tags.config_center as NEW_CONFIG
 import tensorflow as tf
 
 #对齐和向量化
@@ -79,8 +79,6 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentence_words_
                     tags = f.readline().strip().split()
                     #针对单个触发词时的真实标签行
                     pre_tags = f.readline().strip().split()
-                    # for oldTag,NewTag in zip(tags,pre_tags):
-                    #     if(oldTag in CONFIG.TRIGGER_TAGs and )
                     sentence = f.readline()
                     if (len(words) != len(tags)):
                         print(input_file, ' words、labels数不匹配：' + sentence + ' words length:' + str(

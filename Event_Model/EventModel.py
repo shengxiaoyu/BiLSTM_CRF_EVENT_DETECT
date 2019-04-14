@@ -27,6 +27,24 @@ def EventFactory(trigger,word,beginIndex,EndIndex):
         'Credit':Credit,
     }
     return eventDict[trigger](trigger,word,beginIndex,EndIndex)
+def EventFactory2(event_argu_dict):
+    eventDict = {
+        'Know': Know,
+        'BeInLove': BeInLove,
+        'Marry': Marray,
+        'Remarry': Remarray,
+        'Bear': Bear,
+        'FamilyConflict': FamilyConflict,
+        'DomesticViolence': DomesticViolence,
+        'BadHabit': BadHabit,
+        'Derailed': Derailed,
+        'Separation': Separation,
+        'DivorceLawsuit': DivorceLawsuit,
+        'Wealth': Wealth,
+        'Debt': Debt,
+        'Credit': Credit,
+    }
+    return eventDict[event_argu_dict['Type']](event_argu_dict)
 
 class baseModel(object):
     def __init__(self,trigger,word,beginIndex,endIndex):
@@ -34,11 +52,13 @@ class baseModel(object):
         self.word = word
         self.trigger_begin_index = beginIndex
         self.trigger_end_index = endIndex
+        self.negated=None
 
     def fitArgument(self,words,tags):
         """传入分词和标签列表，从中选择参数"""
         raise NotImplementedError()
-
+    def fitArgus(self,event_argus_dict):
+        raise NotImplementedError()
 
     def __findFoward__ (self,words,tags,target,quickStop=False):
         '''find from 0 to self.trigger_begin_index'''
@@ -77,38 +97,72 @@ class Know(baseModel):
     def fitArgument(self,words,tags):
         self.time = self.__findFoward__(words,tags,'Time')
 
+
     def __str__(self):
+        str = ''
+        if (self.negated != None):
+            str = str+self.negated+' '
         if(self.time!=None and len(self.time)>0):
-            return  self.time+ ' ' +self.word
-        else:
-            return self.word
+            str = str+self.time+' '
+        str = str+self.word
+        return str
+
 class BeInLove(baseModel):
     def fitArgument(self, words, tags):
         self.time = self.__findFoward__(words, tags,'Time')
 
+    def fitArgus(self, time, negated=None):
+        self.time = time
+        self.negated = negated
+
     def __str__(self):
+        str = ''
+        if (self.negated != None):
+            str = str + self.negated + ' '
         if (self.time != None and len(self.time) > 0):
-            return  self.time+ ' ' +self.word
-        else:
-            return self.word
+            str = str + self.time + ' '
+        str = str + self.word
+        return str
+
 class Marray(baseModel):
     def fitArgument(self, words, tags):
         self.time = self.__findFoward__(words, tags,'Time')
+    def fitArgus(self, time, negated=None):
+        self.time = time
+        self.negated = negated
 
     def __str__(self):
+        str = ''
+        if (self.negated != None):
+            str = str + self.negated + ' '
         if (self.time != None and len(self.time) > 0):
-            return  self.time+ ' ' +self.word
-        else:
-            return self.word
+            str = str + self.time + ' '
+        str = str + self.word
+        return str
+
 class Remarray(baseModel):
     def fitArgument(self, words, tags):
         self.person = self.__findFoward__(words, tags,'Person')
+    def fitArgus(self, time,personOne,personTwo=None, negated=None):
+        self.time = time
+        self.personOne = personOne
+        self.personTwo = personTwo
+        self.negated = negated
 
     def __str__(self):
-        if (self.person != None and len(self.person) > 0):
-            return self.person+' '+self.word
-        else:
-            return self.word
+        str = ''
+        if (self.negated != None):
+            str = str + self.negated + ' '
+        if (self.time != None and len(self.time) > 0):
+            str = str + self.time + ' '
+        if(self.personOne!=None and len(self.personOne)>0):
+            str = str+self.personOne+' '
+        if (self.personTwo != None and len(self.personTwo) > 0):
+            str = str + self.personTwo+' '
+        str = str + self.word
+        return str
+
+
 class Bear(baseModel):
     def fitArgument(self,words,tags):
         self.time = self.__findFoward__(words, tags,'Time') #前面找时间

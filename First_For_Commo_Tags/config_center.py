@@ -32,14 +32,6 @@ SEGMENTOR = None
 STOP_WORDS=None
 TRIGGER_WORDS_DICT = None
 
-#第二个模型需要的tags
-NEW_TAG_2_ID = None
-NEW_ID_2_TAG = None
-NEW_TRIGGER_TAGs = None
-NEW_ARGU_TAGs = None
-NEW_ARGU_LEN = 0
-NEW_TRIGGER_LEN = 0
-
 #初始化各类模型以及词集
 def init(rootdir):
     initTags(os.path.join(rootdir,'triggerLabels.txt'),os.path.join(rootdir, 'argumentLabels.txt'))

@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-__doc__ = 'description'
+__doc__ = 'description:模型网络图构建中心'
 __author__ = '13314409603@163.com'
+
 import tensorflow as tf
 from tf_metrics import recall, f1, precision
-import LSTM_CRF.config_center as CONFIG
-import Argu_Match.argu_match_config_center as NEW_CONFIG
+import First_For_Commo_Tags.config_center as CONFIG
+
 
 def model_fn(features,labels,mode,params):
     is_training = (mode ==  tf.estimator.ModeKeys.TRAIN)
     #传入的features: ((句子每个单词向量，句子真实长度），句子每个tag索引).batchSize为5
-    features,lengths,oldTags,triggerFeatures = features
+    features,lengths,postags,triggerFlags = features
+    # features,lengths,argu_features,tri_features = features
     # LSTM
     print('构造LSTM层')
 
@@ -29,23 +31,29 @@ def model_fn(features,labels,mode,params):
     print('dropout')
     output = tf.layers.dropout(output, rate=params['dropout_rate'], training=is_training)
 
-    # 添加第一层预测标签特征
-    print('添加第一层预测标签特征')
-    output = tf.concat([output, oldTags], axis=-1)
+    # 添加POS特征
+    print('添加POS特征')
+    output_pos = tf.concat([output, postags], axis=-1)
 
-    #添加是否是关注触发词 特征
-    print('添加是否是关注触发词特征')
-    output = tf.concat([output, triggerFeatures], axis=-1)
+    #添加是否是触发词特征
+    output_pos = tf.concat([output,triggerFlags],axis=-1)
+
+    # #添加是否参数特征
+    # print('添加是否参数特征')
+    # output = tf.concat([output,argu_features],axis=-1)
+    # print('添加是否触发词特征')
+    # output = tf.concat([output,tri_features],axis=-1)
 
     #全连接层
-    logits = tf.layers.dense(output, NEW_CONFIG.NEW_TAGs_LEN) #batch_size*40*len(tags)
+    logits = tf.layers.dense(output, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
 
 
     print('CRF层')
     # CRF
 
-    crf_params = tf.get_variable("crf", [NEW_CONFIG.NEW_TAGs_LEN, NEW_CONFIG.NEW_TAGs_LEN], dtype=tf.float32)
+    crf_params = tf.get_variable("crf", [CONFIG.TAGs_LEN, CONFIG.TAGs_LEN], dtype=tf.float32)
     pred_ids, _ = tf.contrib.crf.crf_decode(logits, crf_params, lengths)
+
 
 
     if mode == tf.estimator.ModeKeys.PREDICT:
@@ -67,12 +75,12 @@ def model_fn(features,labels,mode,params):
             print('评估。。。')
             # Metrics
             weights = tf.sequence_mask(lengths, maxlen=params['max_sequence_length'])
-            indices = [item[1] for item in NEW_CONFIG.NEW_TAG_2_ID.items() if (item[0]!='<pad>'and item[0]!='O')]
+            indices = [item[1] for item in CONFIG.TAG_2_ID.items() if (item[0]!='<pad>'and item[0]!='O')]
             metrics = {
                 'acc': tf.metrics.accuracy(labels, pred_ids, weights),
-                'precision': precision(labels, pred_ids, NEW_CONFIG.NEW_TAGs_LEN,indices, weights),
-                'recall': recall(labels, pred_ids, NEW_CONFIG.NEW_TAGs_LEN,indices,  weights),
-                'f1': f1(labels, pred_ids, NEW_CONFIG.NEW_TAGs_LEN,indices, weights),
+                'precision': precision(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
+                'recall': recall(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
+                'f1': f1(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
             }
             for metric_name, op in metrics.items():
                 tf.summary.scalar(metric_name, op[1])
@@ -85,6 +93,7 @@ def model_fn(features,labels,mode,params):
             train_op = tf.train.AdamOptimizer(learning_rate=params['learning_rate']).minimize(
                 loss, global_step=tf.train.get_or_create_global_step())
             return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=train_op)
+
 
 if __name__ == '__main__':
     pass

@@ -4,10 +4,11 @@ __doc__ = 'description'
 __author__ = '13314409603@163.com'
 from pyltp import SentenceSplitter
 
-import LSTM_CRF.config_center as CONFIG
-import LSTM_CRF.word2vec_lstm_crf_ed as run
+import First_For_Commo_Tags.config_center as CONFIG
+import First_For_Commo_Tags.word2vec_lstm_crf_ed as first
+import Second_For_Fine_Tags.word2vec_lstm_crf_argu_match as second
 from Config.config_parser import getParser
-import Extract_Event.EventModel as EventModel
+import Event_Model.EventModel as EventModel
 
 root_dir = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF'
 
@@ -42,7 +43,7 @@ def extractor(paragraph):
     FLAGS.ifTrain = False
     FLAGS.ifTest = False
     FLAGS.ifPredict = True
-    predictions = run.main(FLAGS, sentences)
+    predictions = first.main(FLAGS, sentences)
     events = []
     # 获取触发词tag
     triggers = CONFIG.TRIGGER_TAGs
@@ -97,6 +98,30 @@ def extractor(paragraph):
                     endIndex = 0
     return events
 
+def extractor2(paragraph):
+    CONFIG.init(root_dir)
+    sentenceSplitter = SentenceSplitter()
+    sentences = []
+    for sentence in sentenceSplitter.split(paragraph):
+        hasTrigger = ifContainTrigger(sentence)
+        if (not hasTrigger):
+            print('该句子中无关注事实：' + sentence)
+        else:
+            sentences.append(sentence)
+
+    # 调用预测接口
+    print('构造参数')
+    FLAGS = getParser()
+    FLAGS.ifTrain = False
+    FLAGS.ifTest = False
+    FLAGS.ifPredict = True
+
+    print('第一个模型预测')
+    sentencs_words_firstTags_list = first.main(FLAGS, sentences)
+    print('第二个模型预测')
+    events = second.main(FLAGS,sentencs_words_firstTags_list)
+    print('事件抽取完成：\n'+'\n'.join([str(event) for event in events]))
+    return events
 if __name__ == '__main__':
     events = extractor('原、被告双方1986年上半年经人介绍认识，××××年××月××日在临桂县宛田乡政府登记结婚，××××年××月××日生育女儿李某乙，××××年××月××日生育儿子李某丙，现女儿李某乙、儿子李某丙都已独立生活')
     print('end')

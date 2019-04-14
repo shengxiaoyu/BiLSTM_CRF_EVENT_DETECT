@@ -10,17 +10,14 @@ import os
 import numpy as np
 import tensorflow as tf
 from sklearn_crfsuite.metrics import flat_classification_report
-import LSTM_CRF.config_center as CONFIG
-# import LSTM_CRF.input_fn as INPUT
-# import LSTM_CRF.model_fn as MODEL
-import Argu_Match.input_fn as INPUT
-import Argu_Match.model_fn as MODEL
-import Argu_Match.generate_example as fileGenerator
-import Argu_Match.argu_match_config_center as NEW_CONFIG
+import First_For_Commo_Tags.config_center as CONFIG
+import Second_For_Fine_Tags.input_fn as INPUT
+import Second_For_Fine_Tags.model_fn as MODEL
+import Second_For_Fine_Tags.config_center as NEW_CONFIG
+from Event_Model.EventModel import EventFactory2
 
-
-#训练、评估、预测,sentece:要预测的句子
-def main(FLAGS,sentences=None,dir=None):
+#训练、评估、预测,sentencs_words_firstTags_list:要预测的句子+第一层模型初步预测结果
+def main(FLAGS,sentencs_words_firstTags_list=None):
     print(FLAGS)
 
     tf.enable_eager_execution()
@@ -28,7 +25,7 @@ def main(FLAGS,sentences=None,dir=None):
     os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.device_map
 
     # 在re train 的时候，才删除上一轮产出的文件，在predicted 的时候不做clean
-    output_dir = os.path.join(FLAGS.root_dir,'output_'+FLAGS.sentence_mode)
+    output_dir = os.path.join(FLAGS.root_dir,'second_output_'+FLAGS.sentence_mode)
     if FLAGS.ifTrain:
         if os.path.exists(output_dir):
             def del_file(path):
@@ -85,7 +82,7 @@ def main(FLAGS,sentences=None,dir=None):
     # estimator
     if FLAGS.ifTrain :
         print('获取训练数据。。。')
-        train_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'dev')),
+        train_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'train')),
                                        shuffe=True, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         train_total = len(list(train_inpf()))
         print('训练总数：'+str(train_total))
@@ -137,80 +134,59 @@ def main(FLAGS,sentences=None,dir=None):
                 fw.write('预测结果： '+' '.join(outputs))
                 fw.write('\n')
                 fw.write('\n')
-    # if FLAGS.ifPredict and sentences:
-    #     sentences_words_posTags = []
-    #     for sentence in sentences:
-    #         #分词、获取pos标签、去停用词
-    #         words = CONFIG.SEGMENTOR.segment(sentence)
-    #         postags = CONFIG.POSTAGGER.postag(words)
-    #         tags = ['O' for _ in words]
-    #
-    #         #标记触发词
-    #         triggers = INPUT.findTrigger(sentence)
-    #         if(triggers==None or len(triggers)==0):
-    #             continue
-    #         for tag,beginIndex,endIndex in triggers:
-    #             words,tags = INPUT.labelTrigger(words,tags,beginIndex,endIndex,tag)
-    #
-    #         # 去停用词
-    #         newWords = []
-    #         newPosTags = []
-    #         newTags = []
-    #         for word, pos,tag in zip(words, postags,tags):
-    #             if (word not in CONFIG.STOP_WORDS):
-    #                 newWords.append(word)
-    #                 newPosTags.append(pos)
-    #                 newTags.append(tag)
-    #         sentences_words_posTags.append([newWords,newTags,newPosTags])
-    #     pre_inf = functools.partial(INPUT.input_fn, input_dir=None,sentences_words_posTags=sentences_words_posTags,
-    #                                   shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
-    #                                   max_sequence_length=FLAGS.max_sequence_length)
-    #     predictions = estimator.predict(input_fn=pre_inf)
-    #     predictions = [x['pre_ids'] for x in list(predictions)]
-    #
-    #     result = []
-    #     for one_sentence_words_posTags,pre_ids in zip(sentences_words_posTags,predictions):
-    #         words = one_sentence_words_posTags[0]
-    #         pre_tags = [CONFIG.ID_2_TAG[id]for id in pre_ids]
-    #         result.append([words,pre_tags])
-    #         print(' '.join(words))
-    #         print(' '.join(pre_tags[0:len(words)]))
-    #     CONFIG.release()
-    #     return result
-    # if (FLAGS.ifPredictFile and dir):
-    #     sentences_words_oldTags_posTags_list, full_tags_list = fileGenerator.generator_examples_from_full_file(dir)
-    #     pre_inf = functools.partial(INPUT.input_fn, input_dir=None,
-    #                                 sentences_words_posTags=sentences_words_oldTags_posTags_list,
-    #                                 shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
-    #                                 max_sequence_length=FLAGS.max_sequence_length)
-    #     # 预测
-    #     predictions = estimator.predict(input_fn=pre_inf)
-    #     predictions = [x['pre_ids'] for x in list(predictions)]
-    #     count = 1000
-    #     index = 0
-    #     newDir = os.path.join(dir, 'newExamples')
-    #     if (not os.path.exists(newDir)):
-    #         os.mkdir(newDir)
-    #     fw = open(os.path.join(newDir, 'newExample' + str(index) + '.txt'), 'w', encoding='utf8')
-    #     for second_tags, id in full_tags_list:
-    #         length = min(FLAGS.max_sequence_length,len(second_tags))
-    #         one_sentence_words_posTags = sentences_words_oldTags_posTags_list[id]
-    #         pre_ids = predictions[id]
-    #         words = one_sentence_words_posTags[0]
-    #         pre_tags = [CONFIG.ID_2_TAG[id] for id in pre_ids]
-    #         if (count == 0):
-    #             fw.close()
-    #             index += 1
-    #             fw = open(os.path.join(newDir, 'newExample' + str(index) + '.txt'), 'w', encoding='utf8')
-    #             count = 1000
-    #         fw.write(' '.join(words[0:length]))
-    #         fw.write('\n')
-    #         fw.write(' '.join(pre_tags[0:length]))
-    #         fw.write('\n')
-    #         fw.write(' '.join(second_tags[0:length]))
-    #         fw.write('\n')
-    #         count -= 1
-    #     fw.close()
+    if FLAGS.ifPredict and sentencs_words_firstTags_list:
+        '''根据原句分词和第一个模型的预测标记序列 让第二个模型预测并抽取事实'''
+        '''传入的sentence_words_firstTags_list 包括原文分词和第一个模型的预测标签序列'''
+
+        def handlerOneInput(one_sentence_words_firstTags):
+            results = []
+            words = one_sentence_words_firstTags[0]
+            firstTags = one_sentence_words_firstTags[1]
+            for index,tag in enumerate(firstTags):
+                if(tag in CONFIG.TRIGGER_TAGs and tag.find('B_')!=-1):#触发词
+                    #不含B_的触发词
+                    currentTrigger = tag[2:]
+                    #确定触发词的长度
+                    endIndex = index+1
+                    while(firstTags[endIndex].find(currentTrigger)!=-1):
+                        endIndex += 1
+                    #构造新的tags列：
+                    newTags = [firstTags[i]+'_Trigger' if i>=index and i<endIndex else 'O' for i in range(len(firstTags))]
+                    #深拷贝words列
+                    newWords = [x for x in words]
+                    results.append([newWords,firstTags,newTags])
+            return results
+
+        #构造第二个模型的输入list
+        sentence_words_firstTags_trueTriggerTags = []
+        for one_sentence_words_firstTags in sentencs_words_firstTags_list:
+            sentence_words_firstTags_trueTriggerTags.extend(handlerOneInput(one_sentence_words_firstTags))
+        pred_inpf = functools.partial(INPUT.input_fn(input_dir=None,shuffe=False,num_epochs=FLAGS.num_epochs,
+                                                     batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length,
+                                                     sentence_words_firstTags_trueTriggerTags=sentence_words_firstTags_trueTriggerTags))
+        predictions = estimator.predict(input_fn=pred_inpf)
+        preds = [x['pre_ids'] for x in list(predictions)]
+        events = []
+        for ids,inputs in zip(preds,sentence_words_firstTags_trueTriggerTags):
+            words = inputs[0]
+            event_argus_dict = {}
+            tags = [NEW_CONFIG.NEW_ID_2_TAG[id] for id in ids]
+            for tag,word in zip(tags,words):
+                if(tag in NEW_CONFIG.NEW_TRIGGER_TAGs):
+                    eventType = tag[2:-8] #B_Know_Trigger => Know
+                    if('Trigger' in event_argus_dict):
+                        event_argus_dict['Trigger'] = event_argus_dict['Trigger'] +word
+                    else:
+                        event_argus_dict['Type'] = eventType
+                        event_argus_dict['Trigger'] = word
+                if(tag in NEW_CONFIG.NEW_ARGU_TAGs and tag !='<pad>' and tag!='O'):
+                    newTag = tag[2:]
+                    if(newTag in event_argus_dict):
+                        event_argus_dict[newTag] = event_argus_dict[newTag]+word
+                    else:
+                        event_argus_dict[newTag] = word
+            events.append(EventFactory2(event_argus_dict))
+        return events
     CONFIG.release()
 
 if __name__ == '__main__':
