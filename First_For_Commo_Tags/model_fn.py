@@ -12,7 +12,6 @@ def model_fn(features,labels,mode,params):
     is_training = (mode ==  tf.estimator.ModeKeys.TRAIN)
     #传入的features: ((句子每个单词向量，句子真实长度），句子每个tag索引).batchSize为5
     features,lengths,postags,triggerFlags = features
-    # features,lengths,argu_features,tri_features = features
     # LSTM
     print('构造LSTM层')
 
@@ -38,14 +37,8 @@ def model_fn(features,labels,mode,params):
     #添加是否是触发词特征
     output_pos = tf.concat([output,triggerFlags],axis=-1)
 
-    # #添加是否参数特征
-    # print('添加是否参数特征')
-    # output = tf.concat([output,argu_features],axis=-1)
-    # print('添加是否触发词特征')
-    # output = tf.concat([output,tri_features],axis=-1)
-
     #全连接层
-    logits = tf.layers.dense(output, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
+    logits = tf.layers.dense(output_pos, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
 
 
     print('CRF层')
@@ -53,7 +46,6 @@ def model_fn(features,labels,mode,params):
 
     crf_params = tf.get_variable("crf", [CONFIG.TAGs_LEN, CONFIG.TAGs_LEN], dtype=tf.float32)
     pred_ids, _ = tf.contrib.crf.crf_decode(logits, crf_params, lengths)
-
 
 
     if mode == tf.estimator.ModeKeys.PREDICT:

@@ -161,9 +161,9 @@ def main(FLAGS,sentencs_words_firstTags_list=None):
         sentence_words_firstTags_trueTriggerTags = []
         for one_sentence_words_firstTags in sentencs_words_firstTags_list:
             sentence_words_firstTags_trueTriggerTags.extend(handlerOneInput(one_sentence_words_firstTags))
-        pred_inpf = functools.partial(INPUT.input_fn(input_dir=None,shuffe=False,num_epochs=FLAGS.num_epochs,
+        pred_inpf = functools.partial(INPUT.input_fn,input_dir=None,shuffe=False,num_epochs=FLAGS.num_epochs,
                                                      batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length,
-                                                     sentence_words_firstTags_trueTriggerTags=sentence_words_firstTags_trueTriggerTags))
+                                                     sentence_words_firstTags_trueTriggerTags=sentence_words_firstTags_trueTriggerTags)
         predictions = estimator.predict(input_fn=pred_inpf)
         preds = [x['pre_ids'] for x in list(predictions)]
         events = []
@@ -185,7 +185,8 @@ def main(FLAGS,sentencs_words_firstTags_list=None):
                         event_argus_dict[newTag] = event_argus_dict[newTag]+word
                     else:
                         event_argus_dict[newTag] = word
-            events.append(EventFactory2(event_argus_dict))
+            if('Type' in event_argus_dict):
+                events.append(EventFactory2(event_argus_dict))
         return events
     CONFIG.release()
 

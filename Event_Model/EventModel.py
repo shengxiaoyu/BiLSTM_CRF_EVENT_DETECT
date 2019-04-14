@@ -44,20 +44,25 @@ def EventFactory2(event_argu_dict):
         'Debt': Debt,
         'Credit': Credit,
     }
-    return eventDict[event_argu_dict['Type']](event_argu_dict)
+    event =  eventDict[event_argu_dict['Type']](event_argu_dict)
+    event.fitArgus()
+    return event
 
 class baseModel(object):
-    def __init__(self,trigger,word,beginIndex,endIndex):
-        self.trigger = trigger
-        self.word = word
-        self.trigger_begin_index = beginIndex
-        self.trigger_end_index = endIndex
-        self.negated=None
+    def __init__(self,argu_dict):
+        self.word = argu_dict['Trigger']
+        self.argu_dict = argu_dict
+    # def __init__(self,trigger,word,beginIndex,endIndex):
+    #     self.trigger = trigger
+    #     self.word = word
+    #     self.trigger_begin_index = beginIndex
+    #     self.trigger_end_index = endIndex
+    #     self.negated=None
 
     def fitArgument(self,words,tags):
         """传入分词和标签列表，从中选择参数"""
         raise NotImplementedError()
-    def fitArgus(self,event_argus_dict):
+    def fitArgus(self):
         raise NotImplementedError()
 
     def __findFoward__ (self,words,tags,target,quickStop=False):
@@ -96,58 +101,43 @@ class baseModel(object):
 class Know(baseModel):
     def fitArgument(self,words,tags):
         self.time = self.__findFoward__(words,tags,'Time')
-
+    def fitArgus(self):
+        if('Know_Time' in self.argu_dict):
+            self.time = self.argu_dict['Know_Time']
 
     def __str__(self):
-        str = ''
-        if (self.negated != None):
-            str = str+self.negated+' '
-        if(self.time!=None and len(self.time)>0):
-            str = str+self.time+' '
-        str = str+self.word
+        str = self.word
         return str
 
 class BeInLove(baseModel):
     def fitArgument(self, words, tags):
         self.time = self.__findFoward__(words, tags,'Time')
 
-    def fitArgus(self, time, negated=None):
-        self.time = time
-        self.negated = negated
+    def fitArgus(self):
+        if ('BeInLove_Time' in self.argu_dict):
+            self.time = self.argu_dict['BeInLove_Time']
 
     def __str__(self):
-        str = ''
-        if (self.negated != None):
-            str = str + self.negated + ' '
-        if (self.time != None and len(self.time) > 0):
-            str = str + self.time + ' '
-        str = str + self.word
+        str = self.word
         return str
 
 class Marray(baseModel):
     def fitArgument(self, words, tags):
         self.time = self.__findFoward__(words, tags,'Time')
-    def fitArgus(self, time, negated=None):
-        self.time = time
-        self.negated = negated
+
+    def fitArgus(self):
+        if ('Marry_Time' in self.argu_dict):
+            self.time = self.argu_dict['Marry_Time']
 
     def __str__(self):
-        str = ''
-        if (self.negated != None):
-            str = str + self.negated + ' '
-        if (self.time != None and len(self.time) > 0):
-            str = str + self.time + ' '
-        str = str + self.word
+        str = self.word
         return str
 
 class Remarray(baseModel):
     def fitArgument(self, words, tags):
         self.person = self.__findFoward__(words, tags,'Person')
-    def fitArgus(self, time,personOne,personTwo=None, negated=None):
-        self.time = time
-        self.personOne = personOne
-        self.personTwo = personTwo
-        self.negated = negated
+    def fitArgus(self):
+        pass
 
     def __str__(self):
         str = ''

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import sys
 
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
@@ -44,7 +43,7 @@ def main(FLAGS,sentences=None,dir=None):
             except Exception as e:
                 print(e)
                 print('pleace remove the files of output dir and data.conf')
-                sys.exit(-1)
+                exit(-1)
     # check output dir exists
     if not os.path.exists(output_dir):
         print('创建output文件夹')
@@ -209,4 +208,10 @@ def main(FLAGS,sentences=None,dir=None):
     CONFIG.release()
 
 if __name__ == '__main__':
+    a = [[1,2,3],[4,5,6]]
+    b = [[7],[8]]
+    a = np.array(a)
+    b = np.array(b)
+    c = tf.concat([a,b],axis=-1)
+    print(c)
     pass

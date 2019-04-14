@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import functools
+import os
 
 __doc__ = 'description:模型输入预处理中心'
 __author__ = '13314409603@163.com'
-import os
-import functools
 import First_For_Commo_Tags.config_center as CONFIG
 import tensorflow as tf
 
@@ -61,7 +61,7 @@ def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedd
     return (words,min(length,max_sequence_length),posTags,triggerFlags),tags
 
 
-def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words_posTags=None,second_dir=None):
+def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words_posTags=None,):
     result = []
     if(sentences_words_posTags):
         for one_sentence_words_posTags in sentences_words_posTags:
@@ -92,81 +92,18 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words
                             len(words)) + ' labels length:' + str(len(tags))+' pos length:'+str(len(posTags)))
                         continue
                     result.append(paddingAndEmbedding(input_file,words,tags,posTags,max_sequence_length,noEmbedding))
-    elif(second_dir):
-        for input_file in os.listdir(second_dir):
-            with open(os.path.join(second_dir,input_file),'r',encoding='utf8') as f:
-                sentence = f.readline()#分词行
-                while(sentence):
-                    words = sentence.strip().split(' ')
-                    first_tags = f.readline().strip().split(' ')
-                    secondes_tags = f.readline().strip().split(' ')
-
-                    #embedding
-                    length = len(words)
-                    for index in range(length):
-                        try:
-                            CONFIG.WV[words[index]]
-                        except:
-                            words[index] = '<pad>'
-
-                    #确定长度
-                    length = len(first_tags)
-                    for index,tag in enumerate(first_tags):
-                        if(tag=='<pad>'):
-                            length = index+1
-                            break
-
-                    if (len(secondes_tags) < max_sequence_length):
-                        for _ in range(len(secondes_tags), max_sequence_length):
-                            secondes_tags.append('<pad>')
-                    else:
-                        secondes_tags = secondes_tags[0:max_sequence_length]
-
-                    if(len(words)<max_sequence_length):
-                        for _ in range(len(words), max_sequence_length):
-                            words.append('<pad>')
-                    else:
-                        words = words[0:max_sequence_length]
-
-                    if (len(first_tags) < max_sequence_length):
-                        for _ in range(len(first_tags), max_sequence_length):
-                            first_tags.append('<pad>')
-                    else:
-                        first_tags = first_tags[0:max_sequence_length]
-
-                    # 根据noEmbedding参数确定是否进行向量化
-                    if (not noEmbedding):
-                        words = [CONFIG.WV[word] for word in words]
-
-                        #构造参数特征
-                        arguFeatures = []
-                        for tag in first_tags:
-                            oneHot = [1 if tag==argu_tag else 0 for argu_tag in CONFIG.ARGU_TAGs]
-                            arguFeatures.append(oneHot)
-
-                        # 构造每个词是否是触发词的特征
-
-                        triFeatures = []
-                        for tag in secondes_tags:
-                            oneHot = [1 if tri_tag[0:-8]==tag else 0 for tri_tag in CONFIG.NEW_TRIGGER_TAGs]
-                            triFeatures.append(oneHot)
-                        secondes_tags = [CONFIG.NEW_TAG_2_ID[tag] for tag in secondes_tags]
-                        result.append(((words,length,arguFeatures,triFeatures),secondes_tags))
-                    else:
-                        result.append([words,first_tags,secondes_tags])
-                    sentence = f.readline()
     return result
 
-def input_fn(shuffe,num_epochs,batch_size,max_sequence_length,sentences_words_posTags=None,second_dir=None,input_dir=None):
+def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentences_words_posTags=None):
     shapes = (([max_sequence_length,CONFIG.WV.vector_size],(),[max_sequence_length,CONFIG.POSs_LEN],[max_sequence_length,1]),[max_sequence_length])
     types = ((tf.float32,tf.int32,tf.float32,tf.float32),tf.int32)
     dataset = tf.data.Dataset.from_generator(
-        functools.partial(generator_fn,input_dir=input_dir,sentences_words_posTags=sentences_words_posTags,max_sequence_length = max_sequence_length,second_dir=second_dir),
+        functools.partial(generator_fn,input_dir=input_dir,sentences_words_posTags=sentences_words_posTags,max_sequence_length = max_sequence_length),
         output_shapes=shapes,
         output_types=types
     )
     if shuffe:
-        dataset = dataset.shuffle(buffer_size=15000).repeat(num_epochs)
+        dataset = dataset.shuffle(buffer_size=10000).repeat(num_epochs)
 
     dataset = dataset.batch(batch_size)
     return dataset
@@ -222,5 +159,4 @@ def labelTrigger(words, labeled,beginIndex,endIndex,tag):
     return words,labeled
 
 if __name__ == '__main__':
-
     pass
