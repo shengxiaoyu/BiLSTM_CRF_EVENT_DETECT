@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from pyltp import SentenceSplitter
+
+import EventModel
 
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
@@ -113,6 +116,7 @@ def main(FLAGS,sentences=None,dir=None):
         #预测结果
         pred = [x['pre_ids'] for x in list(predictions)]
         #预测分析
+        from sklearn_crfsuite.metrics import flat_classification_report
         report = flat_classification_report(y_pred=pred,y_true=targets)
         print(report)
 
@@ -206,6 +210,7 @@ def main(FLAGS,sentences=None,dir=None):
             count -= 1
         fw.close()
     CONFIG.release()
+
 
 if __name__ == '__main__':
     a = [[1,2,3],[4,5,6]]
