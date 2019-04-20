@@ -7,27 +7,7 @@ from Config.config_parser import getParser
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
 
-
-
-def EventFactory(trigger,word,beginIndex,EndIndex):
-    eventDict = {
-        'Know':Know,
-        'BeInLove':BeInLove,
-        'Marry':Marray,
-        'Remarry':Remarray,
-        'Bear':Bear,
-        'FamilyConflict':FamilyConflict,
-        'DomesticViolence':DomesticViolence,
-        'BadHabit':BadHabit,
-        'Derailed':Derailed,
-        'Separation':Separation,
-        'DivorceLawsuit':DivorceLawsuit,
-        'Wealth':Wealth,
-        'Debt':Debt,
-        'Credit':Credit,
-    }
-    return eventDict[trigger](trigger,word,beginIndex,EndIndex)
-def EventFactory2(event_argu_dict):
+def EventFactory(event_argu_dict,event_argus_index_pair_dict,sentence):
     eventDict = {
         'Know': Know,
         'BeInLove': BeInLove,
@@ -44,26 +24,17 @@ def EventFactory2(event_argu_dict):
         'Debt': Debt,
         'Credit': Credit,
     }
-    event =  eventDict[event_argu_dict['Type']](event_argu_dict)
-    event.fitArgus()
+    event =  eventDict[event_argu_dict['Type']](event_argu_dict,event_argus_index_pair_dict,sentence)
     return event
 
 class baseModel(object):
-    def __init__(self,argu_dict):
-        self.word = argu_dict['Trigger']
-        self.argu_dict = argu_dict
-    # def __init__(self,trigger,word,beginIndex,endIndex):
-    #     self.trigger = trigger
-    #     self.word = word
-    #     self.trigger_begin_index = beginIndex
-    #     self.trigger_end_index = endIndex
-    #     self.negated=None
-
-    def fitArgument(self,words,tags):
-        """传入分词和标签列表，从中选择参数"""
-        raise NotImplementedError()
-    def fitArgus(self):
-        raise NotImplementedError()
+    def __init__(self,argu_dict,event_argus_index_pair_dict,sentence):
+        self.trigger = argu_dict['Trigger']
+        self.type = argu_dict['Type']
+        self.trigger_index_pair = event_argus_index_pair_dict['Trigger']
+        self.sentence = sentence
+        self.negated = argu_dict['Negated'] if('Negated' in argu_dict) else ""
+        self.negated_index_pair = event_argus_index_pair_dict['Negated'] if('Negated' in event_argus_index_pair_dict) else None
 
     def __findFoward__ (self,words,tags,target,quickStop=False):
         '''find from 0 to self.trigger_begin_index'''
@@ -99,185 +70,217 @@ class baseModel(object):
 
 #相识事实有一个时间参数，往前找
 class Know(baseModel):
-    def fitArgument(self,words,tags):
-        self.time = self.__findFoward__(words,tags,'Time')
-    def fitArgus(self):
-        if('Know_Time' in self.argu_dict):
-            self.time = self.argu_dict['Know_Time']
+    def __init__(self,argu_dict,event_argus_index_pair_dict,sentence):
+        baseModel.__init__(self,argu_dict,event_argus_index_pair_dict,sentence)
+        self.time =argu_dict['Know_Time'] if('Know_Time' in argu_dict) else ""
+        self.time_index_pair =event_argus_index_pair_dict['Know_Time'] if('Know_Time' in event_argus_index_pair_dict) else None
+
 
     def __str__(self):
-        str = self.word
-        return str
+        str = self.negated+' '+self.time+' '+self.trigger
+        return str.strip()
 
 class BeInLove(baseModel):
-    def fitArgument(self, words, tags):
-        self.time = self.__findFoward__(words, tags,'Time')
-
-    def fitArgus(self):
-        if ('BeInLove_Time' in self.argu_dict):
-            self.time = self.argu_dict['BeInLove_Time']
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
+        self.time = argu_dict['BeInLove_Time'] if ('BeInLove_Time' in argu_dict) else ""
+        self.time_index_pair = event_argus_index_pair_dict['BeInLove_Time'] if (
+                    'BeInLove_Time' in event_argus_index_pair_dict) else None
 
     def __str__(self):
-        str = self.word
-        return str
+        str =  self.negated+' '+self.time + ' ' + self.trigger
+        return str.strip()
 
 class Marray(baseModel):
-    def fitArgument(self, words, tags):
-        self.time = self.__findFoward__(words, tags,'Time')
-
-    def fitArgus(self):
-        if ('Marry_Time' in self.argu_dict):
-            self.time = self.argu_dict['Marry_Time']
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
+        self.time = argu_dict['Marry_Time'] if ('Marry_Time' in argu_dict) else ""
+        self.time_index_pair = event_argus_index_pair_dict['Marry_Time'] if (
+                'Marry_Time' in event_argus_index_pair_dict) else None
 
     def __str__(self):
-        str = self.word
-        return str
+        str =  self.negated+' '+self.time + ' ' + self.trigger
+        return str.strip()
 
 class Remarray(baseModel):
-    def fitArgument(self, words, tags):
-        self.person = self.__findFoward__(words, tags,'Person')
-    def fitArgus(self):
-        pass
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
+        self.participant = argu_dict['Remarry_Participant'] if ('Remarry_Participant' in argu_dict) else ""
+        self.participant_index_pair = event_argus_index_pair_dict['Remarry_Participant'] if ('Remarry_Participant' in event_argus_index_pair_dict) else None
 
     def __str__(self):
-        str = ''
-        if (self.negated != None):
-            str = str + self.negated + ' '
-        if (self.time != None and len(self.time) > 0):
-            str = str + self.time + ' '
-        if(self.personOne!=None and len(self.personOne)>0):
-            str = str+self.personOne+' '
-        if (self.personTwo != None and len(self.personTwo) > 0):
-            str = str + self.personTwo+' '
-        str = str + self.word
-        return str
+        str =  self.negated+' '+self.participant+' '+self.trigger
+        return str.strip()
 
 
 class Bear(baseModel):
-    def fitArgument(self,words,tags):
-        self.time = self.__findFoward__(words, tags,'Time') #前面找时间
-        #后面找其他参数
-        self.gender = self.__findBack__(words,tags,'Gender')#后面找性别
-        self.name = self.__findBack__(words,tags,'Name')#后面找姓名
-        self.age = self.__findBack__(words,tags,'Age')#后面找年龄
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
+
+        self.dateOfBirth = argu_dict['Bear_DateOfBirth'] if ('Bear_DateOfBirth' in argu_dict) else ""
+        self.dateOfBirth_index_pair = event_argus_index_pair_dict['Bear_DateOfBirth'] if ('Bear_DateOfBirth' in event_argus_index_pair_dict) else None
+
+        self.gender = argu_dict['Bear_Gender'] if ('Bear_Gender' in argu_dict) else ""
+        self.gender_index_pair = event_argus_index_pair_dict['Bear_Gender'] if ('Bear_Gender' in event_argus_index_pair_dict) else None
+
+        self.childName = argu_dict['Bear_ChildName'] if ('Bear_ChildName' in argu_dict) else ""
+        self.childName_index_pair = event_argus_index_pair_dict['Bear_ChildName'] if (
+                    'Bear_ChildName' in event_argus_index_pair_dict) else None
+
+        self.age = argu_dict['Bear_Age'] if ('Bear_Age' in argu_dict) else ""
+        self.age_index_pair = event_argus_index_pair_dict['Bear_Age'] if (
+                    'Bear_Age' in event_argus_index_pair_dict) else None
     def __str__(self):
-        str = self.word
-        if(self.time!=None and len(self.time)>0):
-            str = self.time+ ' ' +str
-        if (self.gender != None and len(self.gender) > 0):
-            str = str+' '+self.gender
-        if (self.name != None and len(self.name) > 0):
-            str = str + ' ' + self.name
-        if (self.age != None and len(self.age) > 0):
-            str = str+' '+self.age
-        return str
+        str = self.negated+' '+((self.dateOfBirth+' ') if len(self.dateOfBirth)>0 else '')+self.trigger+' '+((self.gender+' ') if len(self.gender)>0 else '')\
+              +((self.childName + ' ') if len(self.childName) > 0 else '') +((self.age + ' ') if len(self.age) > 0 else '')
+        return str.strip()
+
 class FamilyConflict(baseModel):
-    def fitArgument(self,words,tags):
-        return
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
     def __str__(self):
-        return self.word
+        return self.trigger
 
 class DomesticViolence(baseModel):
-    def fitArgument(self,words,tags):
-        self.victim = self.__findBack__(words,tags,'Person')
-        if(self.victim!=None and len(self.victim)>0):
-            self.perpetrators = self.__findFoward__(words,tags,'Person')
-        else:
-            self.victim = self.__findFoward__(words,tags,'Person')
-            self.perpetrators = self.__findFoward__(words,tags,'Person',quickStop=True)
-            if(self.victim==self.perpetrators):
-                self.perpetrators = None
-                self.victim = None
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
+
+        self.time = argu_dict['DomesticViolence_Time'] if ('DomesticViolence_Time' in argu_dict) else ""
+        self.time_index_pair = event_argus_index_pair_dict['DomesticViolence_Time'] if (
+                'DomesticViolence_Time' in event_argus_index_pair_dict) else None
+
+        self.perpetrator = argu_dict['DomesticViolence_Perpetrators'] if ('DomesticViolence_Perpetrators' in argu_dict) else ""
+        self.perpetrator_index_pair = event_argus_index_pair_dict['DomesticViolence_Perpetrators'] if ('DomesticViolence_Perpetrators' in event_argus_index_pair_dict) else None
+
+        self.victim = argu_dict['DomesticViolence_Victim'] if ('DomesticViolence_Victim' in argu_dict) else ""
+        self.victim_index_pair = event_argus_index_pair_dict['DomesticViolence_Victim'] if ('DomesticViolence_Victim' in event_argus_index_pair_dict) else None
+
+
     def __str__(self):
-        str = self.word
-        if(self.perpetrators!=None and len(self.perpetrators)>0):
-            str = self.perpetrators +' ' + str
-        if(self.victim!=None and len(self.victim)>0):
-            str = str+' '+self.victim
-        return str
+        str = self.negated+' '+((self.time+' ') if len(self.time)>0 else '')+((self.perpetrator+' ') if len(self.perpetrator)>0 else '')+self.trigger+' '+((self.victim+' ') if len(self.victim)>0 else '')
+
+        return str.strip()
 
 class BadHabit(baseModel):
-    def fitArgument(self,words,tags):
-        self.person = self.__findFoward__(words,tags,'Person')
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
+
+        self.person = argu_dict['BadHabit_Participant'] if ('BadHabit_Participant' in argu_dict) else ""
+        self.person_index_pair = event_argus_index_pair_dict['BadHabit_Participant'] if (
+                'BadHabit_Participant' in event_argus_index_pair_dict) else None
+
     def __str__(self):
-        if(self.person!=None and len(self.person)>0):
-            return self.person+' '+self.word
-        else:
-            return self.word
+        str = self.negated+' '+((self.person+' ') if len(self.person)>0 else '')+self.trigger
+        return str.strip()
 
 #出轨
 class Derailed(baseModel):
-    def fitArgument(self,words,tags):
-        self.derailer = self.__findFoward__(words,tags,'Person')#出轨人
-        self.time = self.__findFoward__(words,tags,'Time')#时间
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
+
+        self.time = argu_dict['Derailed_Time'] if ('Derailed_Time' in argu_dict) else ""
+        self.time_index_pair = event_argus_index_pair_dict['Derailed_Time'] if (
+                'Derailed_Time' in event_argus_index_pair_dict) else None
+
+        self.derailer = argu_dict['Derailed_Derailer'] if ('Derailed_Derailer' in argu_dict) else ""
+        self.derailer_index_pair = event_argus_index_pair_dict['Derailed_Derailer'] if (
+                'Derailed_Derailer' in event_argus_index_pair_dict) else None
     def __str__(self):
-        str = ''
-        if(self.time!=None and len(self.time)>0):
-            str = self.time+' '+str
-        if(self.derailer!=None and len(self.derailer)>0):
-            str = self.derailer+' '+str
-        str = str + self.word
-        return str
+        str = self.negated+' '+((self.time+' ') if len(self.time)>0 else '')+((self.derailer+' ') if len(self.derailer)>0 else '')+self.trigger
+        return str.strip()
 
 class Separation(baseModel):
-    def fitArgument(self,words,tags):
-        self.beginTime = self.__findFoward__(words,tags,'Time')
-        self.duration = self.__findFoward__(words,tags,'Duration')
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
+        self.beginTime = argu_dict['Separation_BeginTime'] if ('Separation_BeginTime' in argu_dict) else ""
+        self.beginTime_index_pair = event_argus_index_pair_dict['Separation_BeginTime'] if (
+                'Separation_BeginTime' in event_argus_index_pair_dict) else None
+
+        self.endTime = argu_dict['Separation_EndTime'] if ('Separation_EndTime' in argu_dict) else ""
+        self.endTime_index_pair = event_argus_index_pair_dict['Separation_EndTime'] if (
+                'Separation_EndTime' in event_argus_index_pair_dict) else None
+
+        self.duration = argu_dict['Separation_Duration'] if ('Separation_Duration' in argu_dict) else ""
+        self.duration_index_pair = event_argus_index_pair_dict['Separation_Duration'] if (
+                'Separation_Duration' in event_argus_index_pair_dict) else None
+
+
     def __str__(self):
-        str = self.word
-        if (self.beginTime != None and len(self.beginTime) > 0):
-            str = self.beginTime + ' ' + str
-        if (self.duration != None and len(self.duration) > 0):
-            str = str+' 持续：'+self.duration
-        return str
+        str = self.negated+' '+((self.beginTime+' ') if len(self.beginTime)>0 else '')+self.trigger+' '+((self.endTime+' ') if len(self.endTime)>0 else '')+((self.duration+' ') if len(self.duration)>0 else '')
+        return str.strip()
 class DivorceLawsuit(baseModel):
-    def fitArgument(self,words,tags):
-        self.beginTime = self.__findFoward__(words,tags,'Time')
-        self.person = self.__findFoward__(words,tags,'Person')
-        self.court = self.__findBack__(words,tags,'Court')
-        if(self.court==None or len(self.court)==0):
-            self.court = self.__findFoward__(words,tags,'Court')
-        self.endTime = self.__findBack__(words,tags,'Time')
-        self.document = self.__findBack__(words,tags,'Document')
-        self.result = self.__findBack__(words,tags,'Judgment')
-    def __str__(self):
-        str = ''
-        if (self.beginTime != None and len(self.beginTime) > 0):
-            str = str+self.beginTime
-        if (self.person != None and len(self.person) > 0):
-            if(len(str)>0):
-                str = str+' '+self.person
-            else:
-                str = self.person
-        if(len(str)>0):
-            str = str+' '+self.word
-        else:
-            str = self.word
-        if (self.endTime != None and len(self.endTime) > 0):
-            str = str+' '+self.endTime
-        if (self.court != None and len(self.court) > 0):
-            str = str+' '+self.court
-        if (self.document != None and len(self.document) > 0):
-            str = str+' '+self.document
-        if (self.result != None and len(self.result) > 0):
-            str = str+' '+self.result
-        return str
+
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
+
+        self.sueTime = argu_dict['DivorceLawsuit_SueTime'] if ('DivorceLawsuit_SueTime' in argu_dict) else ""
+        self.sueTime_index_pair = event_argus_index_pair_dict['DivorceLawsuit_SueTime'] if (
+                'DivorceLawsuit_SueTime' in event_argus_index_pair_dict) else None
+
+        self.initiator = argu_dict['DivorceLawsuit_Initiator'] if ('DivorceLawsuit_Initiator' in argu_dict) else ""
+        self.initiator_index_pair = event_argus_index_pair_dict['DivorceLawsuit_Initiator'] if (
+                'DivorceLawsuit_Initiator' in event_argus_index_pair_dict) else None
+
+        self.judgeTime = argu_dict['DivorceLawsuit_JudgeTime'] if ('DivorceLawsuit_JudgeTime' in argu_dict) else ""
+        self.judgeTime_index_pair = event_argus_index_pair_dict['DivorceLawsuit_JudgeTime'] if (
+                'DivorceLawsuit_JudgeTime' in event_argus_index_pair_dict) else None
+
+        self.court = argu_dict['DivorceLawsuit_Court'] if ('DivorceLawsuit_Court' in argu_dict) else ""
+        self.court_index_pair = event_argus_index_pair_dict['DivorceLawsuit_Court'] if (
+                'DivorceLawsuit_Court' in event_argus_index_pair_dict) else None
+
+        self.judgeDocument = argu_dict['DivorceLawsuit_JudgeDocument'] if ('DivorceLawsuit_JudgeDocument' in argu_dict) else ""
+        self.judgeDocument_index_pair = event_argus_index_pair_dict['DivorceLawsuit_JudgeDocument'] if (
+                'DivorceLawsuit_JudgeDocument' in event_argus_index_pair_dict) else None
+
+        self.result = argu_dict['DivorceLawsuit_Result'] if ('DivorceLawsuit_Result' in argu_dict) else ""
+        self.result_index_pair = event_argus_index_pair_dict['DivorceLawsuit_Result'] if (
+                'DivorceLawsuit_Result' in event_argus_index_pair_dict) else None
 
 class Wealth(baseModel):
-    def fitArgument(self,words,tags):
-        return
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
+
+        self.value = argu_dict['Wealth_Value'] if ('Wealth_Value' in argu_dict) else ""
+        self.value_index_pair = event_argus_index_pair_dict['Wealth_Value'] if (
+                'Wealth_Value' in event_argus_index_pair_dict) else None
+
+        self.isCommon = argu_dict['Wealth_IsCommon'] if ('Wealth_IsCommon' in argu_dict) else ""
+        self.isCommon_index_pair = event_argus_index_pair_dict['Wealth_IsCommon'] if (
+                'Wealth_IsCommon' in event_argus_index_pair_dict) else None
+
+        self.isPersonal = argu_dict['Wealth_IsPersonal'] if ('Wealth_IsPersonal' in argu_dict) else ""
+        self.isPersonal_index_pair = event_argus_index_pair_dict['Wealth_IsPersonal'] if (
+                'Wealth_IsPersonal' in event_argus_index_pair_dict) else None
+
+        self.whose = argu_dict['Wealth_Whose'] if ('Wealth_Whose' in argu_dict) else ""
+        self.whose_index_pair = event_argus_index_pair_dict['Wealth_Whose'] if (
+                'Wealth_Whose' in event_argus_index_pair_dict) else None
     def __str__(self):
-        return self.word
+        return self.trigger
 class Debt(baseModel):
-    def fitArgument(self,words,tags):
-        return
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
+        self.creditor = argu_dict['Debt_Creditor'] if ('Debt_Creditor' in argu_dict) else ""
+        self.creditor_index_pair = event_argus_index_pair_dict['Debt_Creditor'] if (
+                'Debt_Creditor' in event_argus_index_pair_dict) else None
+        self.value = argu_dict['Debt_Value'] if ('Debt_Value' in argu_dict) else ""
+        self.value_index_pair = event_argus_index_pair_dict['Debt_Value'] if (
+                'Debt_Value' in event_argus_index_pair_dict) else None
     def __str__(self):
-        return self.word
+        return self.trigger
 class Credit(baseModel):
-    def fitArgument(self,words,tags):
-        return
+    def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
+        baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
+        self.debtor = argu_dict['Credit_Debtor'] if ('Credit_Debtor' in argu_dict) else ""
+        self.debtor_index_pair = event_argus_index_pair_dict['Credit_Debtor'] if (
+                'Credit_Debtor' in event_argus_index_pair_dict) else None
+
+        self.value = argu_dict['Credit_Value'] if ('Credit_Value' in argu_dict) else ""
+        self.value_index_pair = event_argus_index_pair_dict['Credit_Value'] if (
+                'Credit_Value' in event_argus_index_pair_dict) else None
     def __str__(self):
-        return self.word
+        return self.trigger
 
 if __name__ == '__main__':
     sys.exit(0)

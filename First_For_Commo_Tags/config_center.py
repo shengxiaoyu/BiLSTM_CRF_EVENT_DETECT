@@ -31,15 +31,19 @@ SEGMENTOR = None
 STOP_WORDS=None
 TRIGGER_WORDS_DICT = None
 
+ifInited = False
 
 #初始化各类模型以及词集
 def init(rootdir):
-    initTags(os.path.join(rootdir,'triggerLabels.txt'),os.path.join(rootdir, 'argumentLabels.txt'))
-    initWord2Vec(os.path.join(rootdir, 'word2vec'))
-    initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
-    initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
-    initStopWords(os.path.join(rootdir, 'newStopWords.txt'))
-    initTriggerWords(os.path.join(rootdir,'triggers'))
+    global ifInited
+    if(not ifInited):
+        initTags(os.path.join(rootdir,'triggerLabels.txt'),os.path.join(rootdir, 'argumentLabels.txt'))
+        initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
+        initWord2Vec(os.path.join(rootdir, 'word2vec'))
+        initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
+        initStopWords(os.path.join(rootdir, 'newStopWords.txt'))
+        initTriggerWords(os.path.join(rootdir,'triggers'))
+        ifInited = True
 
 def initTags(triggerLablePath,argumentLabelPath):
     global TAG_2_ID, ID_2_TAG,TAGs_LEN,TRIGGER_TAGs,ARGU_TAGs

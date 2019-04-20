@@ -14,7 +14,6 @@ import First_For_Commo_Tags.config_center as CONFIG
 import Second_For_Fine_Tags.input_fn as INPUT
 import Second_For_Fine_Tags.model_fn as MODEL
 import Second_For_Fine_Tags.config_center as NEW_CONFIG
-from Event_Model.EventModel import EventFactory2
 
 #训练、评估、预测,sentencs_words_firstTags_list:要预测的句子+第一层模型初步预测结果
 def main(FLAGS,sentencs_words_firstTags_list=None):
@@ -120,14 +119,14 @@ def main(FLAGS,sentencs_words_firstTags_list=None):
         with open(os.path.join(output_dir,'predict_result.txt'),'w',encoding='utf8') as fw:
             fw.write(str(report))
             for target,predict in zip(pred_true,pred):
-                (words,length,firstTags,_),tags = target
+                (words,length,first_tags,_),tags = target
                 words = [words[i] for i in range(length)]
-                firstTags = [firstTags[i] for i in range(length)]
+                first_tags = [first_tags[i] for i in range(length)]
                 labels = [NEW_CONFIG.NEW_ID_2_TAG[tags[i]] for i in range(length)]
                 outputs = [NEW_CONFIG.NEW_ID_2_TAG[predict[i]] for i in range(length)]
                 fw.write('原 文 ：'+' '.join(words))
                 fw.write('\n')
-                fw.write('第一层预测标签：'+' '.join(firstTags))
+                fw.write('第一层预测标签：'+' '.join(first_tags))
                 fw.write('\n')
                 fw.write('人工标记： '+' '.join(labels))
                 fw.write('\n')
@@ -136,58 +135,58 @@ def main(FLAGS,sentencs_words_firstTags_list=None):
                 fw.write('\n')
     if FLAGS.ifPredict and sentencs_words_firstTags_list:
         '''根据原句分词和第一个模型的预测标记序列 让第二个模型预测并抽取事实'''
-        '''传入的sentence_words_firstTags_list 包括原文分词和第一个模型的预测标签序列'''
+        '''传入的sentence_words_firstTags_list 包括原文分词和第一个模型的预测标签序列,以及每个原文分词在原句中的起止索引'''
 
-        def handlerOneInput(one_sentence_words_firstTags):
+        def handlerOneInput(words,first_tags,index_pairs,sentence):
             results = []
-            words = one_sentence_words_firstTags[0]
-            firstTags = one_sentence_words_firstTags[1]
-            for index,tag in enumerate(firstTags):
+            index_pairs_list = []
+            sentences = []
+            for index,tag in enumerate(first_tags):
                 if(tag in CONFIG.TRIGGER_TAGs and tag.find('B_')!=-1):#触发词
                     #不含B_的触发词
                     currentTrigger = tag[2:]
                     #确定触发词的长度
                     endIndex = index+1
-                    while(firstTags[endIndex].find(currentTrigger)!=-1):
+                    while(first_tags[endIndex].find(currentTrigger)!=-1):
                         endIndex += 1
                     #构造新的tags列：
-                    newTags = [firstTags[i]+'_Trigger' if i>=index and i<endIndex else 'O' for i in range(len(firstTags))]
-                    #深拷贝words列
+                    newTags = [first_tags[i]+'_Trigger' if i>=index and i<endIndex else 'O' for i in range(len(first_tags))]
+                    #深拷贝其余两列
                     newWords = [x for x in words]
-                    results.append([newWords,firstTags,newTags])
-            return results
+                    new_index_pairs = [x for x in index_pairs]
+                    results.append([newWords,first_tags,newTags])
+                    index_pairs_list.append(new_index_pairs)
+                    sentences.append(sentence)
+            return results,index_pairs_list,sentences
 
+        words_list,first_tags_list,index_pairs_list,sentences = sentencs_words_firstTags_list
         #构造第二个模型的输入list
+        #针对第一个模型的预测结果，针对每个触发词都会构成一条新的预测example
         sentence_words_firstTags_trueTriggerTags = []
-        for one_sentence_words_firstTags in sentencs_words_firstTags_list:
-            sentence_words_firstTags_trueTriggerTags.extend(handlerOneInput(one_sentence_words_firstTags))
+        new_index_pairs_list = []
+        new_sentences = []
+        for words,first_tags,index_pairs,sentence in zip(words_list,first_tags_list,index_pairs_list,sentences):
+            the_words_firstTags_newTags_list,the_index_pairs_list,the_sentences =handlerOneInput(words,first_tags,index_pairs,sentence)
+            sentence_words_firstTags_trueTriggerTags.extend(the_words_firstTags_newTags_list)
+            new_index_pairs_list.extend(the_index_pairs_list)
+            new_sentences.extend(the_sentences)
         pred_inpf = functools.partial(INPUT.input_fn,input_dir=None,shuffe=False,num_epochs=FLAGS.num_epochs,
                                                      batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length,
                                                      sentence_words_firstTags_trueTriggerTags=sentence_words_firstTags_trueTriggerTags)
         predictions = estimator.predict(input_fn=pred_inpf)
         preds = [x['pre_ids'] for x in list(predictions)]
-        events = []
+
+        new_words_list = []
+        new_tags_list = []
         for ids,inputs in zip(preds,sentence_words_firstTags_trueTriggerTags):
+            #词语
             words = inputs[0]
-            event_argus_dict = {}
+            new_words_list.append(words)
+            #预测标签
             tags = [NEW_CONFIG.NEW_ID_2_TAG[id] for id in ids]
-            for tag,word in zip(tags,words):
-                if(tag in NEW_CONFIG.NEW_TRIGGER_TAGs):
-                    eventType = tag[2:-8] #B_Know_Trigger => Know
-                    if('Trigger' in event_argus_dict):
-                        event_argus_dict['Trigger'] = event_argus_dict['Trigger'] +word
-                    else:
-                        event_argus_dict['Type'] = eventType
-                        event_argus_dict['Trigger'] = word
-                if(tag in NEW_CONFIG.NEW_ARGU_TAGs and tag !='<pad>' and tag!='O'):
-                    newTag = tag[2:]
-                    if(newTag in event_argus_dict):
-                        event_argus_dict[newTag] = event_argus_dict[newTag]+word
-                    else:
-                        event_argus_dict[newTag] = word
-            if('Type' in event_argus_dict):
-                events.append(EventFactory2(event_argus_dict))
-        return events
+            #每个词语在原句中的index_pair
+            new_tags_list.append(tags)
+        return new_words_list,new_tags_list,new_index_pairs_list,new_sentences
     CONFIG.release()
 
 if __name__ == '__main__':

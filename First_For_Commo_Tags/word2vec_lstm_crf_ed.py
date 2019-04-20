@@ -133,9 +133,12 @@ def main(FLAGS,sentences=None,dir=None):
 
     if FLAGS.ifPredict and sentences:
         sentences_words_posTags = []
+        words_in_sentence_index_list = []
         for sentence in sentences:
             #分词、获取pos标签、去停用词
             words = CONFIG.SEGMENTOR.segment(sentence)
+            #每个词对应的在原句里面的索引[beginIndex,endIndex)
+            indexPairs = formIndexs(words)
             postags = CONFIG.POSTAGGER.postag(words)
             tags = ['O' for _ in words]
 
@@ -150,27 +153,27 @@ def main(FLAGS,sentences=None,dir=None):
             newWords = []
             newPosTags = []
             newTags = []
-            for word, pos,tag in zip(words, postags,tags):
+            newIndexs = []
+            for word, pos,tag,indexPair in zip(words, postags,tags,indexPairs):
                 if (word not in CONFIG.STOP_WORDS):
                     newWords.append(word)
                     newPosTags.append(pos)
                     newTags.append(tag)
+                    newIndexs.append(indexPair)
             sentences_words_posTags.append([newWords,newTags,newPosTags])
+            words_in_sentence_index_list.append(newIndexs)
         pre_inf = functools.partial(INPUT.input_fn, input_dir=None,sentences_words_posTags=sentences_words_posTags,
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
                                       max_sequence_length=FLAGS.max_sequence_length)
         predictions = estimator.predict(input_fn=pre_inf)
         predictions = [x['pre_ids'] for x in list(predictions)]
 
-        result = []
-        for one_sentence_words_posTags,pre_ids in zip(sentences_words_posTags,predictions):
-            words = one_sentence_words_posTags[0]
-            pre_tags = [CONFIG.ID_2_TAG[id]for id in pre_ids]
-            result.append([words,pre_tags])
-            print(' '.join(words))
-            print(' '.join(pre_tags[0:len(words)]))
+        words_list = [one_sentence_words_posTags[0] for one_sentence_words_posTags in sentences_words_posTags]
+        tags_list = []
+        for pre_ids in predictions:
+            tags_list.append([CONFIG.ID_2_TAG[id]for id in pre_ids])
         CONFIG.release()
-        return result
+        return [words_list,tags_list,words_in_sentence_index_list]
     if (FLAGS.ifPredictFile and dir):
         sentences_words_oldTags_posTags_list, full_tags_list = fileGenerator.generator_examples_from_full_file(dir)
         pre_inf = functools.partial(INPUT.input_fn, input_dir=None,
@@ -206,6 +209,14 @@ def main(FLAGS,sentences=None,dir=None):
             count -= 1
         fw.close()
     CONFIG.release()
+
+def formIndexs(words):
+    indexs = []
+    baseIndex = 0
+    for word in words:
+        indexs.append([baseIndex,baseIndex+len(word)])
+        baseIndex += len(word)
+    return indexs
 
 if __name__ == '__main__':
     a = [[1,2,3],[4,5,6]]
