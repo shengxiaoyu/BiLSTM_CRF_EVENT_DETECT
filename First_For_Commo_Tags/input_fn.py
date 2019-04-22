@@ -103,7 +103,7 @@ def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentence
         output_types=types
     )
     if shuffe:
-        dataset = dataset.shuffle(buffer_size=10000).repeat(num_epochs)
+        dataset = dataset.shuffle(buffer_size=25000).repeat(num_epochs)
 
     dataset = dataset.batch(batch_size)
     return dataset

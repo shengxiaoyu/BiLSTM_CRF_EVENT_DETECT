@@ -39,17 +39,27 @@ def paddingAndEmbedding(fileName,words,tags,pre_tags,max_sequence_length,noEmbed
     #添加是否是所关注的触发词 特征
     triggerFeatures = []
     for tag in pre_tags:
-        new_trigger_onehot = [1 if tag==new_trigger else 0 for new_trigger in NEW_CONFIG.NEW_TRIGGER_TAGs ]
-        # triggerFeatures.append([1 if tag in NEW_CONFIG.NEW_TRIGGER_TAGs else 0])
-        triggerFeatures.append(new_trigger_onehot)
+        # new_trigger_onehot = [1 if tag==new_trigger else 0 for new_trigger in NEW_CONFIG.NEW_TRIGGER_TAGs ]
+        triggerFeatures.append([1 if tag in NEW_CONFIG.NEW_TRIGGER_TAGs else 0])
+        # triggerFeatures.append(new_trigger_onehot)
+        # if(tag in NEW_CONFIG.NEW_TRIGGER_TAGs):
+        #     type = tag[2:-8]
+        #     triggerFeatures.append(NEW_CONFIG.NEW_TRIGGER_TYPE_ONEHOT_DICT[type])
+        # else:
+        #     triggerFeatures.append([0 for _ in range(len(NEW_CONFIG.NEW_TRIGGER_TYPE_ONEHOT_DICT))])
 
     #根据noEmbedding参数确定是否进行向量化
     if(not noEmbedding):
         words = [CONFIG.WV[word] for word in words]
         # 第一层的预测标签转onehot表示
         oneHotOldTags = []
+        # for tag in tags:
+        #     oneHotOldTags.append([1 if tag == oldTag else 0 for oldTag in CONFIG.ARGU_TAGs])
+        allOldTags = []
+        allOldTags.extend(CONFIG.ARGU_TAGs)
+        allOldTags.extend(CONFIG.TRIGGER_TAGs)
         for tag in tags:
-            oneHotOldTags.append([1 if tag == oldTag else 0 for oldTag in CONFIG.ARGU_TAGs])
+            oneHotOldTags.append([1 if tag == oldTag else 0 for oldTag in allOldTags])
     else:
         #第一层的预测标签不变
         oneHotOldTags = tags
@@ -87,7 +97,7 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentence_words_
 
 def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentence_words_firstTags_trueTriggerTags=None):
     '''shape代表((最大句长，词向量长),真实句长，（最大句长，新Trigger类别),(最大句长，旧参数类别)),真实标签)'''
-    shapes = (([max_sequence_length,CONFIG.WV.vector_size],(),[max_sequence_length,len(CONFIG.ARGU_TAGs)],[max_sequence_length,NEW_CONFIG.NEW_TRIGGER_LEN]),[max_sequence_length])
+    shapes = (([max_sequence_length,CONFIG.WV.vector_size],(),[max_sequence_length,len(CONFIG.ARGU_TAGs)+len(CONFIG.TRIGGER_TAGs)],[max_sequence_length,1]),[max_sequence_length])
     types = ((tf.float32,tf.int32,tf.float32,tf.float32),tf.int32)
     dataset = tf.data.Dataset.from_generator(
         functools.partial(generator_fn,input_dir=input_dir,sentence_words_firstTags_trueTriggerTags=sentence_words_firstTags_trueTriggerTags,max_sequence_length = max_sequence_length),
@@ -95,7 +105,7 @@ def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentence
         output_types=types
     )
     if shuffe:
-        dataset = dataset.shuffle(buffer_size=10000).repeat(num_epochs)
+        dataset = dataset.shuffle(buffer_size=20000).repeat(num_epochs)
 
     dataset = dataset.batch(batch_size)
     return dataset

@@ -16,7 +16,7 @@ import Second_For_Fine_Tags.model_fn as MODEL
 import Second_For_Fine_Tags.config_center as NEW_CONFIG
 
 #训练、评估、预测,sentencs_words_firstTags_list:要预测的句子+第一层模型初步预测结果
-def main(FLAGS,sentencs_words_firstTags_list=None):
+def main(FLAGS,sentencs_words_firstTags_list=None,words_firstTags_indxPairs_sentences=None):
     print(FLAGS)
 
     tf.enable_eager_execution()
@@ -83,10 +83,9 @@ def main(FLAGS,sentencs_words_firstTags_list=None):
         print('获取训练数据。。。')
         train_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'train')),
                                        shuffe=True, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
-        train_total = len(list(train_inpf()))
-        print('训练总数：'+str(train_total))
-        num_train_steps = train_total/FLAGS.batch_size*FLAGS.num_epochs
-        print('训练steps:'+str(num_train_steps))
+        train_examples = list(train_inpf())
+        train_total = len(train_examples)
+        print('训练steps:'+str(train_total))
         print('获取评估数据。。。')
         eval_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'dev')),
                                       shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
@@ -135,59 +134,120 @@ def main(FLAGS,sentencs_words_firstTags_list=None):
                 fw.write('\n')
     if FLAGS.ifPredict and sentencs_words_firstTags_list:
         '''根据原句分词和第一个模型的预测标记序列 让第二个模型预测并抽取事实'''
-        '''传入的sentence_words_firstTags_list 包括原文分词和第一个模型的预测标签序列,以及每个原文分词在原句中的起止索引'''
+        '''传入的sentence_words_firstTags_list 包括原文分词和第一个模型的预测标签序列'''
 
-        def handlerOneInput(words,first_tags,index_pairs,sentence):
+        def handlerOneInput(words, first_tags):
             results = []
-            index_pairs_list = []
-            sentences = []
-            for index,tag in enumerate(first_tags):
-                if(tag in CONFIG.TRIGGER_TAGs and tag.find('B_')!=-1):#触发词
-                    #不含B_的触发词
+            for index, tag in enumerate(first_tags):
+                if (tag in CONFIG.TRIGGER_TAGs and tag.find('B_') != -1):  # 触发词
+                    # 不含B_的触发词
                     currentTrigger = tag[2:]
-                    #确定触发词的长度
-                    endIndex = index+1
-                    while(first_tags[endIndex].find(currentTrigger)!=-1):
+                    # 确定触发词的长度
+                    endIndex = index + 1
+                    while (endIndex<len(first_tags) and first_tags[endIndex].find(currentTrigger) != -1):
                         endIndex += 1
-                    #构造新的tags列：
-                    newTags = [first_tags[i]+'_Trigger' if i>=index and i<endIndex else 'O' for i in range(len(first_tags))]
-                    #深拷贝其余两列
+                    # 构造新的tags列：
+                    newTags = [first_tags[i] + '_Trigger' if i >= index and i < endIndex else 'O' for i in
+                               range(len(first_tags))]
+                    # 深拷贝其余两列
                     newWords = [x for x in words]
-                    new_index_pairs = [x for x in index_pairs]
-                    results.append([newWords,first_tags,newTags])
-                    index_pairs_list.append(new_index_pairs)
-                    sentences.append(sentence)
-            return results,index_pairs_list,sentences
+                    newFirstTags = [x for x in first_tags]
 
-        words_list,first_tags_list,index_pairs_list,sentences = sentencs_words_firstTags_list
-        #构造第二个模型的输入list
-        #针对第一个模型的预测结果，针对每个触发词都会构成一条新的预测example
+                    results.append([newWords, newFirstTags, newTags])
+            return results
+
+        words_list, first_tags_list = sentencs_words_firstTags_list
+        # 构造第二个模型的输入list
+        # 针对第一个模型的预测结果，针对每个触发词都会构成一条新的预测example
         sentence_words_firstTags_trueTriggerTags = []
-        new_index_pairs_list = []
-        new_sentences = []
-        for words,first_tags,index_pairs,sentence in zip(words_list,first_tags_list,index_pairs_list,sentences):
-            the_words_firstTags_newTags_list,the_index_pairs_list,the_sentences =handlerOneInput(words,first_tags,index_pairs,sentence)
+        for words, first_tags in zip(words_list, first_tags_list):
+            the_words_firstTags_newTags_list = handlerOneInput(words, first_tags)
             sentence_words_firstTags_trueTriggerTags.extend(the_words_firstTags_newTags_list)
-            new_index_pairs_list.extend(the_index_pairs_list)
-            new_sentences.extend(the_sentences)
-        pred_inpf = functools.partial(INPUT.input_fn,input_dir=None,shuffe=False,num_epochs=FLAGS.num_epochs,
-                                                     batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length,
-                                                     sentence_words_firstTags_trueTriggerTags=sentence_words_firstTags_trueTriggerTags)
+        pred_inpf = functools.partial(INPUT.input_fn, input_dir=None, shuffe=False, num_epochs=FLAGS.num_epochs,
+                                      batch_size=FLAGS.batch_size, max_sequence_length=FLAGS.max_sequence_length,
+                                      sentence_words_firstTags_trueTriggerTags=sentence_words_firstTags_trueTriggerTags)
         predictions = estimator.predict(input_fn=pred_inpf)
         preds = [x['pre_ids'] for x in list(predictions)]
 
         new_words_list = []
         new_tags_list = []
-        for ids,inputs in zip(preds,sentence_words_firstTags_trueTriggerTags):
-            #词语
+        for ids, inputs in zip(preds, sentence_words_firstTags_trueTriggerTags):
+            # 词语
             words = inputs[0]
             new_words_list.append(words)
-            #预测标签
+            # 预测标签
             tags = [NEW_CONFIG.NEW_ID_2_TAG[id] for id in ids]
-            #每个词语在原句中的index_pair
+            # 每个词语在原句中的index_pair
             new_tags_list.append(tags)
-        return new_words_list,new_tags_list,new_index_pairs_list,new_sentences
-    CONFIG.release()
+        for words, tags in zip(new_words_list, new_tags_list):
+            print(' '.join(words))
+            print('\n')
+            print(' '.join(tags))
+            print('\n')
+        return new_words_list, new_tags_list
+
+    if(FLAGS.ifPredict and words_firstTags_indxPairs_sentences):
+        '''根据原句分词和第一个模型的预测标记序列 让第二个模型预测并抽取事实'''
+        '''传入的sentence_words_firstTags_list 包括原文分词和第一个模型的预测标签序列,以及每个原文分词在原句中的起止索引'''
+
+        def handlerOneInput(words, first_tags, index_pairs, sentence):
+            results = []
+            index_pairs_list = []
+            sentences = []
+            for index, tag in enumerate(first_tags):
+                if (tag in CONFIG.TRIGGER_TAGs and tag.find('B_') != -1):  # 触发词
+                    # 不含B_的触发词
+                    currentTrigger = tag[2:]
+                    # 确定触发词的长度
+                    endIndex = index + 1
+                    while (first_tags[endIndex].find(currentTrigger) != -1):
+                        endIndex += 1
+                    # 构造新的tags列：
+                    newTags = [first_tags[i] + '_Trigger' if i >= index and i < endIndex else 'O' for i in
+                               range(len(first_tags))]
+                    # 深拷贝其余两列
+                    newWords = [x for x in words]
+                    new_index_pairs = [x for x in index_pairs]
+                    results.append([newWords, first_tags, newTags])
+                    index_pairs_list.append(new_index_pairs)
+                    sentences.append(sentence)
+            return results, index_pairs_list, sentences
+
+        words_list, first_tags_list, index_pairs_list, sentences = words_firstTags_indxPairs_sentences
+        # 构造第二个模型的输入list
+        # 针对第一个模型的预测结果，针对每个触发词都会构成一条新的预测example
+        sentence_words_firstTags_trueTriggerTags = []
+        new_index_pairs_list = []
+        new_sentences = []
+        for words, first_tags, index_pairs, sentence in zip(words_list, first_tags_list, index_pairs_list, sentences):
+            the_words_firstTags_newTags_list, the_index_pairs_list, the_sentences = handlerOneInput(words, first_tags,
+                                                                                                    index_pairs,
+                                                                                                    sentence)
+            sentence_words_firstTags_trueTriggerTags.extend(the_words_firstTags_newTags_list)
+            new_index_pairs_list.extend(the_index_pairs_list)
+            new_sentences.extend(the_sentences)
+        pred_inpf = functools.partial(INPUT.input_fn, input_dir=None, shuffe=False, num_epochs=FLAGS.num_epochs,
+                                      batch_size=FLAGS.batch_size, max_sequence_length=FLAGS.max_sequence_length,
+                                      sentence_words_firstTags_trueTriggerTags=sentence_words_firstTags_trueTriggerTags)
+        predictions = estimator.predict(input_fn=pred_inpf)
+        preds = [x['pre_ids'] for x in list(predictions)]
+
+        new_words_list = []
+        new_tags_list = []
+        for ids, inputs in zip(preds, sentence_words_firstTags_trueTriggerTags):
+            # 词语
+            words = inputs[0]
+            new_words_list.append(words)
+            # 预测标签
+            tags = [NEW_CONFIG.NEW_ID_2_TAG[id] for id in ids]
+            # 每个词语在原句中的index_pair
+            new_tags_list.append(tags)
+        for words, tags in zip(new_words_list, new_tags_list):
+            print(' '.join(words))
+            print('\n')
+            print(' '.join(tags))
+            print('\n')
+        return new_words_list, new_tags_list, new_index_pairs_list, new_sentences
 
 if __name__ == '__main__':
     a = [[1,2,3],[4,5,6]]

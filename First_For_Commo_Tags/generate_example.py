@@ -81,71 +81,9 @@ def generator_full_tags():
         for argu in argus:
             fw.write('B_' + argu + '\n' + 'I_' + argu + '\n')
         fw.write('O')
-#将spe模型下的单句合并为full下的句子
-def merge(path):
-    #会用到trigger集合，需要初始化Trigger_Tags
-    parse = getParser()
-    CONFIG.init(parse.root_dir)
-    #新文件的保存路径，保存在传入文件的同级目录
-    savePath = os.path.join(os.path.split(path)[0],'Merge_'+os.path.split(path)[1])
-    if(not os.path.exists(savePath)):
-        os.mkdir(savePath)
 
-    def merge(tagsList):
-        mergedTags = tagsList[0]
-        for tags in tagsList[1:]:
-            for index,tag in enumerate(tags):
-                if(tag!='O'):
-                    if(mergedTags[index]=='O'):
-                        mergedTags[index] = tag
-                    elif(mergedTags[index] in CONFIG.TRIGGER_TAGs):
-                        '''此时产生冲突'''
-                        '''原先填入的是触发词'''
-                        if(mergedTags[index].find('B_')==-1 and tag.find('B_')!=-1):
-                            mergedTags[index] = tag #原先的不是B_开头触发词，新来的是B_开头触发词才能覆盖
-                    else:#如果以前不是触发词，
-                        if((tag in CONFIG.TRIGGER_TAGs or tag.find('B_')!=-1) and mergedTags[index].find('B_')==-1): #只有新来的是触发词或者B_开头的参数，而且老的不是B_开头才能覆盖
-                            mergedTags[index] = tag
-        return mergedTags
-
-    for fileName in os.listdir(path):
-        with open(os.path.join(path,fileName),'r',encoding='utf8') as f,open(os.path.join(savePath,fileName),'w',encoding='utf8') as fw:
-            #words行
-            lastSentence = f.readline().strip()
-            #tag行
-            lastTagsList = []
-            lastTags = f.readline().strip().split()
-            lastTagsList.append(lastTags)
-            #pos行
-            poses = f.readline().strip()
-
-            sentence = f.readline().strip()
-            while(sentence):
-                if(sentence==lastSentence):
-                    '''此时时同一行，将tags加入列表'''
-                    lastTagsList.append(f.readline().strip().split())
-                    #去掉pos行
-                    f.readline()
-                    #更新words行
-                    sentence = f.readline().strip()
-                else:
-                    '''来了新的行，将上一种合并写入'''
-                    mergedTags = merge(lastTagsList)
-                    fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
-                    #更新缓存
-                    lastSentence = sentence
-                    lastTagsList = []
-                    lastTags = f.readline().strip().split()
-                    lastTagsList.append(lastTags)
-                    poses = f.readline().strip()
-
-                    sentence = f.readline().strip()
-
-            #处理缓存
-            mergedTags = merge(lastTagsList)
-            fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
 
 if __name__ == '__main__':
-    merge('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe\\train')
+
     # generator_full_tags()
     sys.exit(0)

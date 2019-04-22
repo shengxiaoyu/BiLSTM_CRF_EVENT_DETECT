@@ -84,9 +84,7 @@ def main(FLAGS,sentences=None,dir=None):
         train_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'train')),
                                        shuffe=True, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         train_total = len(list(train_inpf()))
-        print('训练总数：'+str(train_total))
-        num_train_steps = train_total/FLAGS.batch_size*FLAGS.num_epochs
-        print('训练steps:'+str(num_train_steps))
+        print('训练steps:'+str(train_total))
         print('获取评估数据。。。')
         eval_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'dev')),
                                       shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
@@ -172,7 +170,11 @@ def main(FLAGS,sentences=None,dir=None):
         tags_list = []
         for pre_ids in predictions:
             tags_list.append([CONFIG.ID_2_TAG[id]for id in pre_ids])
-        CONFIG.release()
+        for words,tags in zip(words_list,tags_list):
+            print(' '.join(words))
+            print('\n')
+            print(' '.join(tags))
+            print('\n')
         return [words_list,tags_list,words_in_sentence_index_list]
     if (FLAGS.ifPredictFile and dir):
         sentences_words_oldTags_posTags_list, full_tags_list = fileGenerator.generator_examples_from_full_file(dir)
@@ -208,7 +210,6 @@ def main(FLAGS,sentences=None,dir=None):
             fw.write('\n')
             count -= 1
         fw.close()
-    CONFIG.release()
 
 def formIndexs(words):
     indexs = []

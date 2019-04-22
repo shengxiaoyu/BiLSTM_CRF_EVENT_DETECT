@@ -23,9 +23,9 @@ def model_fn(features,labels,mode,params):
     print('LSTM联合层')
     output_fw, _ = lstm_cell_fw(t, dtype=tf.float32, sequence_length=lengths)
     output_bw, _ = lstm_cell_bw(t, dtype=tf.float32, sequence_length=lengths) #shape 49*batch_size*100
-    output = tf.concat([output_fw, output_bw], axis=-1) #40*batch_size*200
+    output = tf.concat([output_fw, output_bw], axis=-1) #55*batch_size*200
     #转换回正常输出
-    output = tf.transpose(output, perm=[1, 0, 2]) #batch_size*40*200
+    output = tf.transpose(output, perm=[1, 0, 2]) #batch_size*55*200
     print('dropout')
     output = tf.layers.dropout(output, rate=params['dropout_rate'], training=is_training)
 
@@ -38,7 +38,7 @@ def model_fn(features,labels,mode,params):
     output = tf.concat([output, triggerFeatures], axis=-1)
 
     #全连接层
-    logits = tf.layers.dense(output, NEW_CONFIG.NEW_TAGs_LEN) #batch_size*40*len(tags)
+    logits = tf.layers.dense(output, NEW_CONFIG.NEW_TAGs_LEN) #batch_size*55*len(tags)
 
 
     print('CRF层')

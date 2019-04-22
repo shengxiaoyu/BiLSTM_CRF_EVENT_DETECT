@@ -52,10 +52,13 @@ def initTags(triggerLablePath,argumentLabelPath):
     TRIGGER_TAGs=[]
     ARGU_TAGs = []
     # 把<pad>也加入tag字典
-    TAG_2_ID['<pad>'] = len(TAG_2_ID)
-    ID_2_TAG[len(ID_2_TAG)] = '<pad>'
+    TAG_2_ID['<pad>'] = 0
+    ID_2_TAG[0] = '<pad>'
+
+    TAG_2_ID['O'] = 1
+    ID_2_TAG[1] ='O'
     # 读取根目录下的labelds文件生成tag—id
-    index = 1
+    index = 2
     #获取参数tag
     with open(argumentLabelPath, 'r', encoding='utf8') as f:
         for line in f.readlines():

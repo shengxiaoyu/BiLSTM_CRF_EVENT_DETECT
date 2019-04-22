@@ -27,8 +27,8 @@ def ifContainTrigger(sentence):
             if (sentence.find(word) != -1):
                 triggerContained = triggerContained + (triggerType + ':' + word)
                 break
-        if (len(triggerType) == 0):
-            return False
+    if (len(triggerContained) == 0):
+        return False
     return True
 
 def extractor(paragraph):
@@ -107,12 +107,10 @@ class Extractor(object):
         self.FLAGS.ifTrain = False
         self.FLAGS.ifTest = False
         self.FLAGS.ifPredict = True
-
         CONFIG.init(self.FLAGS.root_dir)
         NEW_CONFIG.initNewTags(os.path.join(self.FLAGS.root_dir, 'full_trigger_labels.txt'),
                                os.path.join(self.FLAGS.root_dir, 'full_argu_labels.txt'))
         self.sentenceSplitter = SentenceSplitter()
-        # self.first =
     def extractor2(self,paragraph):
         # 调用预测接口
 
@@ -124,9 +122,12 @@ class Extractor(object):
             else:
                 sentences.append(sentence)
         print('第一个模型预测')
+        if(len(sentences)==0):
+            print("整个抽取文本无关注事实")
+            return []
         words_list,first_tags_list,index_pairs_list = first.main(self.FLAGS, sentences)
         print('第二个模型预测')
-        words_list,second_tags_list,index_pairs_list,sentences = second.main(self.FLAGS,[words_list,first_tags_list,index_pairs_list,sentences])
+        words_list,second_tags_list,index_pairs_list,sentences = second.main(self.FLAGS,words_firstTags_indxPairs_sentences=[words_list,first_tags_list,index_pairs_list,sentences])
 
         events = []
         for tags, words,index_pairs,sentence in zip(second_tags_list, words_list,index_pairs_list,sentences):
