@@ -26,6 +26,10 @@ def predict():
         result.extend(extractor.extractor2(paragraphs))
     return jsonify(dumps(result,cls=MyEncoder))
 
+@app.route('/api/test',methods=['GET'])
+def test():
+    print("连接成功")
+
 from json import JSONEncoder
 class MyEncoder(JSONEncoder):
     def default(self, o):
