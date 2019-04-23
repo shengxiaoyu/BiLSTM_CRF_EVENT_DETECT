@@ -3,10 +3,10 @@
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
 
-from flask import Flask, request, jsonify
 from json import dumps
+
+from flask import Flask, request, jsonify
 from Event_Model.extract_event import Extractor
-from Config.config_parser import getParser
 
 app = Flask(__name__)
 extractor = Extractor()
