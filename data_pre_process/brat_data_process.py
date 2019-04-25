@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from Config.config_parser import getParser
 
 __doc__ = 'description将brat生成的ann文件和源文件.txt结合，生成人工标注的样子的文件'
 __author__ = '13314409603@163.com'
@@ -9,6 +10,7 @@ import os
 import sys
 from pyltp import Segmentor
 from pyltp import Postagger
+from First_For_Commo_Tags import config_center as CONFIG
 import pandas as pd
 #将案号转为indxe 文件名称,brat文件名不能含中文
 def an2Index(path):
@@ -106,7 +108,7 @@ def writeTriggerToFile(events_triggers,savePath):
 
 
 #将源文件和标注文件合一
-def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,pos_model_path,stop_words_path,labels_path,mode=1):
+def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,pos_model_path,stop_words_path,trigger_labels_path,argu_labels_path,mode=1):
     if(mode==1):
         savePath = os.path.join(savePath,'Spe')
     else:
@@ -120,8 +122,10 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
     with open(stop_words_path, 'r', encoding='utf8') as f:
         stopWords = set(f.read().split())
     #关注标签集
-    with open(labels_path, 'r', encoding='utf8') as f:
+    with open(trigger_labels_path, 'r', encoding='utf8') as f,open(argu_labels_path,'r',encoding='utf8') as f2:
         labedWords = set(f.read().split())
+        for line in f2.readlines():
+            labedWords.add(line.strip())
     eventsType = {}
     def handlderDir(dirPath):
         for fileName in os.listdir(dirPath):
@@ -218,13 +222,15 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 # 考虑标签和分词不对应的情况，一个词被对应到多次标记，因为先标记触发词，所以优先级第一，其余的越靠后越低
                 if (labeled[index].find('O') != -1):
                     if (isBegin):
-                        label = 'B_' + entity.getType()
+                        # label = 'B_' + entity.getType()
+                        label = 'B_' + entity.getName()
                         if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
                             label = 'O'
                         labeled[index] = label
                         isBegin = False
                     else:
-                        label = 'I_' + entity.getType()
+                        # label = 'I_' + entity.getType()
+                        label = 'I_' + entity.getName()
                         if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
                             label = 'O'
                         labeled[index] = label
@@ -258,7 +264,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
         originFile = os.path.join(filePath, filePath.replace('.ann', '.txt'))
         if (not os.path.exists(originFile)):
             return
-
+        print(filePath)
         #获取事件list
         events = getEvents(filePath,originFile)
 
@@ -526,17 +532,87 @@ def main():
     brat_base_path = os.path.join(base_path, 'brat')
     ltp_path = os.path.join(base_path, 'ltp_data_v3.4.0')
     formLabelData(
-        os.path.join(brat_base_path, 'labeled'),
-        os.path.join(base_path, 'labeled'),
-        os.path.join(ltp_path, 'cws.model'),
-        os.path.join(ltp_path, 'userDict.txt'),
-        os.path.join(ltp_path, 'pos.model'),
-        os.path.join(base_path, 'newStopWords.txt'),
-        os.path.join(base_path,'labels.txt'),1)
+        labelFilePath=os.path.join(brat_base_path, 'labeled'),
+        savePath=os.path.join(base_path, 'labeled'),
+        segmentor_model_path=os.path.join(ltp_path, 'cws.model'),
+        segmentor_user_dict_path=os.path.join(ltp_path, 'userDict.txt'),
+        pos_model_path=os.path.join(ltp_path, 'pos.model'),
+        stop_words_path=os.path.join(base_path, 'newStopWords.txt'),
+        # trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
+        # argu_labels_path=os.path.join(base_path,'argumentLabels.txt'),
+        trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
+        argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
+        #mode=1 Spe
+        #mode=2 Full
+        mode=1)
 
+
+#将spe模型下的单句合并为full下的句子
+def merge(path):
+    #会用到trigger集合，需要初始化Trigger_Tags
+    parse = getParser()
+    CONFIG.init(parse.root_dir)
+    #新文件的保存路径，保存在传入文件的同级目录
+    savePath = os.path.join(os.path.split(path)[0],'Merge_'+os.path.split(path)[1])
+    if(not os.path.exists(savePath)):
+        os.mkdir(savePath)
+
+    def merge(tagsList):
+        mergedTags = tagsList[0]
+        for tags in tagsList[1:]:
+            for index,tag in enumerate(tags):
+                if(tag!='O'):
+                    if(mergedTags[index]=='O'):
+                        mergedTags[index] = tag
+                    elif(mergedTags[index] in CONFIG.TRIGGER_TAGs):
+                        '''此时产生冲突'''
+                        '''原先填入的是触发词'''
+                        if(mergedTags[index].find('B_')==-1 and tag.find('B_')!=-1):
+                            mergedTags[index] = tag #原先的不是B_开头触发词，新来的是B_开头触发词才能覆盖
+                    else:#如果以前不是触发词，
+                        if((tag in CONFIG.TRIGGER_TAGs or tag.find('B_')!=-1) and mergedTags[index].find('B_')==-1): #只有新来的是触发词或者B_开头的参数，而且老的不是B_开头才能覆盖
+                            mergedTags[index] = tag
+        return mergedTags
+
+    for fileName in os.listdir(path):
+        with open(os.path.join(path,fileName),'r',encoding='utf8') as f,open(os.path.join(savePath,fileName),'w',encoding='utf8') as fw:
+            #words行
+            lastSentence = f.readline().strip()
+            #tag行
+            lastTagsList = []
+            lastTags = f.readline().strip().split()
+            lastTagsList.append(lastTags)
+            #pos行
+            poses = f.readline().strip()
+
+            sentence = f.readline().strip()
+            while(sentence):
+                if(sentence==lastSentence):
+                    '''此时时同一行，将tags加入列表'''
+                    lastTagsList.append(f.readline().strip().split())
+                    #去掉pos行
+                    f.readline()
+                    #更新words行
+                    sentence = f.readline().strip()
+                else:
+                    '''来了新的行，将上一种合并写入'''
+                    mergedTags = merge(lastTagsList)
+                    fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
+                    #更新缓存
+                    lastSentence = sentence
+                    lastTagsList = []
+                    lastTags = f.readline().strip().split()
+                    lastTagsList.append(lastTags)
+                    poses = f.readline().strip()
+
+                    sentence = f.readline().strip()
+
+            #处理缓存
+            mergedTags = merge(lastTagsList)
+            fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
 
 if __name__ == '__main__':
-
-    print ('end')
+    # merge('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe')
     main()
+    print ('end')
     sys.exit(0)

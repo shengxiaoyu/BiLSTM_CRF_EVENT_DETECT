@@ -5,7 +5,7 @@ import os
 
 __doc__ = 'description:模型输入预处理中心'
 __author__ = '13314409603@163.com'
-import LSTM_CRF.config_center as CONFIG
+import First_For_Commo_Tags.config_center as CONFIG
 import tensorflow as tf
 
 #对齐和向量化
@@ -103,7 +103,7 @@ def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentence
         output_types=types
     )
     if shuffe:
-        dataset = dataset.shuffle(buffer_size=30000).repeat(num_epochs)
+        dataset = dataset.shuffle(buffer_size=25000).repeat(num_epochs)
 
     dataset = dataset.batch(batch_size)
     return dataset

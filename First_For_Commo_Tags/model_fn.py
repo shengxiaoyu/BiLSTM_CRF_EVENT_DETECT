@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from tf_metrics import precision
+from tf_metrics import recall
+from tf_metrics import f1
+
 __doc__ = 'description:模型网络图构建中心'
 __author__ = '13314409603@163.com'
 
 import tensorflow as tf
-from tf_metrics import recall, f1, precision
-import LSTM_CRF.config_center as CONFIG
+# from tf_metrics import recall, f1, precision
+import First_For_Commo_Tags.config_center as CONFIG
 
 
 def model_fn(features,labels,mode,params):
@@ -32,13 +36,13 @@ def model_fn(features,labels,mode,params):
 
     # 添加POS特征
     print('添加POS特征')
-    output_pos = tf.concat([output, postags], axis=-1)
+    output = tf.concat([output, postags], axis=-1)
 
     #添加是否是触发词特征
-    output_pos = tf.concat([output,triggerFlags],axis=-1)
+    output = tf.concat([output,triggerFlags],axis=-1)
 
     #全连接层
-    logits = tf.layers.dense(output_pos, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
+    logits = tf.layers.dense(output, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
 
 
     print('CRF层')
