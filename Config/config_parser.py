@@ -23,8 +23,8 @@ def getParser():
     parser.add_argument('--num_layers', help='num of layers', default=1)
     parser.add_argument('--sentence_mode',
                         # help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Full')
-                        help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Spe')
-                        # help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Merge')
+                        # help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Spe')
+                        help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Merge')
     parser.add_argument('--labeled_data_path', help='labeled data path',
                         # default=os.path.join(os.path.join(rootPath, 'labeled'), parser.get_default('sentence_mode')))
                         default=os.path.join(os.path.join(rootPath, 'labeled'), 'newExamples'))
