@@ -38,5 +38,4 @@ def main():
 if __name__ == '__main__':
     # main()
     # print("end")
-    service.app.run(host='127.0.0.1',port=8000)
-    sys.exit(0)
+    service.app.run(host='localhost',port=8000)

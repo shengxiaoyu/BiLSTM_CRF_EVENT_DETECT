@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from tf_metrics import precision
+from tf_metrics import recall
+from tf_metrics import f1
+
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
 import tensorflow as tf
-from tf_metrics import recall, f1, precision
+# from tf_metrics import recall, f1, precision
 import First_For_Commo_Tags.config_center as CONFIG
 import Second_For_Fine_Tags.config_center as NEW_CONFIG
 
