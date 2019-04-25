@@ -61,7 +61,7 @@ def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedd
     return (words,min(length,max_sequence_length),posTags,triggerFlags),tags
 
 
-def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words_posTags=None,):
+def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words_posTags=None):
     result = []
     if(sentences_words_posTags):
         for one_sentence_words_posTags in sentences_words_posTags:

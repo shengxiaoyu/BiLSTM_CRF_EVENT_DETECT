@@ -37,7 +37,7 @@ ifInited = False
 def init(rootdir):
     global ifInited
     if(not ifInited):
-        initTags(os.path.join(rootdir,'triggerLabels.txt'),os.path.join(rootdir, 'argumentLabels.txt'))
+        initTags(os.path.join(rootdir,'full_argu_labels.txt'),os.path.join(rootdir, 'full_trigger_labels.txt'))
         initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
         initWord2Vec(os.path.join(rootdir, 'word2vec'))
         initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
@@ -77,7 +77,6 @@ def initTags(triggerLablePath,argumentLabelPath):
 def initWord2Vec(word2vec_model_path):
     global WV
     WV = Word2VecModel(word2vec_model_path, '', 30).getEmbedded()
-    # <pad> -- <pad> fill word2vec and tags，添加一个<pad>-向量为0的，用于填充
     WV.add('<pad>', np.zeros(WV.vector_size))
 def initPosTag(pos_tag_path):
     global POS_2_ID,POSs_LEN
@@ -85,7 +84,6 @@ def initPosTag(pos_tag_path):
     posDict = pd.read_csv(pos_tag_path)
     for id,pos in zip(posDict['Index'],posDict['Tag']):
         POS_2_ID[pos]=id
-    # POS_2_ID['<pad>'] = 0
     POSs_LEN = len(POS_2_ID)
 def initPyltpModel(ltp_path):
     global POSTAGGER,SEGMENTOR
