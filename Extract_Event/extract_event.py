@@ -139,31 +139,31 @@ class Event_Detection(object):
             currentTraigger = None
             beginIndex = 0
             endIndex = 0
-            for index, word in enumerate(tags):
-                if (word in triggers):  # 如果是触发词
-                    if (word.find('B_') != -1):  # 如果是B_开头
+            for index, tag in enumerate(tags):
+                if (tag in triggers):  # 如果是触发词
+                    if (tag.find('B_') != -1):  # 如果是B_开头
                         if (hasBegin):  # 如果前面有触发词还在统计
                             event = self.saveOneEvent(currentTraigger, beginIndex, endIndex, words, tags)
                             events.append(event)
                         # 新起一个事件
                         hasBegin = True
-                        currentTraigger = word[2:]
+                        currentTraigger = tag[2:]
                         beginIndex = index
                         endIndex = index
                     else:  # I_开头
                         if (hasBegin):  # 此时正在一个触发词的查找范围内
-                            if (word.find(currentTraigger) != -1):  # 同一个触发词
+                            if (tag.find(currentTraigger) != -1):  # 同一个触发词
                                 endIndex = index
                             else:  # 此时在找触发词，但是来了个其他触发词的I_
                                 event = self.saveOneEvent(currentTraigger, beginIndex, endIndex, words, tags)
                                 events.append(event)
                                 hasBegin = True
-                                currentTraigger = word[2:]
+                                currentTraigger = tag[2:]
                                 beginIndex = index
                                 endIndex = index
                         else:  # 此时没有找触发词直接来了个I_
                             hasBegin = True
-                            currentTraigger = word[2:]
+                            currentTraigger = tag[2:]
                             beginIndex = index
                             endIndex = index
                 else:

@@ -27,7 +27,7 @@ def EventFactory(trigger,word,beginIndex,EndIndex):
         'Credit':Credit,
     }
     return eventDict[trigger](trigger,word,beginIndex,EndIndex)
-
+#基于规则匹配每类事实参数
 class baseModel(object):
     def __init__(self,trigger,word,beginIndex,endIndex):
         self.trigger = trigger
@@ -75,6 +75,7 @@ class baseModel(object):
 #相识事实有一个时间参数，往前找
 class Know(baseModel):
     def fitArgument(self,words,tags):
+        '''匹配规则：在触发词前的Time参数'''
         self.time = self.__findFoward__(words,tags,'Time')
 
     def __str__(self):

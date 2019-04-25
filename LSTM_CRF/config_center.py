@@ -34,7 +34,7 @@ TRIGGER_WORDS_DICT = None
 
 #初始化各类模型以及词集
 def init(rootdir):
-    initTags(os.path.join(rootdir,'triggerLabels.txt'),os.path.join(rootdir, 'argumentLabels.txt'))
+    initTags(os.path.join(rootdir,'full_trigger_labels.txt'),os.path.join(rootdir, 'full_argu_labels.txt'))
     initWord2Vec(os.path.join(rootdir, 'word2vec'))
     initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
     initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
@@ -50,8 +50,11 @@ def initTags(triggerLablePath,argumentLabelPath):
     # 把<pad>也加入tag字典
     TAG_2_ID['<pad>'] = len(TAG_2_ID)
     ID_2_TAG[len(ID_2_TAG)] = '<pad>'
+
+    TAG_2_ID['O'] = len(TAG_2_ID)
+    ID_2_TAG[len(ID_2_TAG)] = 'O'
     # 读取根目录下的labelds文件生成tag—id
-    index = 1
+    index = 2
     #获取参数tag
     with open(argumentLabelPath, 'r', encoding='utf8') as f:
         for line in f.readlines():

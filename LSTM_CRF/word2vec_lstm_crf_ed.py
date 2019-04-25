@@ -117,7 +117,8 @@ def main(FLAGS,sentences=None,dir=None):
         pred = [x['pre_ids'] for x in list(predictions)]
         #预测分析
         from sklearn_crfsuite.metrics import flat_classification_report
-        report = flat_classification_report(y_pred=pred,y_true=targets)
+        indices = [item[1] for item in CONFIG.TAG_2_ID.items() if (item[0]!='<pad>'and item[0]!='O')]
+        report = flat_classification_report(y_pred=pred,y_true=targets,labels=indices)
         print(report)
 
         with open(os.path.join(output_dir,'predict_result.txt'),'w',encoding='utf8') as fw:
