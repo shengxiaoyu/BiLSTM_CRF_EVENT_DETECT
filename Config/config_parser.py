@@ -32,7 +32,7 @@ def getParser():
     # parser.add_argument('--max_sequence_length', help='max length of sequence', default= 51 )  # Full - 40,Spe-51,Merge-55
     parser.add_argument('--max_sequence_length', help='max length of sequence', default= 55 )  # Full - 40,Spe-51,Merge-55
     parser.add_argument('--batch_size', help='batch size', default=5)
-    parser.add_argument('--num_epochs', help='num of epochs', default=3)
+    parser.add_argument('--num_epochs', help='num of epochs', default=1)
     parser.add_argument('--device_map', help='which device to see', default='CPU:0')
     parser.add_argument('--segmentor_model_path', help='segmentor model path',
                         default=os.path.join(ltpPath, 'cws.model'))

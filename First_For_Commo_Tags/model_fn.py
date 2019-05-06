@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from tf_metrics import precision
-from tf_metrics import recall
-from tf_metrics import f1
-
 __doc__ = 'description:模型网络图构建中心'
 __author__ = '13314409603@163.com'
 
@@ -35,14 +31,14 @@ def model_fn(features,labels,mode,params):
     output = tf.layers.dropout(output, rate=params['dropout_rate'], training=is_training)
 
     # 添加POS特征
-    print('添加POS特征')
-    output = tf.concat([output, postags], axis=-1)
+    # print('添加POS特征')
+    # output_pos = tf.concat([output, postags], axis=-1)
 
     #添加是否是触发词特征
-    output = tf.concat([output,triggerFlags],axis=-1)
+    output_pos_trigger = tf.concat([output,triggerFlags],axis=-1)
 
     #全连接层
-    logits = tf.layers.dense(output, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
+    logits = tf.layers.dense(output_pos_trigger, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
 
 
     print('CRF层')
@@ -74,9 +70,9 @@ def model_fn(features,labels,mode,params):
             indices = [item[1] for item in CONFIG.TAG_2_ID.items() if (item[0]!='<pad>'and item[0]!='O')]
             metrics = {
                 'acc': tf.metrics.accuracy(labels, pred_ids, weights),
-                'precision': precision(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
-                'recall': recall(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
-                'f1': f1(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
+                # 'precision': precision(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
+                # 'recall': recall(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
+                # 'f1': f1(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
             }
             for metric_name, op in metrics.items():
                 tf.summary.scalar(metric_name, op[1])

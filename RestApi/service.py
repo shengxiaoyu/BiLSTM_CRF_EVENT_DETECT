@@ -21,9 +21,9 @@ def predict():
     result = []
     if(isinstance(paragraphs,list)):
         for paragraph in paragraphs:
-            result.append(extractor.extractor2(paragraph))
+            result.append(extractor.extractor(paragraph))
     elif(isinstance(paragraphs,str)):
-        result.extend(extractor.extractor2(paragraphs))
+        result.extend(extractor.extractor(paragraphs))
     return jsonify(dumps(result,cls=MyEncoder))
 
 @app.route('/api/test',methods=['GET'])
