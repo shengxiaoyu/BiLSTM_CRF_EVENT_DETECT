@@ -72,8 +72,7 @@ class Event_Detection(object):
             baseIndex += len(word)
         return indexs
 
-    def predict(self,sentences):
-        FLAGS = self.FLAGS
+    def extractorFromSentences(self, sentences):
         sentences_words_posTags = []
         words_in_sentence_index_list = []
         for sentence in sentences:
@@ -104,13 +103,19 @@ class Event_Detection(object):
                     newIndexs.append(indexPair)
             sentences_words_posTags.append([newWords, newTags, newPosTags])
             words_in_sentence_index_list.append(newIndexs)
-        pre_inf = functools.partial(INPUT.input_fn, input_dir=None, sentences_words_posTags=sentences_words_posTags,
+            words_list,tags_list = self.__predict__(sentences_words_posTags)
+
+        return [words_list, tags_list, words_in_sentence_index_list]
+
+    def __predict__(self,sentences_words_tags_posTags):
+        FLAGS = self.FLAGS
+        pre_inf = functools.partial(INPUT.input_fn, input_dir=None, sentences_words_posTags=sentences_words_tags_posTags,
                                     shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
                                     max_sequence_length=FLAGS.max_sequence_length)
         predictions = self.estimator.predict(input_fn=pre_inf)
         predictions = [x['pre_ids'] for x in list(predictions)]
 
-        words_list = [one_sentence_words_posTags[0] for one_sentence_words_posTags in sentences_words_posTags]
+        words_list = [one_sentence_words_posTags[0] for one_sentence_words_posTags in sentences_words_tags_posTags]
         tags_list = []
         for pre_ids in predictions:
             tags_list.append([CONFIG.ID_2_TAG[id] for id in pre_ids])
@@ -119,7 +124,7 @@ class Event_Detection(object):
             print('\n')
             print(' '.join(tags))
             print('\n')
-        return [words_list, tags_list, words_in_sentence_index_list]
+        return words_list,tags_list
 
     # 判断是否含有关注事实触发词
     def ifContainTrigger(self,sentence):
@@ -138,6 +143,7 @@ class Event_Detection(object):
         return True
 
     def extractor(self,paragraph):
+        '''传入原文段，抽取事件，此时需要知道事件中每个词语在原文句中的索引位置，以及原文句'''
         #分句 并判断每句是否含触发词
         sentenceSplitter = SentenceSplitter()
         sentences = []
@@ -150,31 +156,57 @@ class Event_Detection(object):
         if (len(sentences) == 0):
             print("整个抽取文本无关注事实")
             return []
-        words_list, tags_list, words_in_sentence_index_list = self.predict(sentences)
-        events = []
-        # 获取触发词tag
-        triggers = CONFIG.TRIGGER_TAGs
-
-        for words, tags,words_in_sentence_index_pair,sentence in zip(words_list,tags_list,words_in_sentence_index_list,sentences):
-            for index, tag in enumerate(tags):
-                if(tag in triggers and tag.find('B_')!=-1):
-                    '''发现触发词'''
-                    type = tag[2:]
-                    completeTrigger = words[index]
-                    sentence_char_index_pair = words_in_sentence_index_pair[index]
-                    tag_index_pair = [index,index]
-                    for endIndex in range(index+1,len(tags)):
-                        if(tags[endIndex]=='I_'+type):
-                            completeTrigger += words[endIndex]
-                            sentence_char_index_pair[1] = words_in_sentence_index_pair[endIndex][1]
-                            tag_index_pair[1] += 1
-                        else:break
-
-                    event = EventModel.EventFactory(type,completeTrigger,tag_index_pair,sentence,sentence_char_index_pair,words,tags)
-                    event.fitArgument(words,tags,words_in_sentence_index_pair)
-                    events.append(event)
+        words_list, tags_list, words_in_sentence_index_list = self.extractorFromSentences(sentences)
+        events = self.formEvents(words_list,tags_list,words_in_sentence_index_list)
         return events
 
+
+    def formEvents(self,words_list,tags_list,words_in_sentence_index_list,sentences):
+        '''传入分词list,tags list,原句索引对list，原句list。构造出所有的抽取到的事件'''
+        events = []
+        for words, tags,words_in_sentence_index_pair,sentence in zip(words_list,tags_list,words_in_sentence_index_list,sentences):
+            events.extend(self.__get_event_from_one_words__(words,tags,words_in_sentence_index_pair,sentence))
+        return events
+
+    def __get_event_from_one_words__(self,words,tags,words_in_sentence_index_pairs,sentence):
+        # 获取触发词tag
+        triggers = CONFIG.TRIGGER_TAGs
+        events = []
+        for index, tag in enumerate(tags):
+            if (tag in triggers and tag.find('B_') != -1):
+                '''发现触发词'''
+                type = tag[2:]
+                completeTrigger = words[index]
+                # sentence_char_index_pair = words_in_sentence_index_pairs[index]
+                tag_index_pair = [index, index]
+                for endIndex in range(index + 1, len(tags)):
+                    if (tags[endIndex] == 'I_' + type):
+                        completeTrigger += words[endIndex]
+                        # sentence_char_index_pair[1] = words_in_sentence_index_pairs[endIndex][1]
+                        tag_index_pair[1] += 1
+                    else:
+                        break
+                event = EventModel.EventFactory(type, completeTrigger, tag_index_pair, sentence,
+                                                words_in_sentence_index_pairs, words, tags)
+                event.fitArgument(words, tags, words_in_sentence_index_pairs)
+                events.append(event)
+        return events
+
+    def extractor_from_words_posTags(self, words_trigger_tags_pos_tags_list):
+        '''传入分词、触发词标签以及pos标签，抽取事实，此时不需要原sentence和index_pair,而且返回的list 每个item对应一句words的抽取事件结果，可能有多个事件'''
+        pre_words_list, pre_tags_list = self.__predict__(words_trigger_tags_pos_tags_list)
+        events = self.formEvents2(pre_words_list, pre_tags_list)
+        return events
+
+    def formEvents2(self,words_list,tags_list):
+        '''根据分词和预测的tags构造事件，这是为了用于评估从spe格式中抽取的事件和实际事件。此时没有原句和原句索引，而且每个句子抽出来的事件独立在一个list中'''
+        events = []
+        for words,tags in zip(words_list,tags_list):
+            words_in_sentence_indexs = [[0, 0] for _ in range(len(words))]
+            events.append(self.__get_event_from_one_words__(words,tags,words_in_sentence_indexs,''))
+        return events
+
+    # def formSpeTags(self,):
 
     def release(self):
         CONFIG.release()
@@ -185,9 +217,7 @@ if __name__ == '__main__':
     FLAGS.ifTest = False
     FLAGS.ifPredict = True
     extractor = Event_Detection(FLAGS)
-    events = extractor.extractor('原、被告双方1986年上半年经人介绍认识，××××年××月××日在临桂县宛田乡政府登记结婚，'
-                                 '××××年××月××日生育女儿李某乙，××××年××月××日生育儿子李某丙，'
-                                 '现女儿李某乙、儿子李某丙都已独立生活')
+    events = extractor.extractor('原告 韦某 诉称 原告 韦某 被告 季某 2010年 2月份 朋友 介绍 认识 双方 认识 月 后 ×× ×× 年×× 月××日 便 登记 结婚')
 
     print('\n'.join(list(map(lambda x:str(x.__dict__),events))))
     print('end')
