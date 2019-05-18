@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from Config.config_parser import getParser
 
 __doc__ = 'description将brat生成的ann文件和源文件.txt结合，生成人工标注的样子的文件'
 __author__ = '13314409603@163.com'
 
 
+from Config.config_parser import getParser
 import os
 import sys
-from pyltp import Segmentor
-from pyltp import Postagger
 from First_For_Commo_Tags import config_center as CONFIG
+from Config.config_parser import getParser
+from Config.utils import my_segmentor,my_postagger
 import pandas as pd
 #将案号转为indxe 文件名称,brat文件名不能含中文
 def an2Index(path):
@@ -108,16 +108,14 @@ def writeTriggerToFile(events_triggers,savePath):
 
 
 #将源文件和标注文件合一
-def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,pos_model_path,stop_words_path,trigger_labels_path,argu_labels_path,mode=1):
+def formLabelData(labelFilePath,savePath,stop_words_path,trigger_labels_path,argu_labels_path,mode=1):
     if(mode==1):
         savePath = os.path.join(savePath,'Spe')
     else:
         savePath = os.path.join(savePath,'Full')
     # 分词器
-    segmentor = Segmentor()
-    segmentor.load_with_lexicon(segmentor_model_path, segmentor_user_dict_path)
-    postagger = Postagger()
-    postagger.load(pos_model_path)
+    segmentor = my_segmentor
+    postagger = my_postagger
     #停用词集
     with open(stop_words_path, 'r', encoding='utf8') as f:
         stopWords = set(f.read().split())
@@ -222,15 +220,15 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 # 考虑标签和分词不对应的情况，一个词被对应到多次标记，因为先标记触发词，所以优先级第一，其余的越靠后越低
                 if (labeled[index].find('O') != -1):
                     if (isBegin):
-                        # label = 'B_' + entity.getType()
-                        label = 'B_' + entity.getName()
+                        label = 'B_' + entity.getType()
+                        # label = 'B_' + entity.getName()
                         if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
                             label = 'O'
                         labeled[index] = label
                         isBegin = False
                     else:
-                        # label = 'I_' + entity.getType()
-                        label = 'I_' + entity.getName()
+                        label = 'I_' + entity.getType()
+                        # label = 'I_' + entity.getName()
                         if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
                             label = 'O'
                         labeled[index] = label
@@ -305,6 +303,8 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
             event.setWords(newWords)
             event.setPosTags(newPosTags)
             eventType = event.getType()
+            if(eventType == 'MaritalLife' or eventType=='CommonProperty' or eventType=='PersonalProperty'):
+                print('错误标注事件类型')
             if (eventType in eventsType):
                 eventsType[eventType] += 1
             else:
@@ -415,8 +415,6 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
             handlerSingleFile(labelFilePath)
         elif(mode==2):
             handlerSingleFile2(labelFilePath)
-
-
     segmentor.release()
     print(eventsType)
 
@@ -526,22 +524,17 @@ class Relation(object):
         self.parameters = list(map(lambda str:str.split(':'),splits[1].split())) #[[Marray,T2].[Time,T3}...]
     def getParameters(self):
         return self.parameters
-def main():
-    base_path = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF'
-    # base_path = '/root/lstm_crf/data'
+def main(root_dir):
+    base_path = root_dir
     brat_base_path = os.path.join(base_path, 'brat')
-    ltp_path = os.path.join(base_path, 'ltp_data_v3.4.0')
     formLabelData(
         labelFilePath=os.path.join(brat_base_path, 'labeled'),
         savePath=os.path.join(base_path, 'labeled'),
-        segmentor_model_path=os.path.join(ltp_path, 'cws.model'),
-        segmentor_user_dict_path=os.path.join(ltp_path, 'userDict.txt'),
-        pos_model_path=os.path.join(ltp_path, 'pos.model'),
         stop_words_path=os.path.join(base_path, 'newStopWords.txt'),
-        # trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
-        # argu_labels_path=os.path.join(base_path,'argumentLabels.txt'),
-        trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
-        argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
+        trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
+        argu_labels_path=os.path.join(base_path,'argumentLabels.txt'),
+        # trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
+        # argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
         #mode=1 Spe
         #mode=2 Full
         mode=1)
@@ -553,7 +546,7 @@ def merge(path):
     parse = getParser()
     CONFIG.init(parse.root_dir)
     #新文件的保存路径，保存在传入文件的同级目录
-    savePath = os.path.join(os.path.split(path)[0],'Merge_'+os.path.split(path)[1])
+    savePath = os.path.join(os.path.split(path)[0],'Merge')
     if(not os.path.exists(savePath)):
         os.mkdir(savePath)
 
@@ -612,7 +605,11 @@ def merge(path):
             fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
 
 if __name__ == '__main__':
-    # merge('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe')
-    main()
+    flags = getParser()
+
+    #从brat标注文件中生成单句单事实的标注结果
+    # main(flags.root_dir)
+    #将单句单事实融合为单句多事实的标注方式3
+    merge('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe')
     print ('end')
     sys.exit(0)
