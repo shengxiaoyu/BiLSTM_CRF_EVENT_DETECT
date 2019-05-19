@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from pyltp import SentenceSplitter, Segmentor
 
 __doc__ = 'description:封装word2vec模型训练'
 __author__ = '13314409603@163.com'
 
+import sys
+from pyltp import SentenceSplitter
 import os
 from gensim.models import Word2Vec
 from gensim.models.word2vec import PathLineSentences
+from Config.utils import my_segmentor
+from Config.config_parser import getParser
 
 
 class Word2VecModel(object):
@@ -50,10 +53,12 @@ class Word2VecModel(object):
 #segmentor_model_path-分词模型存放位置
 #segmentor_user_dict_path-自定义分词词典位置
 #stop_words_path-停用词位置
-def segment_words(source,savePath,segmentor_model_path, segmentor_user_dict_path,stop_words_path):
+def segment_words(source,savePath,stop_words_path):
     #分词器
-    segmentor = Segmentor()
-    segmentor.load_with_lexicon(segmentor_model_path, segmentor_user_dict_path)
+    segmentor = my_segmentor
+
+    if ( not os.path.exists(savePath)):
+        os.mkdir(savePath)
 
     #停用词
     with open(stop_words_path, 'r', encoding='utf8') as f:
@@ -92,20 +97,25 @@ def segment_words(source,savePath,segmentor_model_path, segmentor_user_dict_path
 
 
 if __name__ == '__main__':
-    rootdir = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\'
+    FLAGES = getParser()
+    dim = FLAGES.embedded_dim
+    rootdir = FLAGES.root_dir
     ltpDir = os.path.join(rootdir,'ltp_data_v3.4.0')
-    # dim = 30
-    # word2vec_model_save_path = os.path.join(rootdir,'word2vec')
-    # wv = Word2VecModel(word2vec_model_save_path, '', 30)
-    # wv = wv.getEmbedded()
-    # wv.add('<pad>',np.zeros((dim)))
-    # print(wv.most_similar('原告'))
-    # print(wv.similarity('原告', '被告'))
-    # print(wv['原告'])
-    # print(wv['被告'])
-    segment_words(os.path.join(rootdir,'segment_result'),
-                  os.path.join(os.path.join(rootdir,'word2vec'),'train'),
-                  os.path.join(ltpDir,'cws.model'),
-                  os.path.join(ltpDir,'userDict.txt'),
+    word2vec_dir = os.path.join(rootdir,'word2vec')
+
+    word2vec_train_dir = os.path.join(word2vec_dir,'train')
+    if (not os.path.exists(word2vec_train_dir) ):
+        os.mkdir(word2vec_train_dir)
+
+    #分词
+    segment_words(os.path.join(rootdir,'原始_待分句_样例'),
+                  word2vec_train_dir,
                   os.path.join(rootdir,'newStopWords.txt'))
-    pass
+    #训练或者加载已有模型
+    wv = Word2VecModel(word2vec_dir, word2vec_train_dir, dim)
+    wv = wv.getEmbedded()
+    print(wv.most_similar('原告'))
+    print(wv.similarity('原告', '被告'))
+    print(wv['原告'])
+    print(wv['被告'])
+    sys.exit(0)
