@@ -28,7 +28,7 @@ def main(FLAGS,sentences=None,dir=None):
     os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.device_map
 
     # 在re train 的时候，才删除上一轮产出的文件，在predicted 的时候不做clean
-    output_dir = os.path.join(FLAGS.root_dir,'output_'+str(FLAGS.num_epochs)+'_'+str(FLAGS.batch_size)+'_fullPos_trigger_Spe')
+    output_dir = os.path.join(FLAGS.root_dir,'output_'+str(FLAGS.num_epochs)+'_'+str(FLAGS.batch_size)+'_fullPos_trigger_Merge')
     if FLAGS.ifTrain:
         if os.path.exists(output_dir):
             def del_file(path):
