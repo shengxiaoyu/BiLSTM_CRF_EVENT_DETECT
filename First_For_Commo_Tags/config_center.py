@@ -37,7 +37,7 @@ ifInited = False
 def init(rootdir):
     global ifInited
     if(not ifInited):
-        initTags(os.path.join(rootdir,'triggerLabels.txt'),os.path.join(rootdir, 'argumentLabels.txt'))
+        initTags(os.path.join(rootdir,'full_trigger_labels.txt'),os.path.join(rootdir, 'full_argu_labels.txt'))
         initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
         initWord2Vec(os.path.join(rootdir, 'word2vec'))
         initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
@@ -59,19 +59,19 @@ def initTags(triggerLablePath,argumentLabelPath):
     ID_2_TAG[1] ='O'
     # 读取根目录下的labelds文件生成tag—id
     index = 2
+    # 获取触发词tag
+    with open(triggerLablePath, 'r', encoding='utf8') as f:
+        for line in f.readlines():
+            TAG_2_ID[line.strip()] = index
+            ID_2_TAG[index] = line.strip()
+            TRIGGER_TAGs.append(line.strip())
+            index += 1
     #获取参数tag
     with open(argumentLabelPath, 'r', encoding='utf8') as f:
         for line in f.readlines():
             TAG_2_ID[line.strip()] = index
             ID_2_TAG[index] = line.strip()
             ARGU_TAGs.append(line.strip())
-            index += 1
-    #获取触发词tag
-    with open(triggerLablePath, 'r', encoding='utf8') as f:
-        for line in f.readlines():
-            TAG_2_ID[line.strip()] = index
-            ID_2_TAG[index] = line.strip()
-            TRIGGER_TAGs.append(line.strip())
             index += 1
     TAGs_LEN = len(TAG_2_ID)
 def initWord2Vec(word2vec_model_path):

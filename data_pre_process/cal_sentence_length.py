@@ -144,8 +144,8 @@ def getMaxSentenceLength(path):
 if __name__ == '__main__':
     # calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Full')
     # print(getMax(0.95))
-    # calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe')
-    # print(getMax(0.95))
+    calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe')
+    print(getMax(0.95))
 
     # initTags()
     # calEventArguDis(os.path.join(os.path.join(base_dir,'labeled'),'Spe'))
@@ -159,6 +159,6 @@ if __name__ == '__main__':
     #             for (pos,count) in pos_count.items():
     #                 f.write(str(pos)+'\t'+str(count)+'\n')
 
-    calRelationOfTagAndPos('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Full')
+    # calRelationOfTagAndPos('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Full')
 
     sys.exit(0)
