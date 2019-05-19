@@ -76,7 +76,7 @@ def main():
             predict_examples.append([currentWords, current_first_tags, current_pos_tags])
             true_events.append(events)
 
-    extractor = Event_Detection(FLAGS)
+    extractor = Event_Detection(FLAGS,output_path='output_1_5_fullPos_trigger_Merge')
     #基于第一层预测结果，使用模式匹配的方式构建事件
     events = extractor.extractor_from_words_posTags(predict_examples)
 
@@ -85,14 +85,14 @@ def main():
     true_events_total = 0
     pre_events_total = 0
     for events1,events2 in zip(true_events,events):
-        true_events_total += len(true_events)
-        pre_events_total += len(events)
+        true_events_total += len(events1)
+        pre_events_total += len(events2)
         the_fz,the_fm = evalutaion(events1,events2)
         fz+=the_fz
         fm+=the_fm
 
-    print('总共事件:'+true_events_total+'\t'+'含事件得分：'+str(fm))
-    print('预测得到事件：'+pre_events_total+'\t'+'预测事件得分：'+str(fz))
+    print('总共事件:'+str(true_events_total)+'\t'+'含事件得分：'+str(fm))
+    print('预测得到事件：'+str(pre_events_total)+'\t'+'预测事件得分：'+str(fz))
     print('预测结果比:'+str(fz/fm))
 
     print('检查事件是否相同')

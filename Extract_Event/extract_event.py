@@ -18,10 +18,11 @@ import First_For_Commo_Tags.input_fn as INPUT
 
 class Event_Detection(object):
 
-    def __init__(self,FLAGS):
+    def __init__(self,FLAGS,output_path=None):
         self.FLAGS = FLAGS
         print(FLAGS)
         self.__initFirstModel__()
+        self.output_path = output_path
 
     def __initFirstModel__(self):
         FLAGS = self.FLAGS
@@ -30,12 +31,13 @@ class Event_Detection(object):
         os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.device_map
 
         # 在re train 的时候，才删除上一轮产出的文件，在predicted 的时候不做clean
-        output_dir = os.path.join(FLAGS.root_dir, 'output_' + FLAGS.sentence_mode+'_no_pos')
+        output_dir = self.output_path
 
         # check output dir exists
         if not os.path.exists(output_dir):
             print('无output文件，无法加载以训练模型')
             os.mkdir(output_dir)
+            raise FileNotFoundError('无output文件，无法加载以训练模型')
 
         print('初始化标签-ID字典等等')
         CONFIG.init(FLAGS.root_dir)
