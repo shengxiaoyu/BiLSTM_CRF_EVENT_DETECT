@@ -28,6 +28,7 @@ def EventFactory(type,completeWord,tag_index_pair,sentence,index_pairs,words,tag
     }
     return eventDict[type](type,completeWord,tag_index_pair,sentence,index_pairs,words,tags)
 
+#单句单事件构造
 def EventFactory2(words,tags):
     eventDict = {
         'Know': Know,
