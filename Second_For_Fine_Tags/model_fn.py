@@ -83,7 +83,6 @@ def model_fn(features,labels,mode,params):
 
             return tf.estimator.EstimatorSpec(
                 mode, loss=loss, eval_metric_ops=metrics)
-
         else:
             print('训练。。。')
             train_op = tf.train.AdamOptimizer(learning_rate=params['learning_rate']).minimize(

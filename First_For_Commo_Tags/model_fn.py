@@ -31,14 +31,15 @@ def model_fn(features,labels,mode,params):
     output = tf.layers.dropout(output, rate=params['dropout_rate'], training=is_training)
 
     # 添加POS特征
-    # print('添加POS特征')
+    print('添加POS特征')
     # output_pos = tf.concat([output, postags], axis=-1)
 
     #添加是否是触发词特征
-    output_pos_trigger = tf.concat([output,triggerFlags],axis=-1)
+    # output_pos_trigger = tf.concat([output_pos,triggerFlags],axis=-1)
+    output_trigger = tf.concat([output,triggerFlags],axis=-1)
 
     #全连接层
-    logits = tf.layers.dense(output_pos_trigger, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
+    logits = tf.layers.dense(output_trigger, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
 
 
     print('CRF层')

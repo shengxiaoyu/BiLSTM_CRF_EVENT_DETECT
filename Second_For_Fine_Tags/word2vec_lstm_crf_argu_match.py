@@ -24,7 +24,7 @@ def main(FLAGS,sentencs_words_firstTags_list=None,words_firstTags_indxPairs_sent
     os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.device_map
 
     # 在re train 的时候，才删除上一轮产出的文件，在predicted 的时候不做clean
-    output_dir = os.path.join(FLAGS.root_dir,'second_output_'+FLAGS.sentence_mode)
+    output_dir = os.path.join(FLAGS.root_dir,'second_output_1_5_'+FLAGS.sentence_mode)
     if FLAGS.ifTrain:
         if os.path.exists(output_dir):
             def del_file(path):
