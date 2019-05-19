@@ -113,7 +113,7 @@ def main(FLAGS,sentencs_words_firstTags_list=None,words_firstTags_indxPairs_sent
         pred = [x['pre_ids'] for x in list(predictions)]
         #预测分析
         #真实tag id 除了<pad>和O
-        indices = [item[1] for item in CONFIG.TAG_2_ID.items() if (item[0] != '<pad>' and item[0] != 'O')]
+        indices = [item[1] for item in NEW_CONFIG.NEW_TAG_2_ID.items() if (item[0] != '<pad>' and item[0] != 'O')]
         report = flat_classification_report(y_pred=pred,y_true=targets,labels=indices)
         print(report)
 
