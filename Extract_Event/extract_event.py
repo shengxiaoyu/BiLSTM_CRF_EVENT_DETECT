@@ -15,14 +15,15 @@ import tensorflow as tf
 import os
 import First_For_Commo_Tags.model_fn as MODEL
 import First_For_Commo_Tags.input_fn as INPUT
+from Extract_Event.EventModel import EventFactory2
 
 class Event_Detection(object):
 
     def __init__(self,FLAGS,output_path=None):
         self.FLAGS = FLAGS
         print(FLAGS)
+        self.output_path = os.path.join(self.FLAGS.root_dir,output_path)
         self.__initFirstModel__()
-        self.output_path = output_path
 
     def __initFirstModel__(self):
         FLAGS = self.FLAGS
@@ -121,11 +122,11 @@ class Event_Detection(object):
         tags_list = []
         for pre_ids in predictions:
             tags_list.append([CONFIG.ID_2_TAG[id] for id in pre_ids])
-        for words, tags in zip(words_list, tags_list):
-            print(' '.join(words))
-            print('\n')
-            print(' '.join(tags))
-            print('\n')
+        # for words, tags in zip(words_list, tags_list):
+        #     print(' '.join(words))
+        #     print('\n')
+        #     print(' '.join(tags))
+        #     print('\n')
         return words_list,tags_list
 
     # 判断是否含有关注事实触发词
@@ -197,18 +198,10 @@ class Event_Detection(object):
     def extractor_from_words_posTags(self, words_trigger_tags_pos_tags_list):
         '''传入分词、触发词标签以及pos标签，抽取事实，此时不需要原sentence和index_pair,而且返回的list 每个item对应一句words的抽取事件结果，可能有多个事件'''
         pre_words_list, pre_tags_list = self.__predict__(words_trigger_tags_pos_tags_list)
-        events = self.formEvents2(pre_words_list, pre_tags_list)
-        return events
-
-    def formEvents2(self,words_list,tags_list):
-        '''根据分词和预测的tags构造事件，这是为了用于评估从spe格式中抽取的事件和实际事件。此时没有原句和原句索引，而且每个句子抽出来的事件独立在一个list中'''
         events = []
-        for words,tags in zip(words_list,tags_list):
-            words_in_sentence_indexs = [[0, 0] for _ in range(len(words))]
-            events.append(self.__get_event_from_one_words__(words,tags,words_in_sentence_indexs,''))
+        for pre_words,pre_tags in zip(pre_words_list,pre_tags_list):
+            events.append(EventFactory2(pre_words,pre_tags))
         return events
-
-    # def formSpeTags(self,):
 
     def release(self):
         CONFIG.release()

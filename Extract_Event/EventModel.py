@@ -8,7 +8,7 @@ __doc__ = 'description'
 __author__ = '13314409603@163.com'
 
 
-
+#基于第一层预测结果，使用规则匹配
 def EventFactory(type,completeWord,tag_index_pair,sentence,index_pairs,words,tags):
     eventDict = {
         'Know':Know,
@@ -28,7 +28,7 @@ def EventFactory(type,completeWord,tag_index_pair,sentence,index_pairs,words,tag
     }
     return eventDict[type](type,completeWord,tag_index_pair,sentence,index_pairs,words,tags)
 
-#单句单事件构造
+#单句单事件构造,准确地基于标签类型
 def EventFactory2(words,tags):
     eventDict = {
         'Know': Know,
@@ -383,6 +383,7 @@ class DomesticViolence(baseModel):
         return score
     def compare(self, another_baseModel):
         score = 0
+
         if (self.trigger == another_baseModel.trigger):
             score += 1
         if (self.victim !=None and self.victim!='' and self.victim == another_baseModel.victim):
