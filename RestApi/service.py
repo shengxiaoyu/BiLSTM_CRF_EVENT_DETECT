@@ -6,10 +6,10 @@ __author__ = '13314409603@163.com'
 from json import dumps
 
 from flask import Flask, request, jsonify
-from Event_Model.extract_event import Extractor
+from Extract_Event.extract_event import Event_Detection
 
 app = Flask(__name__)
-extractor = Extractor()
+extractor = Event_Detection()
 @app.route('/api/event_extractor',methods=['POST'])
 def predict():
     body = request.json

@@ -10,7 +10,7 @@ from pyltp import Postagger
 from pyltp import Segmentor
 # from Config import config_parser
 from RestApi import service
-# from Event_Model.extract_event import Extractor
+# from Extract_Event.extract_event import Extractor
 
 LTP_DATA_DIR='C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\ltp_data_v3.4.0'
 pos_mode_path = os.path.join(LTP_DATA_DIR,'pos.model')
