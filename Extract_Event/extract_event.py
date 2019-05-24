@@ -121,11 +121,6 @@ class Event_Detection(object):
         tags_list = []
         for pre_ids in predictions:
             tags_list.append([CONFIG.ID_2_TAG[id] for id in pre_ids])
-        # for words, tags in zip(words_list, tags_list):
-        #     print(' '.join(words))
-        #     print('\n')
-        #     print(' '.join(tags))
-        #     print('\n')
         return words_list,tags_list
 
     # 判断是否含有关注事实触发词

@@ -28,7 +28,7 @@ def main(FLAGS,sentences=None,dir=None):
     os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.device_map
 
     # 在re train 的时候，才删除上一轮产出的文件，在predicted 的时候不做clean
-    output_dir = os.path.join(FLAGS.root_dir,'output_'+str(FLAGS.num_epochs)+'_'+str(FLAGS.batch_size)+'_fullPos_trigger_Merge')
+    output_dir = os.path.join(FLAGS.root_dir,'output_'+str(FLAGS.num_epochs)+'_'+str(FLAGS.batch_size)+'_pos_trigger_Merge')
     if FLAGS.ifTrain:
         if os.path.exists(output_dir):
             def del_file(path):
@@ -114,24 +114,25 @@ def main(FLAGS,sentences=None,dir=None):
         #预测结果
         pred = [x['pre_ids'] for x in list(predictions)]
         #预测分析
-        indices = [item[1] for item in CONFIG.TAG_2_ID.items() if (item[0] != '<pad>' and item[0] != 'O')]
+        # indices = [item[1] for item in CONFIG.TAG_2_ID.items() if (item[0] != '<pad>' and item[0] != 'O')]
+        indices = [CONFIG.TAG_2_ID[tag] for tag in CONFIG.ARGU_TAGs]
         report = flat_classification_report(y_pred=pred,y_true=targets,labels=indices)
         print(report)
 
         with open(os.path.join(output_dir,'predict_result.txt'),'w',encoding='utf8') as fw:
             fw.write(str(report))
-            for target,predict in zip(pred_true,pred):
-                (words,length,_,_),tags = target
-                words = [words[i] for i in range(length)]
-                labels = [CONFIG.ID_2_TAG[tags[i]] for i in range(length)]
-                outputs = [CONFIG.ID_2_TAG[predict[i]] for i in range(length)]
-                fw.write('原 文 ：'+' '.join(words))
-                fw.write('\n')
-                fw.write('人工标记： '+' '.join(labels))
-                fw.write('\n')
-                fw.write('预测结果： '+' '.join(outputs))
-                fw.write('\n')
-                fw.write('\n')
+            # for target,predict in zip(pred_true,pred):
+            #     (words,length,_,_),tags = target
+            #     words = [words[i] for i in range(length)]
+            #     labels = [CONFIG.ID_2_TAG[tags[i]] for i in range(length)]
+            #     outputs = [CONFIG.ID_2_TAG[predict[i]] for i in range(length)]
+            #     fw.write('原 文 ：'+' '.join(words))
+            #     fw.write('\n')
+            #     fw.write('人工标记： '+' '.join(labels))
+            #     fw.write('\n')
+            #     fw.write('预测结果： '+' '.join(outputs))
+            #     fw.write('\n')
+            #     fw.write('\n')
 
     if FLAGS.ifPredict and sentences:
         sentences_words_posTags = []
