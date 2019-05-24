@@ -54,7 +54,8 @@ def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedd
     if(not noEmbedding):
         words = [CONFIG.WV[word] for word in words]
     try:
-        tags = [CONFIG.TAG_2_ID[tag] for tag in tags]
+        # tags = [CONFIG.TAG_2_ID[tag] for tag in tags]
+        tags = [CONFIG.TAG_2_ID[tag] if tag in CONFIG.ARGU_TAGs else CONFIG.TAG_2_ID['O'] for tag in tags]
     except:
         print('这个文件tag无法找到正确索引，请检查:'+fileName)
 
@@ -103,7 +104,7 @@ def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentence
         output_types=types
     )
     if shuffe:
-        dataset = dataset.shuffle(buffer_size=25000).repeat(num_epochs)
+        dataset = dataset.shuffle(buffer_size=20000).repeat(num_epochs)
 
     dataset = dataset.batch(batch_size)
     return dataset

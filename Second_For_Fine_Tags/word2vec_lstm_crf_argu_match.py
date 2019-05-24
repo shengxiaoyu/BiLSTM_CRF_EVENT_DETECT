@@ -24,7 +24,7 @@ def main(FLAGS,sentencs_words_firstTags_list=None,words_firstTags_indxPairs_sent
     os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.device_map
 
     # 在re train 的时候，才删除上一轮产出的文件，在predicted 的时候不做clean
-    output_dir = os.path.join(FLAGS.root_dir,'second_output_1_5_'+FLAGS.sentence_mode)
+    output_dir = os.path.join(FLAGS.root_dir,'second_output_'+str(FLAGS.num_epochs)+'_'+str(FLAGS.batch_size)+'_'+'no_LSTM_Trigger')
     if FLAGS.ifTrain:
         if os.path.exists(output_dir):
             def del_file(path):
@@ -119,21 +119,21 @@ def main(FLAGS,sentencs_words_firstTags_list=None,words_firstTags_indxPairs_sent
 
         with open(os.path.join(output_dir,'predict_result.txt'),'w',encoding='utf8') as fw:
             fw.write(str(report))
-            for target,predict in zip(pred_true,pred):
-                (words,length,first_tags,_),tags = target
-                words = [words[i] for i in range(length)]
-                first_tags = [first_tags[i] for i in range(length)]
-                labels = [NEW_CONFIG.NEW_ID_2_TAG[tags[i]] for i in range(length)]
-                outputs = [NEW_CONFIG.NEW_ID_2_TAG[predict[i]] for i in range(length)]
-                fw.write('原 文 ：'+' '.join(words))
-                fw.write('\n')
-                fw.write('第一层预测标签：'+' '.join(first_tags))
-                fw.write('\n')
-                fw.write('人工标记： '+' '.join(labels))
-                fw.write('\n')
-                fw.write('预测结果： '+' '.join(outputs))
-                fw.write('\n')
-                fw.write('\n')
+            # for target,predict in zip(pred_true,pred):
+            #     (words,length,first_tags,_),tags = target
+            #     words = [words[i] for i in range(length)]
+            #     first_tags = [first_tags[i] for i in range(length)]
+            #     labels = [NEW_CONFIG.NEW_ID_2_TAG[tags[i]] for i in range(length)]
+            #     outputs = [NEW_CONFIG.NEW_ID_2_TAG[predict[i]] for i in range(length)]
+            #     fw.write('原 文 ：'+' '.join(words))
+            #     fw.write('\n')
+            #     fw.write('第一层预测标签：'+' '.join(first_tags))
+            #     fw.write('\n')
+            #     fw.write('人工标记： '+' '.join(labels))
+            #     fw.write('\n')
+            #     fw.write('预测结果： '+' '.join(outputs))
+            #     fw.write('\n')
+            #     fw.write('\n')
     if FLAGS.ifPredict and sentencs_words_firstTags_list:
         '''根据原句分词和第一个模型的预测标记序列 让第二个模型预测并抽取事实'''
         '''传入的sentence_words_firstTags_list 包括原文分词和第一个模型的预测标签序列'''

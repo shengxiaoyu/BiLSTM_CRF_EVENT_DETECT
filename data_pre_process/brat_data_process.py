@@ -4,7 +4,7 @@
 __doc__ = 'description将brat生成的ann文件和源文件.txt结合，生成人工标注的样子的文件'
 __author__ = '13314409603@163.com'
 
-
+import copy
 from Config.config_parser import getParser
 import os
 import sys
@@ -164,6 +164,8 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                     event = Event(relation.id, paramter[0])
                     # 获得触发词对应的entity
                     entity = entitiesDict.get(paramter[1])
+                    entity = copy.copy(entity)
+
                     # 设置触发词的名称：事件类型_Trigger
                     entity.setName(paramter[0] + '_Trigger')
                     # 填入触发词
@@ -171,6 +173,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 else:
                     # 事件参数处理
                     entity = entitiesDict.get(paramter[1])
+                    entity = copy.copy(entity)
                     entity.setName(event.getType() + '_' + paramter[0])
                     event.addArgument(entity)
             events.append(event)
@@ -631,7 +634,13 @@ secondeTag_2_firstTag = {
     'O':'O',
 }
 
+
+NUM1 = 0
+NUM2 = 0
+SHARE_EVENT = {}
+SHARE_ARGU ={}
 #将spe模型下的单句合并为full下的句子
+
 def merge(path):
     #会用到trigger集合，需要初始化Trigger_Tags
     parse = getParser()
@@ -640,29 +649,11 @@ def merge(path):
     #第一个模型的数据
     savePath = os.path.join(os.path.split(path)[0],'Merge_for_first')
     #第二个模型的数据保存卢坚
-    savePath2 = os.path.join(os.path.split(path)[0],'Merge_for_second')
+    savePath2 = os.path.join(os.path.split(path)[0],'Merge_for_Second')
     if(not os.path.exists(savePath)):
         os.mkdir(savePath)
     if (not os.path.exists(savePath2)):
         os.mkdir(savePath2)
-
-    def merge(tagsList):
-        mergedTags = ['O' for _ in range(len(tagsList[0]))]
-        for tags in tagsList:
-            for index,tag in enumerate(tags):
-                if(tag!='O'):
-                    if(mergedTags[index]=='O'):
-                        mergedTags[index] = secondeTag_2_firstTag[tag]
-                    elif(mergedTags[index] in CONFIG.TRIGGER_TAGs):
-                        '''此时产生冲突'''
-                        '''原先填入的是触发词'''
-                        if(mergedTags[index].find('B_')==-1 and tag.find('B_')!=-1):
-                            mergedTags[index] = secondeTag_2_firstTag[tag] #原先的不是B_开头触发词，新来的是B_开头触发词才能覆盖
-                    else:#如果以前不是触发词，
-                        if((tag in CONFIG.TRIGGER_TAGs or tag.find('B_')!=-1) and mergedTags[index].find('B_')==-1): #只有新来的是触发词或者B_开头的参数，而且老的不是B_开头才能覆盖
-                            mergedTags[index] = secondeTag_2_firstTag[tag]
-        return mergedTags
-
     for fileName in os.listdir(path):
         with open(os.path.join(path,fileName),'r',encoding='utf8') as f,open(os.path.join(savePath,fileName),'w',encoding='utf8') as fw,\
                 open(os.path.join(savePath2,fileName),'w',encoding='utf8') as fw2:
@@ -686,7 +677,7 @@ def merge(path):
                     sentence = f.readline().strip()
                 else:
                     '''来了新的行，将上一种合并写入'''
-                    mergedTags = merge(lastTagsList)
+                    mergedTags = one_merge(lastTagsList)
 
                     #更新，生成文件格式：一行原句，一行通用标签，一行pos
                     fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
@@ -703,10 +694,62 @@ def merge(path):
                     sentence = f.readline().strip()
 
             #处理缓存
-            mergedTags = merge(lastTagsList)
+            mergedTags = one_merge(lastTagsList)
             fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
             for lastTags in lastTagsList:
                 fw2.write(lastSentence + '\n' + ' '.join(mergedTags) + '\n' + poses + '\n' + ' '.join(lastTags) + '\n')
+    print(NUM1)
+    print(NUM2)
+    print(SHARE_EVENT)
+
+
+def one_merge(tagsList):
+    global NUM1,NUM2,SHARE_EVENT,SHARE_ARGU
+    # if (len(tagsList) > 1):
+    #     NUM1 += 1
+    # else:
+    #     NUM2 += 1
+    mergedTags = ['O' for _ in range(len(tagsList[0]))]
+    event_types= []
+    for tags in tagsList:
+        for index,tag in enumerate(tags):
+            if(tag!='O'):
+                if(mergedTags[index]=='O'):
+                    mergedTags[index] = secondeTag_2_firstTag[tag]
+                    # mergedTags[index] = tag
+                elif(mergedTags[index] in CONFIG.TRIGGER_TAGs):
+                    '''此时产生冲突'''
+                    '''原先填入的是触发词'''
+                    if(mergedTags[index].find('B_')==-1 and tag.find('B_')!=-1):
+                        mergedTags[index] = secondeTag_2_firstTag[tag] #原先的不是B_开头触发词，新来的是B_开头触发词才能覆盖
+                else:#如果以前不是触发词，
+                    if((tag in CONFIG.TRIGGER_TAGs or tag.find('B_')!=-1) and mergedTags[index].find('B_')==-1): #只有新来的是触发词或者B_开头的参数，而且老的不是B_开头才能覆盖
+                        mergedTags[index] = secondeTag_2_firstTag[tag]
+                    # if(mergedTags[index]==tag):
+                    #     print('错误')
+                    # mergedTags[index] = mergedTags[index]+'_'+tag
+    # for tag in mergedTags:
+    #     if(tag in SHARE_ARGU):
+    #         SHARE_ARGU[tag] += 1
+    #     else:
+    #         SHARE_ARGU[tag] = 0
+    #     for tag in tags:
+    #         if(tag.find('_Trigger')!=-1):
+    #             event_types.append(tag[2:-8])
+    #             break
+    # if(len(event_types)>1):
+    #     for index,event_type in enumerate(event_types):
+    #         for index2,event_type2 in enumerate(event_types):
+    #             if(index!=index2):
+    #                 if(event_type in SHARE_EVENT):
+    #                     if(event_type2 in SHARE_EVENT[event_type]):
+    #                         SHARE_EVENT[event_type][event_type2] += 1
+    #                     else:
+    #                         SHARE_EVENT[event_type][event_type2] = 1
+    #                 else:
+    #                     SHARE_EVENT[event_type] = {}
+    #                     SHARE_EVENT[event_type][event_type2] = 1
+    return mergedTags
 
 def main():
     base_path = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF'
@@ -714,20 +757,20 @@ def main():
     brat_base_path = os.path.join(base_path, 'brat')
     ltp_path = os.path.join(base_path, 'ltp_data_v3.4.0')
     save_path = os.path.join(base_path, 'labeled')
-    formLabelData(
-        labelFilePath=os.path.join(brat_base_path, 'labeled'),
-        savePath=save_path,
-        segmentor_model_path=os.path.join(ltp_path, 'cws.model'),
-        segmentor_user_dict_path=os.path.join(ltp_path, 'userDict.txt'),
-        pos_model_path=os.path.join(ltp_path, 'pos.model'),
-        stop_words_path=os.path.join(base_path, 'newStopWords.txt'),
-        # trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
-        # argu_labels_path=os.path.join(base_path,'argumentLabels.txt'),
-        trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
-        argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
-        #mode=1 Spe
-        #mode=2 Full
-        mode=1)
+    # formLabelData(
+    #     labelFilePath=os.path.join(brat_base_path, 'labeled'),
+    #     savePath=save_path,
+    #     segmentor_model_path=os.path.join(ltp_path, 'cws.model'),
+    #     segmentor_user_dict_path=os.path.join(ltp_path, 'userDict.txt'),
+    #     pos_model_path=os.path.join(ltp_path, 'pos.model'),
+    #     stop_words_path=os.path.join(base_path, 'newStopWords.txt'),
+    #     # trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
+    #     # argu_labels_path=os.path.join(base_path,'argumentLabels.txt'),
+    #     trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
+    #     argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
+    #     #mode=1 Spe
+    #     #mode=2 Full
+    #     mode=1)
     merge(os.path.join(save_path,'Spe'))
 
 if __name__ == '__main__':

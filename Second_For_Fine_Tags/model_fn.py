@@ -35,7 +35,8 @@ def model_fn(features,labels,mode,params):
 
     # 添加第一层预测标签特征
     print('添加第一层预测标签特征')
-    output = tf.concat([output, oldTags], axis=-1)
+    # output = tf.concat([output, oldTags], axis=-1)
+    output = oldTags
 
     #添加是否是关注触发词 特征
     print('添加是否是关注触发词特征')

@@ -254,13 +254,15 @@ class Event_Detection2(object):
         first_predictions = self.first_estimator.predict(input_fn=pre_inf)
         first_ids_list = [x['pre_ids'] for x in list(first_predictions)]
 
+        first_tags_list = []
+        for pre_ids in first_ids_list:
+            first_tags_list.append([CONFIG.ID_2_TAG[id] for id in pre_ids])
 
 
         #根据第一层预测结果，构造第二层模型预测输入
 
-        def handlerOneInput(words, first_ids,index_of_words):
+        def handlerOneInput(words, first_tags,index_of_words):
             results = []
-            first_tags = [CONFIG.ID_2_TAG[id] for id in first_ids]
             for index, tag in enumerate(first_tags):
                 if (tag in CONFIG.TRIGGER_TAGs and tag.find('B_') != -1):  # 触发词
                     # 不含B_的触发词
@@ -281,8 +283,8 @@ class Event_Detection2(object):
         # 针对第一个模型的预测结果，针对每个触发词都会构成一条新的预测example
         sentence_words_firstTags_trueTriggerTags = []
         index_of_words = 0
-        for words_tags_postag, first_ids in zip(sentences_words_tags_posTags, first_ids_list):
-            the_words_firstTags_newTags_list = handlerOneInput(words_tags_postag[0], first_ids,index_of_words)
+        for words_tags_postag, first_tags in zip(sentences_words_tags_posTags, first_tags_list):
+            the_words_firstTags_newTags_list = handlerOneInput(words_tags_postag[0], first_tags,index_of_words)
             sentence_words_firstTags_trueTriggerTags.extend(the_words_firstTags_newTags_list)
             index_of_words += 1
 
