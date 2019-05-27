@@ -8,6 +8,7 @@ import os
 import First_For_Commo_Tags.config_center as CONFIG
 import tensorflow as tf
 import copy
+import re
 #对齐和向量化
 def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedding):
     # print(fileName)
@@ -109,15 +110,19 @@ def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentence
     dataset = dataset.batch(batch_size)
     return dataset
 
-
+#查找所有的触发词
 def findTrigger(sentence):
     triggers = []
     for tag,words in CONFIG.TRIGGER_WORDS_DICT.items():
         for word in words:
-            beginIndex = sentence.find(word)
-            if(beginIndex!=-1):
+            start = 0
+            beginIndex = sentence.find(word,start)
+            while(beginIndex!=-1):
                 endIndex = beginIndex+len(word)
                 triggers.append([tag,beginIndex,endIndex])
+                start = endIndex
+                beginIndex = sentence.find(word,start)
+
     if(len(triggers)==0):
         return None
     #处理相互覆盖的触发词，如果找到的触发词有交集，就取最长的触发词

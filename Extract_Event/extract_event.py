@@ -101,7 +101,7 @@ class Event_Detection(object):
             print("整个抽取文本无关注事实")
             return []
         words_list, tags_list, words_in_sentence_index_list,sentences = self.__extractorFromSentences__(sentences)
-        events = self.__formEvents__(words_list,tags_list,words_in_sentence_index_list,sentences)
+        events = self.__formEvents__(words_list,tags_list)
         return events
 
     # 判断是否含有关注事实触发词
@@ -162,36 +162,31 @@ class Event_Detection(object):
             indexs.append([baseIndex, baseIndex + len(word)])
             baseIndex += len(word)
         return indexs
-    def __formEvents__(self,words_list,tags_list,words_in_sentence_index_list,sentences):
+    def __formEvents__(self,words_list,tags_list):
         '''传入分词list,tags list,原句索引对list，原句list。构造出所有的抽取到的事件'''
         events = []
-        for words, tags,words_in_sentence_index_pair,sentence in zip(words_list,tags_list,words_in_sentence_index_list,sentences):
-            events.extend(self.__get_event_from_one_words__(words,tags,words_in_sentence_index_pair,sentence))
+        for words, tags in zip(words_list,tags_list):
+            event = self.__get_event_from_one_words__(words,tags)
+            if(event):
+                events.append(event)
         return events
 
-    def __get_event_from_one_words__(self,words,tags,words_in_sentence_index_pairs,sentence):
+    def __get_event_from_one_words__(self,words,tags):
         # 获取触发词tag
         triggers = CONFIG.TRIGGER_TAGs
-        events = []
         for index, tag in enumerate(tags):
             if (tag in triggers and tag.find('B_') != -1):
                 '''发现触发词'''
                 type = tag[2:-8]
                 completeTrigger = words[index]
-                # sentence_char_index_pair = words_in_sentence_index_pairs[index]
                 tag_index_pair = [index, index]
                 for endIndex in range(index + 1, len(tags)):
                     if (tags[endIndex] == 'I_' + type):
                         completeTrigger += words[endIndex]
-                        # sentence_char_index_pair[1] = words_in_sentence_index_pairs[endIndex][1]
                         tag_index_pair[1] += 1
                     else:
                         break
-                event = EventModel.EventFactory(type, completeTrigger, tag_index_pair, sentence,
-                                                words_in_sentence_index_pairs, words, tags)
-                event.fitArgument(words, tags, words_in_sentence_index_pairs)
-                events.append(event)
-        return events
+                return EventFactory2(words,tags)
 
 
     '''从已经分好词的词组中抽取'''
