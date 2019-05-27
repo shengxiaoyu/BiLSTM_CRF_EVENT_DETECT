@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from tf_metrics import precision
-from tf_metrics import recall
-from tf_metrics import f1
 
 __doc__ = 'description:模型网络图构建中心'
 __author__ = '13314409603@163.com'
@@ -75,9 +72,9 @@ def model_fn(features,labels,mode,params):
             indices = [item[1] for item in CONFIG.TAG_2_ID.items() if (item[0]!='<pad>'and item[0]!='O')]
             metrics = {
                 'acc': tf.metrics.accuracy(labels, pred_ids, weights),
-                'precision': precision(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
-                'recall': recall(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
-                'f1': f1(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
+                # 'precision': precision(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
+                # 'recall': recall(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
+                # 'f1': f1(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
             }
             for metric_name, op in metrics.items():
                 tf.summary.scalar(metric_name, op[1])

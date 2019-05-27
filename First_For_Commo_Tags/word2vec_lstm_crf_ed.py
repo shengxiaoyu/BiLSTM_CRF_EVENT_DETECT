@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from pyltp import SentenceSplitter
-
-import EventModel
 
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
@@ -13,10 +10,11 @@ import os
 import numpy as np
 import tensorflow as tf
 from sklearn_crfsuite.metrics import flat_classification_report
+
 import First_For_Commo_Tags.config_center as CONFIG
+import First_For_Commo_Tags.generate_example as fileGenerator
 import First_For_Commo_Tags.input_fn as INPUT
 import First_For_Commo_Tags.model_fn as MODEL
-import First_For_Commo_Tags.generate_example as fileGenerator
 
 
 #训练、评估、预测,sentece:要预测的句子
