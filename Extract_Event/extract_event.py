@@ -123,7 +123,7 @@ class Event_Detection(object):
             print("整个抽取文本无关注事实")
             return []
         words_list, tags_list, words_in_sentence_index_list = self.__extractorFromSentences__(sentences)
-        events = self.__formEvents__(words_list,tags_list,words_in_sentence_index_list)
+        events = self.__formEvents__(words_list,tags_list,words_in_sentence_index_list,sentences)
         return events
 
     # 判断是否含有关注事实触发词
