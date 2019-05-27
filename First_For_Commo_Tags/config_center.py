@@ -104,7 +104,7 @@ def initTriggerWords(path):
     for triggerFile in os.listdir(path):
         with open(os.path.join(path, triggerFile), 'r', encoding='utf8') as f:
             content = f.read()
-        TRIGGER_WORDS_DICT[triggerFile.split('.')[0]] = set(filter(lambda x:False if(x=='') else True,content.split('\n')))
+        TRIGGER_WORDS_DICT[triggerFile.split('.')[0]+'_Trigger'] = set(filter(lambda x:False if(x=='') else True,content.split('\n')))
 #释放模型
 def release():
     global POSTAGGER, SEGMENTOR

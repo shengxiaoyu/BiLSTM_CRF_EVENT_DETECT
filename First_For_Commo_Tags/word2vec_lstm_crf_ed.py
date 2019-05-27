@@ -3,7 +3,7 @@
 
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
-
+import copy
 import functools
 import os
 
@@ -148,20 +148,19 @@ def main(FLAGS,sentences=None,dir=None):
                 continue
             for tag,beginIndex,endIndex in triggers:
                 words,tags = INPUT.labelTrigger(words,tags,beginIndex,endIndex,tag)
-
-            # 去停用词
-            newWords = []
-            newPosTags = []
-            newTags = []
-            newIndexs = []
-            for word, pos,tag,indexPair in zip(words, postags,tags,indexPairs):
-                if (word not in CONFIG.STOP_WORDS):
-                    newWords.append(word)
-                    newPosTags.append(pos)
-                    newTags.append(tag)
-                    newIndexs.append(indexPair)
-            sentences_words_posTags.append([newWords,newTags,newPosTags])
-            words_in_sentence_index_list.append(newIndexs)
+                # 去停用词
+                newWords = []
+                newPosTags = []
+                newTags = []
+                newIndexs = []
+                for word, pos,tag,indexPair in zip(words, postags,tags,indexPairs):
+                    if (word not in CONFIG.STOP_WORDS):
+                        newWords.append(word)
+                        newPosTags.append(pos)
+                        newTags.append(tag)
+                        newIndexs.append(copy.copy(indexPair))
+                sentences_words_posTags.append([newWords,newTags,newPosTags])
+                words_in_sentence_index_list.append(newIndexs)
         pre_inf = functools.partial(INPUT.input_fn, input_dir=None,sentences_words_posTags=sentences_words_posTags,
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
                                       max_sequence_length=FLAGS.max_sequence_length)

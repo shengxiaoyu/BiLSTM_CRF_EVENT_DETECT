@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import functools
-import os
 
 __doc__ = 'description:模型输入预处理中心'
 __author__ = '13314409603@163.com'
+import functools
+import os
 import First_For_Commo_Tags.config_center as CONFIG
 import tensorflow as tf
-
+import copy
 #对齐和向量化
 def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedding):
     # print(fileName)
@@ -138,7 +138,9 @@ def findTrigger(sentence):
     newTriggers.append(currenctTrigger)
     return newTriggers
 # 标注trigger触发词
-def labelTrigger(words, labeled,beginIndex,endIndex,tag):
+def labelTrigger(words,labeled,beginIndex,endIndex,tag):
+    words = copy.copy(words)
+    labeled = copy.copy(labeled)
     coursor = 0
     isBegin = True
     for index, word in enumerate(words):
