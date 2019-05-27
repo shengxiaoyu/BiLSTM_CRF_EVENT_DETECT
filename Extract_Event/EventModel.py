@@ -262,6 +262,17 @@ class Remarray(baseModel):
             score += 1
         return score
 class Bear(baseModel):
+    def set_attr(self,attr,value):
+        if(attr =='Bear'):
+            self.trigger = value
+        if(attr=='Age'):
+            self.childAge = value
+        if(attr=='Gender'):
+            self.gender = value
+        if(attr=='Name'):
+            self.childName = value
+        if(attr=='Time'):
+            self.dateOfBirth = value
     def fitArgument(self,words,tags,words_in_sentence_index_pair):
         '''匹配规则：在触发词前第一个time参数为出生时间；触发词后找gender,childeName,childAge'''
         self.dateOfBirth,self.dateOfBirth_index_pair = self.__findFoward__(words, tags,'Time',words_in_sentence_index_pair) #前面找时间
