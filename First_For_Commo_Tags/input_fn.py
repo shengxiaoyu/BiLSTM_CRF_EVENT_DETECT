@@ -71,13 +71,12 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words
             with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:
                 sentence = f.readline()#句子行
                 while sentence:
-                    #第一层的标记行，忽略
-                    f.readline()
-                    pos = f.readline()
-                    #细粒度标记行
+                    # 细粒度标记行
                     label = f.readline()
                     if not label:
                         break
+                    pos = f.readline()
+
                     words = sentence.strip().split(' ')
                     words = list(filter(lambda word:word!='',words))
 
