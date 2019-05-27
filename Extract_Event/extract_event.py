@@ -67,6 +67,10 @@ class Event_Detection(object):
             print("整个抽取文本无关注事实")
             return []
         words_list,first_tags_list,index_pairs_list = first.main(self.FLAGS, sentences)
+
+        #处理多个事件共享触发词
+
+
         print('第二个模型预测')
         words_list,second_tags_list,index_pairs_list,sentences = second.main(self.FLAGS,words_firstTags_indxPairs_sentences=[words_list,first_tags_list,index_pairs_list,sentences])
 
@@ -147,9 +151,11 @@ class Event_Detection(object):
         CONFIG.release()
 
 class Event_Detection2(object):
+    '''通用方法'''
     def __init__(self,FLAGS,first_output_path=None,second_output_path=None):
         self.FLAGS = FLAGS
         print(FLAGS)
+        self.sentenceSplitter = SentenceSplitter()
         self.first_output_path = os.path.join(self.FLAGS.root_dir,first_output_path)
         self.__initFirstModel__()
         self.second_output_path = os.path.join(self.FLAGS.root_dir,second_output_path)
@@ -279,6 +285,8 @@ class Event_Detection2(object):
                     results.append([newWords, first_tags, newTags,index_of_words])
             return results
 
+
+
         # 构造第二个模型的输入list
         # 针对第一个模型的预测结果，针对每个触发词都会构成一条新的预测example
         sentence_words_firstTags_trueTriggerTags = []
@@ -310,6 +318,9 @@ class Event_Detection2(object):
             words_index_list.append(inputs[3])
         return new_words_list, new_tags_list,words_index_list
 
+    '''两中抽取方式，1、从自然语段抽取；2、从分好词的词组中抽取'''
+
+    '''从分好词的词组抽取'''
     def extractor_from_words_posTags(self,words_trigger_tags_pos_tags_list):
         '''传入分词、触发词标签以及pos标签，抽取事实，此时不需要原sentence和index_pair,而且返回的list 每个item对应一句words的抽取事件结果，可能有多个事件'''
         pre_words_list, pre_tags_list ,words_index_list = self.__predict__(words_trigger_tags_pos_tags_list)
@@ -327,9 +338,153 @@ class Event_Detection2(object):
         events.append(current_events)
         return events
 
+    '''从自然语段中抽取'''
+    def extractor(self,paragraph):
+        # 调用预测接口
+        sentences = []
+        for sentence in self.sentenceSplitter.split(paragraph):
+            hasTrigger = self.__ifContainTrigger__(sentence)
+            if (not hasTrigger):
+                print('该句子中无关注事实：' + sentence)
+            else:
+                sentences.append(sentence)
+        if (len(sentences) == 0):
+            print("整个抽取文本无关注事实")
+            return []
+
+        first_words_list = []
+        first_tags_list = []
+        if(self.first_estimator):
+            print('第一个模型预测')
+            sentences_words_posTags = []
+            for sentence in sentences:
+                # 分词、获取pos标签、去停用词
+                words = CONFIG.SEGMENTOR.segment(sentence)
+                postags = CONFIG.POSTAGGER.postag(words)
+                tags = ['O' for _ in words]
+
+                # 标记触发词
+                triggers = First_Input.findTrigger(sentence)
+                if (triggers == None or len(triggers) == 0):
+                    continue
+                for tag, beginIndex, endIndex in triggers:
+                    words, tags = First_Input.labelTrigger(words, tags, beginIndex, endIndex, tag)
+
+                #去停用词
+                newWords = []
+                newPosTags = []
+                newTags = []
+                for word, pos,tag in zip(words, postags,tags):
+                    if (word not in CONFIG.STOP_WORDS):
+                        newWords.append(word)
+                        newPosTags.append(pos)
+                        newTags.append(tag)
+                sentences_words_posTags.append([newWords,newTags,newPosTags])
+            pre_inf = functools.partial(First_Input.input_fn, input_dir=None, sentences_words_posTags=sentences_words_posTags,
+                                        shuffe=False, num_epochs=1, batch_size=self.FLAGS.batch_size,
+                                        max_sequence_length=self.FLAGS.max_sequence_length)
+            predictions = self.first_estimator.predict(input_fn=pre_inf)
+            predictions = [x['pre_ids'] for x in list(predictions)]
+
+            first_words_list = [one_sentence_words_posTags[0] for one_sentence_words_posTags in sentences_words_posTags]
+            for pre_ids in predictions:
+                first_tags_list.append([CONFIG.ID_2_TAG[id]for id in pre_ids])
+
+
+        # 处理多个事件共享触发词
+
+
+        second_word_list = []
+        second_tags_list = []
+        if(self.second_estimator):
+            print('第二个模型预测')
+            '''根据原句分词和第一个模型的预测标记序列 让第二个模型预测并抽取事实'''
+            '''传入的sentence_words_firstTags_list 包括原文分词和第一个模型的预测标签序列'''
+
+            def handlerOneInput(words, first_tags):
+                results = []
+                for index, tag in enumerate(first_tags):
+                    if (tag in CONFIG.TRIGGER_TAGs and tag.find('B_') != -1):  # 触发词
+                        # 不含B_的触发词
+                        currentTrigger = tag[2:]
+                        # 确定触发词的长度
+                        endIndex = index + 1
+                        while (endIndex < len(first_tags) and first_tags[endIndex].find(currentTrigger) != -1):
+                            endIndex += 1
+                        # 构造新的tags列：
+                        newTags = [first_tags[i] + '_Trigger' if i >= index and i < endIndex else 'O' for i in
+                                   range(len(first_tags))]
+                        # 深拷贝其余两列
+                        newWords = [x for x in words]
+                        newFirstTags = [x for x in first_tags]
+
+                        results.append([newWords, newFirstTags, newTags])
+                return results
+
+            # 构造第二个模型的输入list
+            # 针对第一个模型的预测结果，针对每个触发词都会构成一条新的预测example
+            sentence_words_firstTags_trueTriggerTags = []
+            for words, first_tags in zip(first_words_list, first_tags_list):
+                the_words_firstTags_newTags_list = handlerOneInput(words, first_tags)
+                sentence_words_firstTags_trueTriggerTags.extend(the_words_firstTags_newTags_list)
+            pred_inpf = functools.partial(Second_Input.input_fn, input_dir=None, shuffe=False, num_epochs=self.FLAGS.num_epochs,
+                                          batch_size=self.FLAGS.batch_size, max_sequence_length=self.FLAGS.max_sequence_length,
+                                          sentence_words_firstTags_trueTriggerTags=sentence_words_firstTags_trueTriggerTags)
+            predictions = self.second_estimator.predict(input_fn=pred_inpf)
+            preds = [x['pre_ids'] for x in list(predictions)]
+
+            for ids, inputs in zip(preds, sentence_words_firstTags_trueTriggerTags):
+                # 词语
+                words = inputs[0]
+                second_word_list.append(words)
+                # 预测标签
+                tags = [NEW_CONFIG.NEW_ID_2_TAG[id] for id in ids]
+                # 每个词语在原句中的index_pair
+                second_tags_list.append(tags)
+
+        events = []
+        for tags, words in zip(second_tags_list, second_word_list):
+            events.append(EventFactory2(words,tags))
+        return events
+
+    def __ifContainTrigger__(self,sentence):
+        # 初始化触发词集
+        triggerDict = CONFIG.TRIGGER_WORDS_DICT
+        # 判断释放含触发词
+        triggerContained = ''
+        for oneKindTrigger in triggerDict.items():
+            triggerType = oneKindTrigger[0]
+            for word in oneKindTrigger[1]:
+                if (sentence.find(word) != -1):
+                    triggerContained = triggerContained + (triggerType + ':' + word)
+                    break
+        if (len(triggerContained) == 0):
+            return False
+        return True
+
     def release(self):
         CONFIG.release()
+
+def shareBear(tags):
+    bearCount = 0
+    nameCount = 0
+    ageCount = 0
+    genderCount = 0
+    for tag in tags:
+        if(tag=='B_Bear'):
+            bearCount+=1
+        if(tag=='B_Name'):
+            nameCount+=1
+        if(tag=='B_Age'):
+            ageCount+=1
+        if(tag=='B_Gender'):
+            genderCount += 1
+    if(nameCount>bearCount or ageCount>bearCount or genderCount>bearCount):
+         pass
 if __name__ == '__main__':
-    # events = Extractor.extractor2('原、被告双方1986年上半年经人介绍认识，××××年××月××日在临桂县宛田乡政府登记结婚，××××年××月××日生育女儿李某乙，××××年××月××日生育儿子李某丙，现女儿李某乙、儿子李某丙都已独立生活')
+    extractor = Event_Detection2(getParser(),first_output_path='output_15_64_pos_trigger_Merge',second_output_path='second_output_15_64_Trigger')
+    events = extractor.extractor('原告李××诉称，原、被告经人介绍认识订婚，1997年12月10日在汶上县民政局登记结婚，婚后生育一男一女，男孩叫刘×锦，女孩叫刘×华'
+                                       '婚后生育四个女儿，长女王雪斌，次女王雪玲，三女王乙，四女王丙。'
+                                 )
     print('end')
     exit(0)

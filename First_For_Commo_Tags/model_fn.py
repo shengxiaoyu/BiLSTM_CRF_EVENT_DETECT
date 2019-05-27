@@ -35,7 +35,7 @@ def model_fn(features,labels,mode,params):
     output = tf.concat([output, postags], axis=-1)
 
     #添加是否是触发词特征
-    # output = tf.concat([output,triggerFlags],axis=-1)
+    output = tf.concat([output,triggerFlags],axis=-1)
 
     #全连接层
     logits = tf.layers.dense(output, CONFIG.TAGs_LEN) #batch_size*40*len(tags)

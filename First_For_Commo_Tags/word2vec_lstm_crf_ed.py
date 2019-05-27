@@ -25,7 +25,7 @@ def main(FLAGS,sentences=None,dir=None):
     os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.device_map
 
     # 在re train 的时候，才删除上一轮产出的文件，在predicted 的时候不做clean
-    output_dir = os.path.join(FLAGS.root_dir,'output_'+str(FLAGS.num_epochs)+'_'+str(FLAGS.batch_size)+'_'+'pos')
+    output_dir = os.path.join(FLAGS.root_dir,'output_'+str(FLAGS.num_epochs)+'_'+str(FLAGS.batch_size)+'_'+'pos_trigger_Merge')
     if FLAGS.ifTrain:
         if os.path.exists(output_dir):
             def del_file(path):
@@ -149,18 +149,20 @@ def main(FLAGS,sentences=None,dir=None):
                 words,tags = INPUT.labelTrigger(words,tags,beginIndex,endIndex,tag)
 
             # 去停用词
-            newWords = []
-            newPosTags = []
-            newTags = []
-            newIndexs = []
-            for word, pos,tag,indexPair in zip(words, postags,tags,indexPairs):
-                if (word not in CONFIG.STOP_WORDS):
-                    newWords.append(word)
-                    newPosTags.append(pos)
-                    newTags.append(tag)
-                    newIndexs.append(indexPair)
-            sentences_words_posTags.append([newWords,newTags,newPosTags])
-            words_in_sentence_index_list.append(newIndexs)
+            # newWords = []
+            # newPosTags = []
+            # newTags = []
+            # newIndexs = []
+            # for word, pos,tag,indexPair in zip(words, postags,tags,indexPairs):
+            #     if (word not in CONFIG.STOP_WORDS):
+            #         newWords.append(word)
+            #         newPosTags.append(pos)
+            #         newTags.append(tag)
+            #         newIndexs.append(indexPair)
+            # sentences_words_posTags.append([newWords,newTags,newPosTags])
+            # words_in_sentence_index_list.append(newIndexs)
+            sentences_words_posTags.append([words,tags,postags])
+            words_in_sentence_index_list.append(indexPairs)
         pre_inf = functools.partial(INPUT.input_fn, input_dir=None,sentences_words_posTags=sentences_words_posTags,
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
                                       max_sequence_length=FLAGS.max_sequence_length)

@@ -112,13 +112,17 @@ def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentence
 
 def findTrigger(sentence):
     triggers = []
-    for tag,words in CONFIG.TRIGGER_WORDS_DICT.items():
+    for tag, words in CONFIG.TRIGGER_WORDS_DICT.items():
         for word in words:
-            beginIndex = sentence.find(word)
-            if(beginIndex!=-1):
-                endIndex = beginIndex+len(word)
-                triggers.append([tag,beginIndex,endIndex])
-    if(len(triggers)==0):
+            start = 0
+            beginIndex = sentence.find(word, start)
+            while (beginIndex != -1):
+                endIndex = beginIndex + len(word)
+                triggers.append([tag, beginIndex, endIndex])
+                start = endIndex
+                beginIndex = sentence.find(word, start)
+
+    if (len(triggers) == 0):
         return None
     #处理相互覆盖的触发词，如果找到的触发词有交集，就取最长的触发词
     #现用beginIndex排序
