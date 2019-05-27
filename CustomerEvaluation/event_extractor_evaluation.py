@@ -7,7 +7,7 @@ __doc__ = 'description'
 __author__ = '13314409603@163.com'
 from Config.config_parser import getParser
 from Extract_Event.EventModel import EventFactory2
-from extract_event import Event_Detection
+from Extract_Event.extract_event import Event_Detection
 
 def main():
     FLAGS = getParser()
