@@ -2,13 +2,10 @@
 # -*- coding: utf-8 -*-
 import functools
 import sys
-
 from Config.config_parser import getParser
-
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
 from pyltp import SentenceSplitter
-
 import First_For_Commo_Tags.config_center as CONFIG
 import Extract_Event.EventModel as EventModel
 import tensorflow as tf

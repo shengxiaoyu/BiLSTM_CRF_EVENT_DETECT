@@ -98,7 +98,7 @@ class baseModel(object):
         end_index = self.tag_index_pair[1]+1
         # 从触发词开始往后找
         hasFound = False
-        while(end_index<len(tags)):
+        while(end_index<len(words_in_sentence_index_pair)):
             if (tags[end_index] == 'B_'+target):  # 先找B_
                 if(hasFound):#找最近的，如果找到了就直接结束
                     break
@@ -108,7 +108,10 @@ class baseModel(object):
                 hasFound = True
             elif (tags[end_index] == 'I_'+target):  # 再找I_
                 targetWord += words[end_index]
-                index_pair[1] = words_in_sentence_index_pair[end_index][1]
+                try:
+                    index_pair[1] = words_in_sentence_index_pair[end_index][1]
+                except:
+                    print('错误')
             else:
                 if(hasFound):
                     break
