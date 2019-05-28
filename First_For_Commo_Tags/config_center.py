@@ -73,6 +73,15 @@ def initTags(triggerLablePath,argumentLabelPath):
             ID_2_TAG[index] = line.strip()
             ARGU_TAGs.append(line.strip())
             index += 1
+    #添加自定义符合参数：Know_BeInLove_Time,Know_Marry_Time,DomesticViolence_Speparation_Time,DomesticViolence_BadHabit_FirstPerson
+    other_attr = ['Know_BeInLove_Time','Know_Marry_Time','DomesticViolence_Speparation_Time','DomesticViolence_BadHabit_FirstPerson']
+    for attr in other_attr:
+        TAG_2_ID['B_'+attr] = index
+        ID_2_TAG[index] = 'B_'+attr
+        index+=1
+        TAG_2_ID['I_'+attr] = index
+        ID_2_TAG[index] = 'I_'+attr
+        index+=1
     TAGs_LEN = len(TAG_2_ID)
 def initWord2Vec(word2vec_model_path):
     global WV

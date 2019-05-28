@@ -28,7 +28,7 @@ def EventFactory(type,completeWord,tag_index_pair,sentence,index_pairs,words,tag
     }
     return eventDict[type](type,completeWord,tag_index_pair,sentence,index_pairs,words,tags)
 
-#单句单事件构造,准确地基于标签类型
+#单句单多事件构造,准确地基于标签类型
 def EventFactory2(words,tags):
     eventDict = {
         'Know': Know,
@@ -47,17 +47,15 @@ def EventFactory2(words,tags):
         'Credit': Credit,
     }
     type = ''
+    events = []
     for tag in tags:
         if(tag.find('_Trigger')!=-1):
             type = tag[2:-8]
-            break
-    if(type in eventDict):
-        event = eventDict[type].to_simple_model(type,words,tags)
-        event.fit_arguments_by_spe(words,tags)
-        return event
-    else:
-        return None
-
+        if(type in eventDict):
+            event = eventDict[type].to_simple_model(type,words,tags)
+            event.fit_arguments_by_spe(words,tags)
+            events.append(event)
+    return events
 #基于规则匹配每类事实参数
 class baseModel(object):
     def __init__(self,type,completeWord,tag_index_pair,sentence,sentence_char_index_pair,words,tags):

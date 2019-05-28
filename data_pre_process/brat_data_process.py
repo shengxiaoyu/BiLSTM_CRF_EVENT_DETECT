@@ -546,27 +546,10 @@ def merge(path):
     parse = getParser()
     CONFIG.init(parse.root_dir)
     #新文件的保存路径，保存在传入文件的同级目录
-    savePath = os.path.join(os.path.split(path)[0],'Merge')
+    #base实验的数据
+    savePath = os.path.join(os.path.split(path)[0],'Merge_for_base')
     if(not os.path.exists(savePath)):
         os.mkdir(savePath)
-
-    def merge(tagsList):
-        mergedTags = tagsList[0]
-        for tags in tagsList[1:]:
-            for index,tag in enumerate(tags):
-                if(tag!='O'):
-                    if(mergedTags[index]=='O'):
-                        mergedTags[index] = tag
-                    elif(mergedTags[index] in CONFIG.TRIGGER_TAGs):
-                        '''此时产生冲突'''
-                        '''原先填入的是触发词'''
-                        if(mergedTags[index].find('B_')==-1 and tag.find('B_')!=-1):
-                            mergedTags[index] = tag #原先的不是B_开头触发词，新来的是B_开头触发词才能覆盖
-                    else:#如果以前不是触发词，
-                        if((tag in CONFIG.TRIGGER_TAGs or tag.find('B_')!=-1) and mergedTags[index].find('B_')==-1): #只有新来的是触发词或者B_开头的参数，而且老的不是B_开头才能覆盖
-                            mergedTags[index] = tag
-        return mergedTags
-
     for fileName in os.listdir(path):
         with open(os.path.join(path,fileName),'r',encoding='utf8') as f,open(os.path.join(savePath,fileName),'w',encoding='utf8') as fw:
             #words行
@@ -589,7 +572,9 @@ def merge(path):
                     sentence = f.readline().strip()
                 else:
                     '''来了新的行，将上一种合并写入'''
-                    mergedTags = merge(lastTagsList)
+                    mergedTags = one_merge(lastTagsList)
+
+                    # 更新，生成文件格式：一行原句，一行融合标签，一行pos
                     fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
                     #更新缓存
                     lastSentence = sentence
@@ -601,8 +586,34 @@ def merge(path):
                     sentence = f.readline().strip()
 
             #处理缓存
-            mergedTags = merge(lastTagsList)
+            mergedTags = one_merge(lastTagsList)
             fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
+
+
+#'Know_BeInLove_Time','Know_Marry_Time','DomesticViolence_Speparation_Time','DomesticViolence_BadHabit_FirstPerson'
+def one_merge(tagsList):
+    mergedTags = ['O' for _ in range(len(tagsList[0]))]
+    for tags in tagsList:
+        for index,tag in enumerate(tags):
+            if(tag!='O'):
+                if(mergedTags[index]=='O'):
+                    mergedTags[index] = tag
+                else:#冲突,只更新限定的复合参数，其他参数不变
+                    if((mergedTags[index].find('Know_Time')!=-1 and tag.find('BeInLove_Time')!=-1) or (mergedTags[index].find('BeInLove_Time')!=-1 and tag.find('Know_Time')!=-1)):
+                        mergedTags[index] = mergedTags[index][0:2]+'Know_BeInLove_Time'
+                    if ((mergedTags[index].find('Know_Time') != -1 and tag.find('Marry_Time') != -1) or (
+                            mergedTags[index].find('Marry_Time') != -1 and tag.find('Know_Time') != -1)):
+                        mergedTags[index] = mergedTags[index][0:2] + 'Know_Marry_Time'
+                    if ((mergedTags[index].find('DomesticViolence_Time') != -1 and tag.find('Separation_BeginTime') != -1) or (
+                            mergedTags[index].find('Separation_BeginTime') != -1 and tag.find('DomesticViolence_Time') != -1)):
+                        mergedTags[index] = mergedTags[index][0:2] + 'DomesticViolence_Speparation_Time'
+                    if ((mergedTags[index].find('DomesticViolence_Perpetrators') != -1 and tag.find(
+                            'BadHabit_Participant') != -1) or (
+                            mergedTags[index].find('BadHabit_Participant') != -1 and tag.find(
+                        'DomesticViolence_Perpetrators') != -1)):
+                        mergedTags[index] = mergedTags[index][0:2] + 'DomesticViolence_BadHabit_FirstPerson'
+
+    return mergedTags
 
 if __name__ == '__main__':
     flags = getParser()
@@ -610,6 +621,6 @@ if __name__ == '__main__':
     #从brat标注文件中生成单句单事实的标注结果
     # main(flags.root_dir)
     #将单句单事实融合为单句多事实的标注方式3
-    merge('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe')
+    merge('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe\\train')
     print ('end')
     sys.exit(0)

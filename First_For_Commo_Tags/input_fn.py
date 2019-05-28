@@ -144,8 +144,6 @@ def findTrigger(sentence):
     return newTriggers
 # 标注trigger触发词
 def labelTrigger(words,labeled,beginIndex,endIndex,tag):
-    words = copy.copy(words)
-    labeled = copy.copy(labeled)
     coursor = 0
     isBegin = True
     for index, word in enumerate(words):

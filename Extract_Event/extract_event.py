@@ -11,7 +11,6 @@ __author__ = '13314409603@163.com'
 from pyltp import SentenceSplitter
 
 import First_For_Commo_Tags.config_center as CONFIG
-import Extract_Event.EventModel as EventModel
 import tensorflow as tf
 import os
 import First_For_Commo_Tags.model_fn as MODEL
@@ -19,11 +18,8 @@ import First_For_Commo_Tags.input_fn as INPUT
 from Extract_Event.EventModel import EventFactory2
 
 class Event_Detection(object):
-    '''通用类方法'''
-
     def __init__(self,FLAGS,output_path=None):
         self.FLAGS = FLAGS
-        print(FLAGS)
         self.output_path = os.path.join(self.FLAGS.root_dir,output_path)
         self.__initFirstModel__()
 
@@ -136,21 +132,22 @@ class Event_Detection(object):
             if (triggers == None or len(triggers) == 0):
                 continue
             for tag, beginIndex, endIndex in triggers:
-                copiedWords, copiedTags = INPUT.labelTrigger(list(words), tags, beginIndex, endIndex, tag)
-                # 去停用词
-                newWords = []
-                newPosTags = []
-                newTags = []
-                newIndexs = []
-                for word, pos, tag, indexPair in zip(copiedWords, postags, copiedTags, indexPairs):
-                    if (word not in CONFIG.STOP_WORDS):
-                        newWords.append(word)
-                        newPosTags.append(pos)
-                        newTags.append(tag)
-                        newIndexs.append(copy.copy(indexPair))
-                sentences_words_posTags.append([newWords, newTags, newPosTags])
-                words_in_sentence_index_list.append(newIndexs)
-                newSentences.append(copy.copy(sentence))
+                words, tags = INPUT.labelTrigger(list(words), tags, beginIndex, endIndex, tag)
+
+            # 去停用词
+            newWords = []
+            newPosTags = []
+            newTags = []
+            newIndexs = []
+            for word, pos, tag, indexPair in zip(words, postags, tags, indexPairs):
+                if (word not in CONFIG.STOP_WORDS):
+                    newWords.append(word)
+                    newPosTags.append(pos)
+                    newTags.append(tag)
+                    newIndexs.append(copy.copy(indexPair))
+            sentences_words_posTags.append([newWords, newTags, newPosTags])
+            words_in_sentence_index_list.append(newIndexs)
+            newSentences.append(copy.copy(sentence))
 
         words_list,tags_list = self.__predict__(sentences_words_posTags)
 
@@ -173,20 +170,7 @@ class Event_Detection(object):
 
     def __get_event_from_one_words__(self,words,tags):
         # 获取触发词tag
-        triggers = CONFIG.TRIGGER_TAGs
-        for index, tag in enumerate(tags):
-            if (tag in triggers and tag.find('B_') != -1):
-                '''发现触发词'''
-                type = tag[2:-8]
-                completeTrigger = words[index]
-                tag_index_pair = [index, index]
-                for endIndex in range(index + 1, len(tags)):
-                    if (tags[endIndex] == 'I_' + type):
-                        completeTrigger += words[endIndex]
-                        tag_index_pair[1] += 1
-                    else:
-                        break
-                return EventFactory2(words,tags)
+        return EventFactory2(words,tags)
 
 
     '''从已经分好词的词组中抽取'''
@@ -203,9 +187,7 @@ class Event_Detection(object):
 
 if __name__ == '__main__':
     FLAGS = getParser()
-    extractor = Event_Detection(FLAGS,output_path='output_15_64_pos_trigger_Spe')
-    events = extractor.extractor('××××年××月，原、被告经人介绍在家乡举行结婚仪式同居生活，生有一男一女两个孩子。'
-                                 ' 原告诉称，原、被告经人介绍，于1987年12月14日登记结婚，婚后生育两个女儿，大女儿已成年，二女儿马某甲现年17周岁。'
-                                 '婚续期间，生育三个女孩，长女王某乙1992年2月5日出生，次女王某丙1994年12月21日出生，小女张甲1996年12月16日出生。')
+    extractor = Event_Detection(FLAGS,output_path='output_15_64_base')
+    events = extractor.extractor('原告与被告于2015年底经人介绍相识并确立恋爱关系。原、被告于2007年11月于网上相识恋爱。1997年经人介绍原、被告相识结婚。原告李××诉称，原、被告经人介绍认识订婚，1997年12月10日在汶上县民政局登记结婚，婚后生育一男一女，男孩叫刘×锦，女孩叫刘×华。婚后生育四个女儿，长女王雪斌，次女王雪玲，三女王乙，四女王丙。2017年6月原被告发生争吵后，被告出手殴打了原告，原告回娘家居住，双方分居至今。2008年底，原告确感无法继续与被告生活，外出打工与被告分居至今，并分别于2011年2月、2011年10月向法院提起离婚诉讼，第一次因原告未到庭参加诉讼，法院裁定按撤诉处理，第二次法院判决不准予离婚。2002年原告根据有关政策将被告及孩子户口迁至本市，但仍分居，无奈原告于2007年和2008年先后两次向法院提出离婚请求。婚后因被告脾气暴躁，多次对原告实施家庭暴力，并且还有打牌赌博的恶习，导致夫妻感情完全破裂。请求法院根据双方提交的证据依法分割共同财产，包括双方银行存款、住房公积金、不动产等。')
     print('end')
     sys.exit(0)
