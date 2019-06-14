@@ -5,7 +5,6 @@ __doc__ = 'description:模型网络图构建中心'
 __author__ = '13314409603@163.com'
 
 import tensorflow as tf
-# from tf_metrics import recall, f1, precision
 import First_For_Commo_Tags.config_center as CONFIG
 
 
@@ -33,14 +32,14 @@ def model_fn(features,labels,mode,params):
 
     # 添加POS特征
     print('添加POS特征')
-    output = tf.concat([output, postags], axis=-1)
+    # output = tf.concat([output, postags], axis=-1)
 
     #添加是否是触发词特征
-    output = tf.concat([output,triggerFlags],axis=-1)
+    # output = tf.concat([output,triggerFlags],axis=-1)
 
     #全连接层
     logits = tf.layers.dense(output, CONFIG.TAGs_LEN) #batch_size*40*len(tags)
-
+    logits = tf.nn.softmax(logits)
 
     print('CRF层')
     # CRF
@@ -69,12 +68,8 @@ def model_fn(features,labels,mode,params):
             print('评估。。。')
             # Metrics
             weights = tf.sequence_mask(lengths, maxlen=params['max_sequence_length'])
-            indices = [item[1] for item in CONFIG.TAG_2_ID.items() if (item[0]!='<pad>'and item[0]!='O')]
             metrics = {
                 'acc': tf.metrics.accuracy(labels, pred_ids, weights),
-                # 'precision': precision(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
-                # 'recall': recall(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
-                # 'f1': f1(labels, pred_ids, CONFIG.TAGs_LEN, indices, weights),
             }
             for metric_name, op in metrics.items():
                 tf.summary.scalar(metric_name, op[1])
