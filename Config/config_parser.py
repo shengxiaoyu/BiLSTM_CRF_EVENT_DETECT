@@ -25,7 +25,7 @@ def getParser():
                         # help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Spe')
                         help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Merge')
     parser.add_argument('--labeled_data_path', help='labeled data path',
-                        default=os.path.join(os.path.join(rootPath, 'labeled'), parser.get_default('Merge_for_baseline')))
+                        default=os.path.join(os.path.join(rootPath, 'labeled'), 'Merge_for_baseline'))
     # parser.add_argument('--max_sequence_length', help='max length of sequence', default= 51 )  # Full - 40,Spe-51,Merge-55
     parser.add_argument('--max_sequence_length', help='max length of sequence', default= 55 )  # Full - 40,Spe-51,Merge-55
     parser.add_argument('--batch_size', help='batch size', default=32)
