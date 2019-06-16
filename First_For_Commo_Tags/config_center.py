@@ -31,6 +31,10 @@ SEGMENTOR = None
 STOP_WORDS=None
 TRIGGER_WORDS_DICT = None
 
+TRIGGER_IDS=set()
+TRIGGER_ARGS_DICT={}
+I_IDS=set()
+
 ifInited = False
 
 #初始化各类模型以及词集
@@ -39,14 +43,14 @@ def init(rootdir):
     if(not ifInited):
         initTags(os.path.join(rootdir,'full_trigger_labels.txt'),os.path.join(rootdir, 'full_argu_labels.txt'))
         initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
-        initWord2Vec(os.path.join(rootdir, 'word2vec'))
+        initWord2Vec(os.path.join(rootdir, 'newWord2vec'))
         initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
         initStopWords(os.path.join(rootdir, 'newStopWords.txt'))
         initTriggerWords(os.path.join(rootdir,'triggers'))
         ifInited = True
 
 def initTags(triggerLablePath,argumentLabelPath):
-    global TAG_2_ID, ID_2_TAG,TAGs_LEN,TRIGGER_TAGs,ARGU_TAGs
+    global TAG_2_ID, ID_2_TAG,TAGs_LEN,TRIGGER_TAGs,ARGU_TAGs,TRIGGER_IDS,TRIGGER_ARGS_DICT,I_IDS
     TAG_2_ID={}
     ID_2_TAG={}
     TRIGGER_TAGs=[]
@@ -62,16 +66,34 @@ def initTags(triggerLablePath,argumentLabelPath):
     # 获取触发词tag
     with open(triggerLablePath, 'r', encoding='utf8') as f:
         for line in f.readlines():
-            TAG_2_ID[line.strip()] = index
-            ID_2_TAG[index] = line.strip()
-            TRIGGER_TAGs.append(line.strip())
+            tag = line.strip()
+            TAG_2_ID[tag] = index
+            ID_2_TAG[index] = tag
+            if (tag.find('B_') != -1 and tag.find('FamilyConflict')==-1):
+                TRIGGER_IDS.add(index)
+            if (tag.find('I_') != -1):
+                I_IDS.add(index)
+            TRIGGER_TAGs.append(tag)
             index += 1
     #获取参数tag
     with open(argumentLabelPath, 'r', encoding='utf8') as f:
         for line in f.readlines():
-            TAG_2_ID[line.strip()] = index
-            ID_2_TAG[index] = line.strip()
-            ARGU_TAGs.append(line.strip())
+            tag = line.strip()
+            TAG_2_ID[tag] = index
+            ID_2_TAG[index] = tag
+            ARGU_TAGs.append(tag)
+            # 获取触发词
+            index1 = tag.find('_')
+            index2 = tag.find('_', index1 + 1)
+            # 构造触发词id和对应参数id的map
+            if (index1 != -1 and index2 != -1):
+                trigger = 'B_' + tag[index1 + 1:index2] + '_Trigger'
+                trigger_id = TAG_2_ID[trigger]
+                if (trigger_id not in TRIGGER_ARGS_DICT):
+                    TRIGGER_ARGS_DICT[trigger_id] = set()
+                TRIGGER_ARGS_DICT[trigger_id].add(index)
+            if (tag.find('I_') != -1):
+                I_IDS.add(index)
             index += 1
     TAGs_LEN = len(TAG_2_ID)
 def initWord2Vec(word2vec_model_path):

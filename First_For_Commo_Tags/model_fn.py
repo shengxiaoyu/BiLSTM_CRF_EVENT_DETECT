@@ -30,11 +30,11 @@ def model_fn(features,labels,mode,params):
     print('dropout')
     output = tf.layers.dropout(output, rate=params['dropout_rate'], training=is_training)
 
-    # 添加POS特征
-    print('添加POS特征')
+    # # 添加POS特征
+    # print('添加POS特征')
     # output = tf.concat([output, postags], axis=-1)
-
-    #添加是否是触发词特征
+    #
+    # #添加是否是触发词特征
     # output = tf.concat([output,triggerFlags],axis=-1)
 
     #全连接层

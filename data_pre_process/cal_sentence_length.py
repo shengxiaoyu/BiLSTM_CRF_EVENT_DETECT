@@ -23,9 +23,10 @@ def calSentenceLength(path):
             calSentenceLength(os.path.join(path,subPath))
     else:#统计单个文件
         with open(path, 'r', encoding='utf8') as f:
-            for sentence in f.readlines():
-                length = len(sentence.strip().split(' '))
-                LENGTHS[length] += 1
+            for index,sentence in enumerate(f.readlines()):
+                if(index%3==0):#排除tag和pos行
+                    length = len(sentence.strip().split(' '))
+                    LENGTHS[length] += 1
 
 #输入占比区间，例如输入0.95，返回包含95%的句子此时需要设置句子长度的阈值
 def getMax(rate):
@@ -144,7 +145,7 @@ def getMaxSentenceLength(path):
 if __name__ == '__main__':
     # calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Full')
     # print(getMax(0.95))
-    calSentenceLength('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe')
+    calSentenceLength(r'C:\Users\13314\Desktop\Bi-LSTM+CRF\labeled\Merge_for_baseline')
     print(getMax(0.95))
 
     # initTags()

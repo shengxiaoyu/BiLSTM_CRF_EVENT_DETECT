@@ -203,6 +203,9 @@ def formLabelData(labelFilePath,savePath,stop_words_path,trigger_labels_path,arg
                           event.endIndex <= endIndexOfTheLine):
                         event.addSentence(line)
                         break
+                        # 当前句子整个再事件范围内
+                    elif (beginIndexOfTheLine > event.beginIndex and endIndexOfTheLine < event.endIndex):
+                        event.addSentence(line)
                     cursor = endIndexOfTheLine
         return events
 
@@ -220,15 +223,15 @@ def formLabelData(labelFilePath,savePath,stop_words_path,trigger_labels_path,arg
                 # 考虑标签和分词不对应的情况，一个词被对应到多次标记，因为先标记触发词，所以优先级第一，其余的越靠后越低
                 if (labeled[index].find('O') != -1):
                     if (isBegin):
-                        label = 'B_' + entity.getType()
-                        # label = 'B_' + entity.getName()
+                        # label = 'B_' + entity.getType()
+                        label = 'B_' + entity.getName()
                         if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
                             label = 'O'
                         labeled[index] = label
                         isBegin = False
                     else:
-                        label = 'I_' + entity.getType()
-                        # label = 'I_' + entity.getName()
+                        # label = 'I_' + entity.getType()
+                        label = 'I_' + entity.getName()
                         if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
                             label = 'O'
                         labeled[index] = label
@@ -531,10 +534,10 @@ def main(root_dir):
         labelFilePath=os.path.join(brat_base_path, 'labeled'),
         savePath=os.path.join(base_path, 'labeled'),
         stop_words_path=os.path.join(base_path, 'newStopWords.txt'),
-        trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
-        argu_labels_path=os.path.join(base_path,'argumentLabels.txt'),
-        # trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
-        # argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
+        # trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
+        # argu_labels_path=os.path.join(base_path,'argumentLabels.txt'),
+        trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
+        argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
         #mode=1 Spe
         #mode=2 Full
         mode=1)
@@ -546,26 +549,25 @@ def merge(path):
     parse = getParser()
     CONFIG.init(parse.root_dir)
     #新文件的保存路径，保存在传入文件的同级目录
-    savePath = os.path.join(os.path.split(path)[0],'Merge')
+    savePath = os.path.join(os.path.split(path)[0],'Merge_for_baseline')
     if(not os.path.exists(savePath)):
         os.mkdir(savePath)
 
     def merge(tagsList):
-        mergedTags = tagsList[0]
-        for tags in tagsList[1:]:
-            for index,tag in enumerate(tags):
-                if(tag!='O'):
-                    if(mergedTags[index]=='O'):
-                        mergedTags[index] = tag
-                    elif(mergedTags[index] in CONFIG.TRIGGER_TAGs):
-                        '''此时产生冲突'''
-                        '''原先填入的是触发词'''
-                        if(mergedTags[index].find('B_')==-1 and tag.find('B_')!=-1):
-                            mergedTags[index] = tag #原先的不是B_开头触发词，新来的是B_开头触发词才能覆盖
-                    else:#如果以前不是触发词，
-                        if((tag in CONFIG.TRIGGER_TAGs or tag.find('B_')!=-1) and mergedTags[index].find('B_')==-1): #只有新来的是触发词或者B_开头的参数，而且老的不是B_开头才能覆盖
-                            mergedTags[index] = tag
-        return mergedTags
+        '''一种新的合并方式，将除了共享参数的地方合并，共享参数的地方多次分配'''
+        new_tags_list = []
+        for index,tags in enumerate(tagsList):
+            new_tags = [tag for tag in tags]
+            for index2,tags2 in enumerate(tagsList):
+                '''遍历将其他的标记方式并入当前的标记方式'''
+                if(index==index2):
+                    continue
+                for index3,tag in enumerate(tags2):
+                    '''只有O才能合并，不能与第一种冲突'''
+                    if(new_tags[index2]=='O'):
+                        new_tags[index3] = tag
+            new_tags_list.append(new_tags)
+        return new_tags_list
 
     for fileName in os.listdir(path):
         with open(os.path.join(path,fileName),'r',encoding='utf8') as f,open(os.path.join(savePath,fileName),'w',encoding='utf8') as fw:
@@ -589,8 +591,9 @@ def merge(path):
                     sentence = f.readline().strip()
                 else:
                     '''来了新的行，将上一种合并写入'''
-                    mergedTags = merge(lastTagsList)
-                    fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
+                    new_tags_list = merge(lastTagsList)
+                    for new_tags in new_tags_list:
+                        fw.write(lastSentence+'\n'+' '.join(new_tags)+'\n'+poses+'\n')
                     #更新缓存
                     lastSentence = sentence
                     lastTagsList = []
@@ -601,8 +604,9 @@ def merge(path):
                     sentence = f.readline().strip()
 
             #处理缓存
-            mergedTags = merge(lastTagsList)
-            fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
+            new_tags_list = merge(lastTagsList)
+            for new_tags in new_tags_list:
+                fw.write(lastSentence + '\n' + ' '.join(new_tags) + '\n' + poses + '\n')
 
 if __name__ == '__main__':
     flags = getParser()
@@ -610,6 +614,6 @@ if __name__ == '__main__':
     #从brat标注文件中生成单句单事实的标注结果
     # main(flags.root_dir)
     #将单句单事实融合为单句多事实的标注方式3
-    merge('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe')
+    merge('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe\\dev')
     print ('end')
     sys.exit(0)

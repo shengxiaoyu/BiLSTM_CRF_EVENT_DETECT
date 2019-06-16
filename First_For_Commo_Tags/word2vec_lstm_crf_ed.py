@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from First_For_Commo_Tags.ilp_solver import optimize
 
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
@@ -26,7 +27,7 @@ def main(FLAGS,sentences=None,dir=None):
     os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.device_map
 
     # 在re train 的时候，才删除上一轮产出的文件，在predicted 的时候不做clean
-    output_dir = os.path.join(FLAGS.root_dir,'output_'+str(FLAGS.num_epochs)+'_'+str(FLAGS.batch_size)+'_fullPos_trigger_Spe')
+    output_dir = os.path.join(FLAGS.root_dir,'output_'+str(FLAGS.num_epochs)+'_'+str(FLAGS.batch_size)+'_baseline_SUEEL')
     if FLAGS.ifTrain:
         if os.path.exists(output_dir):
             def del_file(path):
@@ -98,7 +99,7 @@ def main(FLAGS,sentences=None,dir=None):
         print('开始训练+评估。。。')
         tf.estimator.train_and_evaluate(estimator,train_spec,eval_spec)
 
-    if FLAGS.ifTest:
+    if FLAGS.ifTest and not FLAGS.ilp:
         print('获取预测数据。。。')
         test_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
@@ -130,7 +131,39 @@ def main(FLAGS,sentences=None,dir=None):
                 fw.write('预测结果： '+' '.join(outputs))
                 fw.write('\n')
                 fw.write('\n')
+    if FLAGS.ifTest and FLAGS.ilp:
+        print('获取预测数据。。。')
+        test_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),
+                                      shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
+                                      max_sequence_length=FLAGS.max_sequence_length)
 
+        predictions = estimator.predict(input_fn=test_inpf)
+
+        # crf转移矩阵
+        trans = estimator.get_variable_value('crf')
+        #真实的标记
+        pred_true = INPUT.generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path, 'test')),
+                                       max_sequence_length=FLAGS.max_sequence_length, noEmbedding=True)
+        #(words,min(length,max_sequence_length),posTags,triggerFlags),tags
+        words_list = [x[0][0] for x in pred_true]
+        tags_list = [x[1] for x in pred_true]
+        lengths = [x[0][1] for x in pred_true]
+
+        print('预测总数：' + str(len(targets)))
+        # blstm获得的结果
+        logits = [x['logits'] for x in list(predictions)]
+
+        # 使用ILP-solver优化后的结果
+        with open(os.path.join(output_dir, 'predict.txt'), 'w', encoding='utf-8') as fw:
+            for logit, words, tags, length in zip(logits, words_list, tags_list, lengths):
+                scores, ids_list = optimize(length, CONFIG.TAGs_LEN, trans, logit, CONFIG.ID_2_TAG, CONFIG.TRIGGER_IDS,
+                                            CONFIG.TRIGGER_ARGS_DICT, CONFIG.I_IDS)
+                fw.write('原句：' + ' '.join(words) + '\n')
+                fw.write('目标标记：' + ' '.join(tags) + '\n')
+                index = 0
+                for socre, ids in zip(scores, ids_list):
+                    fw.write('预测结果%d:,得分%f,标记：%s \n' % (index, socre, str(' '.join([CONFIG.ID_2_TAG[id] for id in ids]))))
+                    index += 1
     if FLAGS.ifPredict and sentences:
         sentences_words_posTags = []
         words_in_sentence_index_list = []
