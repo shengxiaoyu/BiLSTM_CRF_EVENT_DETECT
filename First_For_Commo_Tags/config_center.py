@@ -41,9 +41,9 @@ ifInited = False
 def init(rootdir):
     global ifInited
     if(not ifInited):
-        initTags(os.path.join(rootdir,'full_trigger_labels.txt'),os.path.join(rootdir, 'full_argu_labels.txt'))
+        initTags(os.path.join(rootdir,'triggerLabels.txt'),os.path.join(rootdir, 'argumentLabels.txt'))
         initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
-        initWord2Vec(os.path.join(rootdir, 'newWord2vec'))
+        initWord2Vec(os.path.join(rootdir, 'word2vec'))
         initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
         initStopWords(os.path.join(rootdir, 'newStopWords.txt'))
         initTriggerWords(os.path.join(rootdir,'triggers'))

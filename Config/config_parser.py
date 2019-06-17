@@ -22,12 +22,12 @@ def getParser():
     parser.add_argument('--hidden_units', help='hidden units', default=100)
     parser.add_argument('--num_layers', help='num of layers', default=1)
     parser.add_argument('--sentence_mode',
-                        # help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Spe')
-                        help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Merge')
+                        help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Spe')
+                        # help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Merge')
     parser.add_argument('--labeled_data_path', help='labeled data path',
-                        default=os.path.join(os.path.join(rootPath, 'labeled'), 'Merge_for_baseline'))
+                        default=os.path.join(os.path.join(rootPath, 'labeled'), 'Merge_for_first'))
     # parser.add_argument('--max_sequence_length', help='max length of sequence', default= 51 )  # Full - 40,Spe-51,Merge-55
-    parser.add_argument('--max_sequence_length', help='max length of sequence', default= 54 )  # Full - 40,Spe-51,Merge-55
+    parser.add_argument('--max_sequence_length', help='max length of sequence', default= 55 )  # Full - 40,Spe-51,Merge-55
     parser.add_argument('--batch_size', help='batch size', default=32)
     parser.add_argument('--num_epochs', help='num of epochs', default=1)
     parser.add_argument('--device_map', help='which device to see', default='CPU:0')
@@ -36,7 +36,7 @@ def getParser():
     parser.add_argument('--segmentor_user_dict_path', help='segmentor user dictionary path',
                         default=os.path.join(ltpPath, 'userDict.txt'))
     parser.add_argument('--word2vec_path', help='word2vecpath', default=os.path.join(rootPath, 'word2vec'))
-    parser.add_argument('--embedded_dim', help='wordembeddeddim', default=200)
+    parser.add_argument('--embedded_dim', help='wordembeddeddim', default=300)
     parser.add_argument('--ilp',default=False)
     FLAGS, args = parser.parse_known_args()
     return FLAGS ;
