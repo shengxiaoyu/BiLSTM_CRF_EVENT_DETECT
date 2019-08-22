@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from pyltp import SentenceSplitter
-
-import EventModel
-
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
 
 import functools
 import os
 
+from pyltp import SentenceSplitter
 import numpy as np
 import tensorflow as tf
 from sklearn_crfsuite.metrics import flat_classification_report

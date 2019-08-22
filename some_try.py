@@ -8,9 +8,8 @@ __author__ = '13314409603@163.com'
 
 from pyltp import Postagger
 from pyltp import Segmentor
-# from Config import config_parser
 from RestApi import service
-# from Event_Model.extract_event import Extractor
+
 
 LTP_DATA_DIR='A:\研二2\Bi-LSTM+CRF\ltp_data_v3.4.0'
 pos_mode_path = os.path.join(LTP_DATA_DIR,'pos.model')
