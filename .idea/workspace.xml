@@ -15,8 +15,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Second_For_Fine_Tags/word2vec_lstm_crf_argu_match.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="260">
-              <caret line="83" column="49" selection-start-line="83" selection-start-column="49" selection-end-line="83" selection-end-column="49" />
+            <state relative-caret-position="314">
+              <caret line="95" column="77" lean-forward="true" selection-start-line="95" selection-start-column="77" selection-end-line="95" selection-end-column="77" />
               <folding>
                 <element signature="e#888#1474#0" />
                 <element signature="e#5766#8314#0" />
@@ -29,11 +29,20 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Second_For_Fine_Tags/input_fn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="87" column="28" selection-start-line="87" selection-start-column="28" selection-end-line="87" selection-end-column="28" />
+            <state relative-caret-position="274">
+              <caret line="88" column="32" lean-forward="true" selection-start-line="88" selection-start-column="32" selection-end-line="88" selection-end-column="32" />
               <folding>
                 <element signature="e#107#116#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Second_For_Fine_Tags/main.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="456">
+              <caret line="26" column="26" lean-forward="true" selection-start-line="26" selection-start-column="26" selection-end-line="26" selection-end-column="26" />
             </state>
           </provider>
         </entry>
@@ -45,6 +54,18 @@
               <caret line="21" selection-start-line="21" selection-end-line="21" />
               <folding>
                 <element signature="e#377#386#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Config/config_parser.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="141">
+              <caret line="10" column="37" lean-forward="true" selection-start-line="10" selection-start-column="37" selection-end-line="10" selection-end-column="37" />
+              <folding>
+                <element signature="e#47#62#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -74,11 +95,12 @@
         <option value="$PROJECT_DIR$/Second_For_Fine_Tags/model_fn.py" />
         <option value="$PROJECT_DIR$/Word2Vec/my_word2vec.py" />
         <option value="$PROJECT_DIR$/Second_For_Fine_Tags/word2vec_lstm_crf_argu_match.py" />
-        <option value="$PROJECT_DIR$/Config/config_parser.py" />
         <option value="$PROJECT_DIR$/First_For_Commo_Tags/main.py" />
         <option value="$PROJECT_DIR$/some_try.py" />
         <option value="$PROJECT_DIR$/First_For_Commo_Tags/word2vec_lstm_crf_ed.py" />
+        <option value="$PROJECT_DIR$/Second_For_Fine_Tags/main.py" />
         <option value="$PROJECT_DIR$/Second_For_Fine_Tags/input_fn.py" />
+        <option value="$PROJECT_DIR$/Config/config_parser.py" />
       </list>
     </option>
   </component>
@@ -153,7 +175,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.main">
     <configuration name="extract_event" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="BiLSTM_CRF_EVENT_DETECT" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -176,8 +198,31 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="BiLSTM_CRF_EVENT_DETECT" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Second_For_Fine_Tags" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Second_For_Fine_Tags/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
         <item itemvalue="Python.extract_event" />
       </list>
     </recent_temporary>
@@ -201,12 +246,12 @@
       <workItem from="1563773521288" duration="1435000" />
       <workItem from="1564383287581" duration="652000" />
       <workItem from="1564452250594" duration="62000" />
-      <workItem from="1566451734128" duration="10111000" />
+      <workItem from="1566451734128" duration="11004000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="19192000" />
+    <option name="totallyTimeSpent" value="20085000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
@@ -217,8 +262,8 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.5436992" />
-      <window_info anchor="bottom" id="Debug" order="3" visible="true" weight="0.27642277" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.030487806" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.2784553" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -251,10 +296,21 @@
           <line>1313</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Second_For_Fine_Tags/input_fn.py</url>
+          <line>26</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Second_For_Fine_Tags/input_fn.py</url>
+          <line>75</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$main.coverage" NAME="main Coverage Results" MODIFIED="1566463953804" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Second_For_Fine_Tags" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$extract_event.coverage" NAME="extract_event Coverage Results" MODIFIED="1566459764696" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Event_Model" />
   </component>
   <component name="editorHistoryManager">
@@ -386,16 +442,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Config/config_parser.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="146">
-          <caret line="11" column="36" selection-start-line="11" selection-start-column="36" selection-end-line="11" selection-end-column="36" />
-          <folding>
-            <element signature="e#47#62#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/some_try.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="146">
@@ -432,13 +478,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Second_For_Fine_Tags/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="431">
-          <caret line="26" column="26" lean-forward="true" selection-start-line="26" selection-start-column="26" selection-end-line="26" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/First_For_Commo_Tags/config_center.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="219">
@@ -451,8 +490,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Second_For_Fine_Tags/word2vec_lstm_crf_argu_match.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="83" column="49" selection-start-line="83" selection-start-column="49" selection-end-line="83" selection-end-column="49" />
+        <state relative-caret-position="314">
+          <caret line="95" column="77" lean-forward="true" selection-start-line="95" selection-start-column="77" selection-end-line="95" selection-end-column="77" />
           <folding>
             <element signature="e#888#1474#0" />
             <element signature="e#5766#8314#0" />
@@ -461,10 +500,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Second_For_Fine_Tags/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="26" column="26" lean-forward="true" selection-start-line="26" selection-start-column="26" selection-end-line="26" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Config/config_parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="141">
+          <caret line="10" column="37" lean-forward="true" selection-start-line="10" selection-start-column="37" selection-end-line="10" selection-end-column="37" />
+          <folding>
+            <element signature="e#47#62#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Second_For_Fine_Tags/input_fn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="87" column="28" selection-start-line="87" selection-start-column="28" selection-end-line="87" selection-end-column="28" />
+        <state relative-caret-position="274">
+          <caret line="88" column="32" lean-forward="true" selection-start-line="88" selection-start-column="32" selection-end-line="88" selection-end-column="32" />
           <folding>
             <element signature="e#107#116#0" expanded="true" />
           </folding>
