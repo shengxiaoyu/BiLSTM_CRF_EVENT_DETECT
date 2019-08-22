@@ -25,8 +25,8 @@ def predict(sentencs_words_firstTags_list):
 
 
 if __name__ == '__main__':
-    # train()
-    test()
+    train()
+    # test()
     # words = '原告 王 某某 诉称 被告 2010年 4月 人 介绍 相识 同年 12月 17日 办理 结婚 登记 2011年 1月 28日 生育 子 取名 罗某甲'.split()
     # firstTags = 'O O O O O B_Time I_Time O O B_Know B_Time I_Time I_Time B_Marry I_Marry I_Marry B_Time I_Time I_Time B_Bear B_Gender O B_Name'.split()
     # predict([[words],[firstTags]])
