@@ -8,8 +8,8 @@ __author__ = '13314409603@163.com'
 
 def getParser():
     # 构造参数
-    rootPath = 'A:\研二2\Bi-LSTM+CRF'
-    # rootPath = '/root/lstm_crf/data'
+    # rootPath = 'A:\研二2\Bi-LSTM+CRF'
+    rootPath = '/root/lstm_crf/data'
     ltpPath = os.path.join(rootPath, 'ltp_data_v3.4.0')
     parser = argparse.ArgumentParser(description='Bi-LSTM+CRF')
     parser.add_argument('--root_dir', help='root dir', default=rootPath)
@@ -26,8 +26,8 @@ def getParser():
                         # help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Spe')
                         help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Merge')
     parser.add_argument('--labeled_data_path', help='labeled data path',
-                        # default=os.path.join(os.path.join(rootPath, 'labeled'), parser.get_default('sentence_mode')))
-                        default=os.path.join(os.path.join(rootPath, 'labeled'), 'newExamples'))
+                        default=os.path.join(os.path.join(rootPath, 'labeled'), parser.get_default('sentence_mode')))
+                        # default=os.path.join(os.path.join(rootPath, 'labeled'), 'newExamples'))
     parser.add_argument('--max_sequence_length', help='max length of sequence', default= 55 )  # Full - 40,Spe-51,Merge-55
     parser.add_argument('--batch_size', help='batch size', default=64)
     parser.add_argument('--num_epochs', help='num of epochs', default=15)
