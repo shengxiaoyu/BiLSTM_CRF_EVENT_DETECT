@@ -12,7 +12,7 @@ from pyltp import Segmentor
 from RestApi import service
 # from Event_Model.extract_event import Extractor
 
-LTP_DATA_DIR='C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\ltp_data_v3.4.0'
+LTP_DATA_DIR='A:\研二2\Bi-LSTM+CRF\ltp_data_v3.4.0'
 pos_mode_path = os.path.join(LTP_DATA_DIR,'pos.model')
 segmentor_model_path = os.path.join(LTP_DATA_DIR,'cws.model')
 user_dict_path = os.path.join(LTP_DATA_DIR,'userDict.txt')

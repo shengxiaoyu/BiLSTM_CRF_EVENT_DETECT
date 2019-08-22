@@ -164,6 +164,7 @@ class Extractor(object):
         print('事件抽取完成：\n'+'\n'.join([str(event) for event in events]))
         return events
 if __name__ == '__main__':
-    # events = Extractor.extractor2('原、被告双方1986年上半年经人介绍认识，××××年××月××日在临桂县宛田乡政府登记结婚，××××年××月××日生育女儿李某乙，××××年××月××日生育儿子李某丙，现女儿李某乙、儿子李某丙都已独立生活')
+    ext = Extractor()
+    events = ext.extractor2('原、被告双方1986年上半年经人介绍认识，××××年××月××日在临桂县宛田乡政府登记结婚，××××年××月××日生育女儿李某乙，××××年××月××日生育儿子李某丙，现女儿李某乙、儿子李某丙都已独立生活')
     print('end')
     exit(0)

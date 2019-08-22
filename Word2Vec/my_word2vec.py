@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from pyltp import SentenceSplitter, Segmentor
 
 __doc__ = 'description:封装word2vec模型训练'
 __author__ = '13314409603@163.com'
 
+from pyltp import SentenceSplitter, Segmentor
 import os
 from gensim.models import Word2Vec
 from gensim.models.word2vec import PathLineSentences
@@ -92,12 +92,12 @@ def segment_words(source,savePath,segmentor_model_path, segmentor_user_dict_path
 
 
 if __name__ == '__main__':
-    rootdir = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\'
+    rootdir = r'A:\研二2\Bi-LSTM+CRF'
     ltpDir = os.path.join(rootdir,'ltp_data_v3.4.0')
     # dim = 30
-    # word2vec_model_save_path = os.path.join(rootdir,'word2vec')
-    # wv = Word2VecModel(word2vec_model_save_path, '', 30)
-    # wv = wv.getEmbedded()
+    word2vec_model_save_path = os.path.join(rootdir,'word2vec')
+    wv = Word2VecModel(word2vec_model_save_path, '', 30)
+    wv = wv.getEmbedded()
     # wv.add('<pad>',np.zeros((dim)))
     # print(wv.most_similar('原告'))
     # print(wv.similarity('原告', '被告'))

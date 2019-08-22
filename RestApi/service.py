@@ -3,16 +3,6 @@
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
 
-from flask import Flask
-from Config.config_parser import getParser
-from Extract_Event.extract_event import Event_Detection
-
-app = Flask(__name__)
-FLAGS = getParser()
-FLAGS.ifTrain = False
-FLAGS.ifTest = False
-FLAGS.ifPredict = True
-extractor = Event_Detection(getParser())
 from json import dumps
 
 from flask import Flask, request, jsonify
