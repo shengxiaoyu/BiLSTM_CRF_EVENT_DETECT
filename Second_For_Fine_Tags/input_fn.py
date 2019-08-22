@@ -85,6 +85,8 @@ def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentence_words_
                     words = sentence.strip().split()
                     #第一个模型的预测标签行
                     tags = f.readline().strip().split()
+                    #pos行，丢弃
+                    f.readlines()
                     #针对单个触发词时的真实标签行
                     pre_tags = f.readline().strip().split()
                     sentence = f.readline()
