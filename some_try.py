@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-import sys
 
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
@@ -10,8 +9,7 @@ from pyltp import Postagger
 from pyltp import Segmentor
 from RestApi import service
 
-
-LTP_DATA_DIR='A:\研二2\Bi-LSTM+CRF\ltp_data_v3.4.0'
+LTP_DATA_DIR='A:\Bi-LSTM+CRF\ltp_data_v3.4.0'
 pos_mode_path = os.path.join(LTP_DATA_DIR,'pos.model')
 segmentor_model_path = os.path.join(LTP_DATA_DIR,'cws.model')
 user_dict_path = os.path.join(LTP_DATA_DIR,'userDict.txt')
@@ -37,4 +35,4 @@ def main():
 if __name__ == '__main__':
     # main()
     # print("end")
-    service.app.run(host='localhost',port=8000)
+    service.app.run(host='localhost', port=8000)
