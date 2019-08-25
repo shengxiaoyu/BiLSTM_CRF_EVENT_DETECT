@@ -2,55 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f37fe3ca-cb22-46e0-bc56-0ace397bed4d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/conflict_detect/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/check_conflict/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/check_conflict/check_conflict.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/data_pre_process/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/data_pre_process/generate_bert_input.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/data_pre_process/handle_single_file.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/data_pre_process/test.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/edit_distance_similar/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/edit_distance_similar/similar_calculator.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/evaluation/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/evaluation/eval.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/event_alignment/alignmenter.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/util/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/util/constant.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conflict_detect/util/text_detecter.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/event_dectect/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/BiLSTM_CRF_EVENT_DETECT.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BiLSTM_CRF_EVENT_DETECT.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Config/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Config/config_parser.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Event_Model/EventModel.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Event_Model/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Event_Model/extract_event.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/First_For_Commo_Tags/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/First_For_Commo_Tags/config_center.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/First_For_Commo_Tags/generate_example.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/First_For_Commo_Tags/input_fn.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/First_For_Commo_Tags/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/First_For_Commo_Tags/model_fn.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/First_For_Commo_Tags/word2vec_lstm_crf_ed.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/RestApi/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/RestApi/service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Second_For_Fine_Tags/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Second_For_Fine_Tags/config_center.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Second_For_Fine_Tags/input_fn.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Second_For_Fine_Tags/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Second_For_Fine_Tags/model_fn.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Second_For_Fine_Tags/word2vec_lstm_crf_argu_match.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Word2Vec/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Word2Vec/my_word2vec.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_pre_process/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_pre_process/brat_data_process.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_pre_process/cal_sentence_length.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_pre_process/cpws_process.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_pre_process/data_process.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_pre_process/qsz_process.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_pre_process/tsbl_process.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/some_try.py" beforeDir="false" afterPath="$PROJECT_DIR$/some_try.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -60,11 +12,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/conflict_detect/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="513">
-              <caret line="47" column="44" selection-start-line="47" selection-start-column="39" selection-end-line="47" selection-end-column="44" />
+            <state relative-caret-position="931">
+              <caret line="52" lean-forward="true" selection-start-line="52" selection-end-line="52" />
               <folding>
                 <element signature="e#107#174#0" expanded="true" />
               </folding>
@@ -72,14 +24,13 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="457">
-              <caret line="177" column="39" selection-start-line="177" selection-start-column="39" selection-end-line="177" selection-end-column="39" />
+            <state relative-caret-position="3496">
+              <caret line="196" column="10" selection-start-line="196" selection-start-column="10" selection-end-line="196" selection-end-column="10" />
               <folding>
                 <element signature="e#106#127#0" expanded="true" />
-                <element signature="e#6065#6212#0" />
               </folding>
             </state>
           </provider>
@@ -88,8 +39,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/conflict_detect/data_pre_process/handle_single_file.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="386">
-              <caret line="144" column="45" lean-forward="true" selection-start-line="144" selection-start-column="45" selection-end-line="144" selection-end-column="45" />
+            <state relative-caret-position="2736">
+              <caret line="144" column="45" selection-start-line="144" selection-start-column="45" selection-end-line="144" selection-end-column="45" />
             </state>
           </provider>
         </entry>
@@ -97,7 +48,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/conflict_detect/evaluation/eval.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
+            <state relative-caret-position="1178">
               <caret line="66" column="86" selection-start-line="66" selection-start-column="73" selection-end-line="66" selection-end-column="86" />
               <folding>
                 <element signature="e#106#173#0" expanded="true" />
@@ -109,7 +60,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RestApi/service.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-28">
+            <state relative-caret-position="570">
               <caret line="36" selection-start-line="36" selection-end-line="36" />
               <folding>
                 <element signature="e#107#129#0" expanded="true" />
@@ -121,7 +72,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="438">
+            <state relative-caret-position="3496">
               <caret line="184" selection-start-line="184" selection-end-line="184" />
             </state>
           </provider>
@@ -130,18 +81,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/event_dectect/Event_Model/EventModel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="27">
-              <caret line="139" lean-forward="true" selection-start-line="139" selection-end-line="139" />
+            <state relative-caret-position="1919">
+              <caret line="139" selection-start-line="139" selection-end-line="139" />
               <folding>
                 <element signature="e#790#2467#0" />
-                <element signature="e#2514#2977#0" />
-                <element signature="e#3010#3524#0" />
-                <element signature="e#3555#4053#0" />
-                <element signature="e#4086#4620#0" />
-                <element signature="e#4650#6103#0" />
-                <element signature="e#6142#6345#0" />
-                <element signature="e#6386#7650#0" />
-                <element signature="e#7683#8257#0" />
               </folding>
             </state>
           </provider>
@@ -150,7 +93,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/some_try.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="371">
+            <state relative-caret-position="646">
               <caret line="34" column="26" selection-start-line="34" selection-start-column="26" selection-end-line="34" selection-end-column="26" />
             </state>
           </provider>
@@ -229,8 +172,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="374" />
-    <option name="y" value="78" />
+    <option name="x" value="946" />
+    <option name="y" value="48" />
     <option name="width" value="974" />
     <option name="height" value="1087" />
   </component>
@@ -455,21 +398,23 @@
       <workItem from="1566541525357" duration="7686000" />
       <workItem from="1566613696587" duration="6706000" />
       <workItem from="1566628533630" duration="6096000" />
+      <workItem from="1566697906478" duration="1649000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="49071000" />
+    <option name="totallyTimeSpent" value="50720000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
+    <frame x="946" y="48" width="974" height="1087" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1671875" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.33507308" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3292683" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.4288618" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.4328205" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3953252" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -486,6 +431,29 @@
       <window_info anchor="right" id="SciView" order="3" />
       <window_info anchor="right" id="Database" order="4" />
     </layout>
+    <layout-to-restore>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.33507308" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3292683" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.4328205" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.3953252" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" />
+      <window_info anchor="bottom" id="Database Changes" order="9" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="bottom" id="Terminal" order="11" />
+      <window_info anchor="bottom" id="Python Console" order="12" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="SciView" order="3" />
+      <window_info anchor="right" id="Database" order="4" />
+    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -517,7 +485,7 @@
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$service.coverage" NAME="service Coverage Results" MODIFIED="1566537680381" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/RestApi" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1566541974517" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/conflict_detect" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$extract_event.coverage" NAME="extract_event Coverage Results" MODIFIED="1566459764696" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Event_Model" />
-    <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$some_try.coverage" NAME="some_try Coverage Results" MODIFIED="1566632170568" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$some_try.coverage" NAME="some_try Coverage Results" MODIFIED="1566698336342" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
@@ -831,9 +799,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/conflict_detect/data_pre_process/handle_single_file.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2736">
+          <caret line="144" column="45" selection-start-line="144" selection-start-column="45" selection-end-line="144" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/conflict_detect/evaluation/eval.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
+        <state relative-caret-position="1178">
           <caret line="66" column="86" selection-start-line="66" selection-start-column="73" selection-end-line="66" selection-end-column="86" />
           <folding>
             <element signature="e#106#173#0" expanded="true" />
@@ -841,58 +816,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/conflict_detect/data_pre_process/handle_single_file.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="386">
-          <caret line="144" column="45" lean-forward="true" selection-start-line="144" selection-start-column="45" selection-end-line="144" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/conflict_detect/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="513">
-          <caret line="47" column="44" selection-start-line="47" selection-start-column="39" selection-end-line="47" selection-end-column="44" />
-          <folding>
-            <element signature="e#107#174#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/some_try.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="371">
-          <caret line="34" column="26" selection-start-line="34" selection-start-column="26" selection-end-line="34" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/event_dectect/Event_Model/EventModel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="27">
-          <caret line="139" lean-forward="true" selection-start-line="139" selection-end-line="139" />
-          <folding>
-            <element signature="e#790#2467#0" />
-            <element signature="e#2514#2977#0" />
-            <element signature="e#3010#3524#0" />
-            <element signature="e#3555#4053#0" />
-            <element signature="e#4086#4620#0" />
-            <element signature="e#4650#6103#0" />
-            <element signature="e#6142#6345#0" />
-            <element signature="e#6386#7650#0" />
-            <element signature="e#7683#8257#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="438">
-          <caret line="184" selection-start-line="184" selection-end-line="184" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/RestApi/service.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-28">
+        <state relative-caret-position="570">
           <caret line="36" selection-start-line="36" selection-end-line="36" />
           <folding>
             <element signature="e#107#129#0" expanded="true" />
@@ -900,13 +826,46 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3496">
+          <caret line="184" selection-start-line="184" selection-end-line="184" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/event_dectect/Event_Model/EventModel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1919">
+          <caret line="139" selection-start-line="139" selection-end-line="139" />
+          <folding>
+            <element signature="e#790#2467#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/some_try.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="646">
+          <caret line="34" column="26" selection-start-line="34" selection-start-column="26" selection-end-line="34" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="457">
-          <caret line="177" column="39" selection-start-line="177" selection-start-column="39" selection-end-line="177" selection-end-column="39" />
+        <state relative-caret-position="3496">
+          <caret line="196" column="10" selection-start-line="196" selection-start-column="10" selection-end-line="196" selection-end-column="10" />
           <folding>
             <element signature="e#106#127#0" expanded="true" />
-            <element signature="e#6065#6212#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/conflict_detect/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="931">
+          <caret line="52" lean-forward="true" selection-start-line="52" selection-end-line="52" />
+          <folding>
+            <element signature="e#107#174#0" expanded="true" />
           </folding>
         </state>
       </provider>

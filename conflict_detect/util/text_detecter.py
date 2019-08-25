@@ -4,7 +4,7 @@ __doc__ = 'description'
 __author__ = '13314409603@163.com'
 
 import re
-from util.constant import NEGATION,REMARRY,FAMILY_CONFLICT_POSITIVE,GENDER,UP_TO_DATE
+from conflict_detect.util.constant import NEGATION,REMARRY,FAMILY_CONFLICT_POSITIVE,GENDER,UP_TO_DATE
 from model import myDate
 
 #文本对齐、冲突检测工具类，判断规则和业务紧密相关
