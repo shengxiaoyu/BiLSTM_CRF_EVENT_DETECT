@@ -81,13 +81,13 @@ def main(FLAGS,sentencs_words_firstTags_list=None,words_firstTags_indxPairs_sent
     # estimator
     if FLAGS.ifTrain :
         print('获取训练数据。。。')
-        train_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path+'_Spe_Second', 'train')),
+        train_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path+'_for_Second', 'train')),
                                        shuffe=True, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         train_examples = list(train_inpf())
         train_total = len(train_examples)
         print('训练steps:'+str(train_total))
         print('获取评估数据。。。')
-        eval_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path+'_Spe_Second', 'dev')),
+        eval_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path+'_for_Second', 'dev')),
                                       shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         hook = tf.contrib.estimator.stop_if_no_increase_hook(
             estimator, 'f1', 500, min_steps=8000, run_every_secs=120)
@@ -100,11 +100,11 @@ def main(FLAGS,sentencs_words_firstTags_list=None,words_firstTags_indxPairs_sent
 
     if FLAGS.ifTest:
         print('获取预测数据。。。')
-        test_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path+'_Spe_Second', 'test')),
+        test_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path+'_for_Second', 'test')),
                                       shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
 
         predictions = estimator.predict(input_fn=test_inpf)
-        pred_true = INPUT.generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path+'_Spe_Second', 'test')),max_sequence_length = FLAGS.max_sequence_length,noEmbedding=True)
+        pred_true = INPUT.generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path+'_for_Second', 'test')),max_sequence_length = FLAGS.max_sequence_length,noEmbedding=True)
 
         #取真实的tags
         targets = [x[1] for x in pred_true]

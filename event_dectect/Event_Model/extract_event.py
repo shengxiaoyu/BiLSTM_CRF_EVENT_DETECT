@@ -147,35 +147,6 @@ class Extractor(object):
             if(event):
                 events.append(event)
                 id_index += 1
-            # event_argus_dict = {}
-            # event_argus_index_pair_dict = {}
-            # #针对每一句构造一个map
-            # for tag,word,index_pair in zip(tags,words,index_pairs):
-            #     if (tag in NEW_CONFIG.NEW_TRIGGER_TAGs):
-            #         '''触发词标签，确定触发词和事件类型'''
-            #         if ('Trigger' in event_argus_dict):
-            #             '''将I_开头的加入'''
-            #             event_argus_dict['Trigger'] = event_argus_dict['Trigger'] + word
-            #             #索引的融合，默认是连在一起的，直接替换endIndex
-            #             last_index_pair = event_argus_index_pair_dict['Trigger']
-            #             event_argus_index_pair_dict['Trigger'] = [last_index_pair[0],index_pair[1]]
-            #         else:
-            #             event_argus_dict['Type'] = tag[2:-8] # B_Know_Trigger => Know
-            #             event_argus_dict['Trigger'] = word
-            #             event_argus_index_pair_dict['Trigger'] = index_pair
-            #     if (tag in NEW_CONFIG.NEW_ARGU_TAGs and tag != '<pad>' and tag != 'O'):
-            #         newTag = tag[2:] #B_Argu => Argu
-            #         if (newTag in event_argus_dict):
-            #             event_argus_dict[newTag] = event_argus_dict[newTag] + word
-            #             last_index_pair = event_argus_index_pair_dict[newTag]
-            #             event_argus_index_pair_dict[newTag] = [last_index_pair[0],index_pair[1]]
-            #         else:
-            #             event_argus_dict[newTag] = word
-            #             event_argus_index_pair_dict[newTag] = index_pair
-            #
-            #
-            # if ('Type' in event_argus_dict):
-            #     events.append(EventModel.EventFactory(event_argus_dict, event_argus_index_pair_dict, sentence))
         print('事件抽取完成：\n'+'\n'.join([str(event) for event in events]))
         return events
 if __name__ == '__main__':

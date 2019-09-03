@@ -109,12 +109,8 @@ def writeTriggerToFile(events_triggers,savePath):
 
 
 #将源文件和标注文件合一
-def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,pos_model_path,stop_words_path,trigger_labels_path,argu_labels_path,step=1):
+def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,pos_model_path,stop_words_path,trigger_labels_path,argu_labels_path):
     savePath = os.path.join(savePath,'Spe')
-    if(step==1):
-        savePath += '_First'
-    else:
-        savePath += '_Second'
 
     # 分词器
     segmentor = Segmentor()
@@ -222,19 +218,13 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 # 考虑标签和分词不对应的情况，一个词被对应到多次标记，因为先标记触发词，所以优先级第一，其余的越靠后越低
                 if (labeled[index].find('O') != -1):
                     if (isBegin):
-                        if(step==1):
-                            label = 'B_' + entity.getType()
-                        else:
-                            label = 'B_' + entity.getName()
+                        label = 'B_' + entity.getName()
                         if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
                             label = 'O'
                         labeled[index] = label
                         isBegin = False
                     else:
-                        if (step == 1):
-                            label = 'I_' + entity.getType()
-                        else:
-                            label = 'I_' + entity.getName()
+                        label = 'I_' + entity.getName()
                         if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
                             label = 'O'
                         labeled[index] = label
@@ -455,6 +445,7 @@ def main():
     # base_path = '/root/lstm_crf/data'
     brat_base_path = os.path.join(base_path, 'brat')
     ltp_path = os.path.join(base_path, 'ltp_data_v3.4.0')
+    #生成标注样例，每个样例一个事件，标签为最终标签
     formLabelData(
         labelFilePath=os.path.join(brat_base_path, 'relabled'),
         savePath=os.path.join(base_path, 'labeled'),
@@ -465,40 +456,128 @@ def main():
         # trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
         trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
         # argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
-        argu_labels_path=os.path.join(base_path,'argumentLabels.txt'),
-        #1-第一阶段的标注样例，2-第二阶段的标注样例
-        step=1)
+        argu_labels_path=os.path.join(base_path,'argumentLabels.txt'))
 
 
+#将spe模型下的单句合并为full下的句子
+secondeTag_2_firstTag = {
+    'B_Know_Time':'B_Time',
+    'I_Know_Time':'I_Time',
+    'B_BeInLove_Time':'B_Time',
+    'I_BeInLove_Time':'I_Time',
+    'B_Marry_Time':'B_Time',
+    'I_Marry_Time':'I_Time',
+    'B_Remarry_Participant':'B_Person',
+    'I_Remarry_Participant':'I_Person',
+    'B_Bear_DateOfBirth':'B_Time',
+    'I_Bear_DateOfBirth':'I_Time',
+    'B_Bear_Gender':'B_Gender',
+    'I_Bear_Gender':'I_Gender',
+    'B_Bear_ChildName':'B_Name',
+    'I_Bear_ChildName':'I_Name',
+    'B_Bear_Age':'B_Age',
+    'I_Bear_Age':'I_Age',
+    'B_DomesticViolence_Perpetrators':'B_Person',
+    'I_DomesticViolence_Perpetrators':'I_Person',
+    'B_DomesticViolence_Victim':'B_Person',
+    'I_DomesticViolence_Victim':'I_Person',
+    'B_DomesticViolence_Time':'B_Time',
+    'I_DomesticViolence_Time':'I_Time',
+    'B_BadHabit_Participant':'B_Person',
+    'I_BadHabit_Participant':'I_Person',
+    'B_Derailed_Time':'B_Time',
+    'I_Derailed_Time':'I_Time',
+    'B_Derailed_Derailer':'B_Person',
+    'I_Derailed_Derailer':'I_Person',
+    'B_Separation_BeginTime':'B_Time',
+    'I_Separation_BeginTime':'I_Time',
+    'B_Separation_EndTime':'B_Time',
+    'I_Separation_EndTime':'I_Time',
+    'B_Separation_Duration':'B_Duration',
+    'I_Separation_Duration':'I_Duration',
+    'B_DivorceLawsuit_SueTime':'B_Time',
+    'I_DivorceLawsuit_SueTime':'I_Time',
+    'B_DivorceLawsuit_Initiator':'B_Person',
+    'I_DivorceLawsuit_Initiator':'I_Person',
+    'B_DivorceLawsuit_Court':'B_Court',
+    'I_DivorceLawsuit_Court':'I_Court',
+    'B_DivorceLawsuit_Result':'B_Judgment',
+    'I_DivorceLawsuit_Result':'I_Judgment',
+    'B_DivorceLawsuit_JudgeTime':'B_Time',
+    'I_DivorceLawsuit_JudgeTime':'I_Time',
+    'B_DivorceLawsuit_JudgeDocument':'B_Document',
+    'I_DivorceLawsuit_JudgeDocument':'I_Document',
+    'B_Wealth_Value':'B_Price',
+    'I_Wealth_Value':'I_Price',
+    'B_Wealth_IsPersonal':'B_PersonalProperty',
+    'I_Wealth_IsPersonal':'I_PersonalProperty',
+    'B_Wealth_Whose':'B_Person',
+    'I_Wealth_Whose':'B_Person',
+    'B_Wealth_IsCommon':'B_CommonProperty',
+    'I_Wealth_IsCommon':'I_CommonProperty',
+    'B_Debt_Creditor':'B_Person',
+    'I_Debt_Creditor':'I_Person',
+    'B_Debt_Value':'B_Price',
+    'I_Debt_Value':'I_Price',
+    'B_Credit_Debtor':'B_Person',
+    'I_Credit_Debtor':'I_Person',
+    'B_Credit_Value':'B_Price',
+    'I_Credit_Value':'I_Price',
+    'B_Negated':'B_Negated',
+    'I_Negated':'I_Negated',
+    'B_Know_Trigger':'B_Know',
+    'I_Know_Trigger':'I_Know',
+    'B_BeInLove_Trigger':'B_BeInLove',
+    'I_BeInLove_Trigger':'I_BeInLove',
+    'B_Marry_Trigger':'B_Marry',
+    'I_Marry_Trigger':'I_Marry',
+    'B_Remarry_Trigger':'B_Remarry',
+    'I_Remarry_Trigger':'I_Remarry',
+    'B_Bear_Trigger':'B_Bear',
+    'I_Bear_Trigger':'I_Bear',
+    'B_FamilyConflict_Trigger':'B_FamilyConflict',
+    'I_FamilyConflict_Trigger':'I_FamilyConflict',
+    'B_DomesticViolence_Trigger':'B_DomesticViolence',
+    'I_DomesticViolence_Trigger':'I_DomesticViolence',
+    'B_BadHabit_Trigger':'B_BadHabit',
+    'I_BadHabit_Trigger':'I_BadHabit',
+    'B_Derailed_Trigger':'B_Derailed',
+    'I_Derailed_Trigger':'I_Derailed',
+    'B_Separation_Trigger':'B_Separation',
+    'I_Separation_Trigger':'I_Separation',
+    'B_DivorceLawsuit_Trigger':'B_DivorceLawsuit',
+    'I_DivorceLawsuit_Trigger':'I_DivorceLawsuit',
+    'B_Wealth_Trigger':'B_Wealth',
+    'I_Wealth_Trigger':'I_Wealth',
+    'B_Debt_Trigger':'B_Debt',
+    'I_Debt_Trigger':'I_Debt',
+    'B_Credit_Trigger':'B_Credit',
+    'I_Credit_Trigger':'I_Credit',
+    'O':'O',
+}
+
+
+NUM1 = 0
+NUM2 = 0
+SHARE_EVENT = {}
+SHARE_ARGU ={}
 #将spe模型下的单句合并为full下的句子
 def merge(path):
     #会用到trigger集合，需要初始化Trigger_Tags
     parse = getParser()
     CONFIG.init(parse.root_dir)
     #新文件的保存路径，保存在传入文件的同级目录
-    savePath = os.path.join(os.path.split(path)[0],'Merge_'+os.path.split(path)[1])
+    #第一个模型的数据
+    savePath = os.path.join(os.path.split(path)[0],'Merge_for_first')
+    #第二个模型的数据保存卢坚
+    savePath2 = os.path.join(os.path.split(path)[0],'Merge_for_Second')
     if(not os.path.exists(savePath)):
         os.mkdir(savePath)
-
-    def merge(tagsList):
-        mergedTags = tagsList[0]
-        for tags in tagsList[1:]:
-            for index,tag in enumerate(tags):
-                if(tag!='O'):
-                    if(mergedTags[index]=='O'):
-                        mergedTags[index] = tag
-                    elif(mergedTags[index] in CONFIG.TRIGGER_TAGs):
-                        '''此时产生冲突'''
-                        '''原先填入的是触发词'''
-                        if(mergedTags[index].find('B_')==-1 and tag.find('B_')!=-1):
-                            mergedTags[index] = tag #原先的不是B_开头触发词，新来的是B_开头触发词才能覆盖
-                    else:#如果以前不是触发词，
-                        if((tag in CONFIG.TRIGGER_TAGs or tag.find('B_')!=-1) and mergedTags[index].find('B_')==-1): #只有新来的是触发词或者B_开头的参数，而且老的不是B_开头才能覆盖
-                            mergedTags[index] = tag
-        return mergedTags
-
+    if (not os.path.exists(savePath2)):
+        os.mkdir(savePath2)
     for fileName in os.listdir(path):
-        with open(os.path.join(path,fileName),'r',encoding='utf8') as f,open(os.path.join(savePath,fileName),'w',encoding='utf8') as fw:
+        with open(os.path.join(path,fileName),'r',encoding='utf8') as f,open(os.path.join(savePath,fileName),'w',encoding='utf8') as fw,\
+                open(os.path.join(savePath2,fileName),'w',encoding='utf8') as fw2:
             #words行
             lastSentence = f.readline().strip()
             #tag行
@@ -519,8 +598,13 @@ def merge(path):
                     sentence = f.readline().strip()
                 else:
                     '''来了新的行，将上一种合并写入'''
-                    mergedTags = merge(lastTagsList)
+                    mergedTags = one_merge(lastTagsList)
+
+                    #更新，生成文件格式：一行原句，一行通用标签，一行pos
                     fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
+                    #更新，生成文件格式：一行原句，一行通用标签，一行pos，一行细粒度标签
+                    for lastTags in lastTagsList:
+                        fw2.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n'+' '.join(lastTags)+'\n')
                     #更新缓存
                     lastSentence = sentence
                     lastTagsList = []
@@ -531,11 +615,36 @@ def merge(path):
                     sentence = f.readline().strip()
 
             #处理缓存
-            mergedTags = merge(lastTagsList)
+            mergedTags = one_merge(lastTagsList)
             fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
+            for lastTags in lastTagsList:
+                fw2.write(lastSentence + '\n' + ' '.join(mergedTags) + '\n' + poses + '\n' + ' '.join(lastTags) + '\n')
+    print(NUM1)
+    print(NUM2)
+    print(SHARE_EVENT)
+
+
+def one_merge(tagsList):
+    global NUM1,NUM2,SHARE_EVENT,SHARE_ARGU
+    mergedTags = ['O' for _ in range(len(tagsList[0]))]
+    for tags in tagsList:
+        for index,tag in enumerate(tags):
+            if(tag!='O'):
+                if(mergedTags[index]=='O'):
+                    mergedTags[index] = secondeTag_2_firstTag[tag]
+                    # mergedTags[index] = tag
+                elif(mergedTags[index] in CONFIG.TRIGGER_TAGs):
+                    '''此时产生冲突'''
+                    '''原先填入的是触发词'''
+                    if(mergedTags[index].find('B_')==-1 and tag.find('B_')!=-1):
+                        mergedTags[index] = secondeTag_2_firstTag[tag] #原先的不是B_开头触发词，新来的是B_开头触发词才能覆盖
+                else:#如果以前不是触发词，
+                    if((tag in CONFIG.TRIGGER_TAGs or tag.find('B_')!=-1) and mergedTags[index].find('B_')==-1): #只有新来的是触发词或者B_开头的参数，而且老的不是B_开头才能覆盖
+                        mergedTags[index] = secondeTag_2_firstTag[tag]
+    return mergedTags
 
 if __name__ == '__main__':
-    # main()
-    merge(r'A:\Bi-LSTM+CRF\labeled\Spe_First')
+    main()
+    merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
     print ('end')
     sys.exit(0)

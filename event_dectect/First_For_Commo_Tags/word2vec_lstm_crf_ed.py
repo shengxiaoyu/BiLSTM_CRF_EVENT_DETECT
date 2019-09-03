@@ -77,12 +77,12 @@ def main(FLAGS,sentences=None,dir=None):
     # estimator
     if FLAGS.ifTrain :
         print('获取训练数据。。。')
-        train_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path+'_Spe_First', 'train')),
+        train_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path+'_for_first', 'train')),
                                        shuffe=True, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         train_total = len(list(train_inpf()))
         print('训练steps:'+str(train_total))
         print('获取评估数据。。。')
-        eval_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path+'_Spe_First', 'dev')),
+        eval_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path+'_for_first', 'dev')),
                                       shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
         hook = tf.contrib.estimator.stop_if_no_increase_hook(estimator, 'f1', 500, min_steps=8000, run_every_secs=120)
         dev_total = len(list(eval_inpf()))
@@ -94,11 +94,11 @@ def main(FLAGS,sentences=None,dir=None):
 
     if FLAGS.ifTest:
         print('获取预测数据。。。')
-        test_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path+'_Spe_First', 'test')),
+        test_inpf = functools.partial(INPUT.input_fn, input_dir=(os.path.join(FLAGS.labeled_data_path+'_for_first', 'test')),
                                       shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
 
         predictions = estimator.predict(input_fn=test_inpf)
-        pred_true = INPUT.generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path+'_Spe_First', 'test')),max_sequence_length = FLAGS.max_sequence_length,noEmbedding=True)
+        pred_true = INPUT.generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path+'_for_first', 'test')),max_sequence_length = FLAGS.max_sequence_length,noEmbedding=True)
 
         #取真实的tags
         targets = [x[1] for x in pred_true]
