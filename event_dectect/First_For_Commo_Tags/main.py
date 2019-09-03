@@ -14,7 +14,7 @@ from event_dectect.Config.config_parser import getParser
 from event_dectect.Word2Vec.my_word2vec import Word2VecModel
 from event_dectect.data_pre_process.cpws_process import CpwsProcess
 from event_dectect.data_pre_process.qsz_process import QszProcess
-from tsbl_process import TsblProcess
+from event_dectect.data_pre_process.tsbl_process import TsblProcess
 
 
 #从原材料中生成分句后的起诉庭审笔录、起诉状、裁判文书

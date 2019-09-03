@@ -5,7 +5,7 @@ __doc__ = 'description'
 __author__ = '13314409603@163.com'
 
 import xml.sax
-from data_process import DataProcess
+from event_dectect.data_pre_process.data_process import DataProcess
 import os
 from pyltp import SentenceSplitter
 
