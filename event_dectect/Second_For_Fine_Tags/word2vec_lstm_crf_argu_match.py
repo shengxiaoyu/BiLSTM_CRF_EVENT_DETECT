@@ -104,7 +104,7 @@ def main(FLAGS,sentencs_words_firstTags_list=None,words_firstTags_indxPairs_sent
                                       shuffe=False, num_epochs=FLAGS.num_epochs, batch_size=FLAGS.batch_size,max_sequence_length=FLAGS.max_sequence_length)
 
         predictions = estimator.predict(input_fn=test_inpf)
-        pred_true = INPUT.generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path+'_for_second', 'test')),max_sequence_length = FLAGS.max_sequence_length,noEmbedding=True)
+        pred_true = INPUT.generator_fn(input_dir=(os.path.join(FLAGS.labeled_data_path+'_Spe_Second', 'test')),max_sequence_length = FLAGS.max_sequence_length,noEmbedding=True)
 
         #取真实的tags
         targets = [x[1] for x in pred_true]
