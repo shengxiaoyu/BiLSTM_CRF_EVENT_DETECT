@@ -39,6 +39,31 @@ def run():
     non['p-Entailment'] = 0
     result['non'] = non
 
+    result_events = {}
+
+    # 冲突事件集合
+    contradictory_events = {}
+    # 冲突事件被预测为冲突
+    contradictory_events['p-Contradictory'] = []
+    # 蕴含
+    contradictory_events['p-Entailment'] = []
+    # 没有检测出来
+    contradictory_events['p-non'] = []
+    # 放入result集合
+    result_events['Contradictory'] = contradictory_events
+
+    entailment_events = {}
+    entailment_events['p-Contradictory'] = []
+    entailment_events['p-Entailment'] = []
+    entailment_events['p-non'] = []
+    result_events['Entailment'] = entailment_events
+
+    # 标记数据中没有的事件被预测为冲突或者蕴含
+    non_events = {}
+    non_events['p-Contradictory'] = []
+    non_events['p-Entailment'] = []
+    result_events['non'] = non_events
+
 
     for dir_name in os.listdir(root):
         dir = os.path.join(root,dir_name)
@@ -67,7 +92,7 @@ def run():
                                 my_event_relations.append(Relation(None,'Contradictory',events[i],events[j]))
                             else:
                                 my_event_relations.append(Relation(None,'Entailment',events[i],events[j]))
-                cal(result,event_relations,my_event_relations)
+                cal(result,event_relations,my_event_relations,result_events)
     save_root = r'A:\Bi-LSTM+CRF\bert\data'
     with open(os.path.join(save_root, 'event_relations.txt'), 'w', encoding='utf8') as writer:
         writer.write('\t\tp-Contradictory\tp-Entailment\tp-Non\n')
@@ -79,16 +104,18 @@ def run():
                 writer.write('\n')
 
 
-def cal(result,relations,pre_relations):
+def cal(result,relations,pre_relations,result_events):
     if(relations==None or len(relations)==0):
         if(pre_relations!=None and len(pre_relations)>0):
             for relation in pre_relations:
                 result['non']['p-'+relation.type] += 1
+                result_events['non']['p-'+relation.type].append(relation)
             return
     if(pre_relations==None or len(pre_relations)==0):
         if(relations!=None and len(relations)>0):
             for relation in relations:
                 result[relation.type]['p-non'] += 1
+                result_events[relation.type]['p-non'].append(relation)
             return
 
     for relation in relations:
@@ -96,10 +123,12 @@ def cal(result,relations,pre_relations):
         for pre_relation in pre_relations:
             if(relation.__eq__(pre_relation)):
                 result[relation.type]['p-'+pre_relation.type] += 1
+                result_events[relation.type]['p-'+pre_relation.type].append(relation)
                 found = True
                 break
         if(not found):
             result[relation.type]['p-non'] += 1
+            result_events[relation.type]['p-non'].append(relation)
 
     for pre_relation in pre_relations:
         found = False
@@ -109,6 +138,7 @@ def cal(result,relations,pre_relations):
                 break
         if(not found):
             result['non']['p-'+pre_relation.type] += 1
+            result_events['non']['p-'+pre_relation.type].append(pre_relation)
 
 if __name__ == '__main__':
     run()

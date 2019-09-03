@@ -50,9 +50,9 @@ class Event(object):
         if(event_type!=None and trigger!=None):
             event = Event(id,event_type,trigger)
             event.speaker = speaker
-            event.__addSent(sentence)
+            event._addSent(sentence)
             for argu_type in argus.keys():
-                event.__setArgu(argu_type, argus[argu_type])
+                event._setArgu(argu_type, argus[argu_type])
             return event
         return None
     def __init__(self, id, type, trigger):
@@ -62,9 +62,9 @@ class Event(object):
         self.sentence = None
         self.begin_index = 0
         self.speaker = None
-    def __setArgu(self, argu_name, argu_value):
+    def _setArgu(self, argu_name, argu_value):
         setattr(self,argu_name,argu_value)
-    def __addSent(self, sent):
+    def _addSent(self, sent):
         if(self.sentence ==None):
             self.sentence = sent
         else:

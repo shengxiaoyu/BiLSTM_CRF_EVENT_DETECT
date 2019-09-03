@@ -4,7 +4,6 @@ __doc__ = 'description'
 __author__ = '13314409603@163.com'
 
 import os
-import docx
 # from win32com import client as wc
 from event_dectect.data_pre_process.data_process import DataProcess
 from enum import Enum

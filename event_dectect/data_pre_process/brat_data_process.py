@@ -109,11 +109,13 @@ def writeTriggerToFile(events_triggers,savePath):
 
 
 #将源文件和标注文件合一
-def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,pos_model_path,stop_words_path,trigger_labels_path,argu_labels_path,mode=1):
-    if(mode==1):
-        savePath = os.path.join(savePath,'Spe')
+def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dict_path,pos_model_path,stop_words_path,trigger_labels_path,argu_labels_path,step=1):
+    savePath = os.path.join(savePath,'Spe')
+    if(step==1):
+        savePath += '_First'
     else:
-        savePath = os.path.join(savePath,'Full')
+        savePath += '_Second'
+
     # 分词器
     segmentor = Segmentor()
     segmentor.load_with_lexicon(segmentor_model_path, segmentor_user_dict_path)
@@ -134,10 +136,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
             if (os.path.isdir(newPath)):
                 handlderDir(newPath)
             else:
-                if (mode == 1):
-                    handlerSingleFile(newPath)
-                elif (mode == 2):
-                    handlerSingleFile2(newPath)
+                handlerSingleFile(newPath)
 
     #获取event列表，其中包括每个事件含有的原文句子
     def getEvents(filePath,originFile):
@@ -223,15 +222,19 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 # 考虑标签和分词不对应的情况，一个词被对应到多次标记，因为先标记触发词，所以优先级第一，其余的越靠后越低
                 if (labeled[index].find('O') != -1):
                     if (isBegin):
-                        # label = 'B_' + entity.getType()
-                        label = 'B_' + entity.getName()
+                        if(step==1):
+                            label = 'B_' + entity.getType()
+                        else:
+                            label = 'B_' + entity.getName()
                         if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
                             label = 'O'
                         labeled[index] = label
                         isBegin = False
                     else:
-                        # label = 'I_' + entity.getType()
-                        label = 'I_' + entity.getName()
+                        if (step == 1):
+                            label = 'I_' + entity.getType()
+                        else:
+                            label = 'I_' + entity.getName()
                         if (label not in labedWords):  # 如果不是关注集里的标注类型，则设为O
                             label = 'O'
                         labeled[index] = label
@@ -328,94 +331,14 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 fw.write(' '.join(event.getPosTags()))
                 fw.write('\n')
 
-    #一个句子可以标注多个事件
-    def handlerSingleFile2(filePath):
-        if (filePath.find('.ann') == -1):
-            return
-        # 查看源文件是否存在，如果不存在直接跳过
-        originFile = os.path.join(filePath, filePath.replace('.ann', '.txt'))
-        if (not os.path.exists(originFile)):
-            return
-
-        events = getEvents(filePath,originFile)
-
-        #在源文件上标注标签
-        #获取源文件，并将换行符置为2个位置形式
-        with open(originFile,'r',encoding='utf8') as f:
-            content = f.read()
-            content = content.replace('\n','\r\n')
-        #分词，构造标签list
-        content = list(segmentor.segment(content))
-        tags = list(map(lambda x:'O'if(x!='\r\n') else x,content))
-        posTags = list(postagger.postag(content))
-
-        #针对每个事件将标签填入
-        for event in events:
-            #此时传入整个原文，起始索引为0
-            labelAEntity(content,tags,event.getTrigger(),0)
-            for argument in event.getArguments():
-                labelAEntity(content,tags,argument,0)
-
-        #去停用词
-        content,tags,posTags=delStopWords(content,tags,posTags)
-        newContent = []
-        newTags = []
-        newPosTags = []
-        #在全文里面要保留\n区别换行
-        for word,tag,posTag in zip(content,tags,posTags):
-            if(word=='\r'): #考虑\r\n被分词的情况，如果\r单独存在，则直接舍掉，
-                continue
-            if(word.find('\r')!=-1):#如果\r和其他词在一起，则只去掉\r，包括\r\n在一起的情况
-                word = word.replace('\r','')
-                tag = tag.replace('\r','')
-                posTag = posTag.replace('\r','')
-            newContent.append(word)
-            newTags.append(tag)
-            newPosTags.append(posTag)
-        # 存储
-        theSavePath = ''
-        if (filePath.find('qsz') != -1):
-            theSavePath = os.path.join(savePath, 'qsz_' + os.path.basename(filePath).replace('.ann', '.txt'))
-        if (filePath.find('cpws') != -1):
-            theSavePath = os.path.join(savePath, 'cpws' + os.path.basename(filePath).replace('.ann', '.txt'))
-        if (filePath.find('qstsbl') != -1):
-            theSavePath = os.path.join(savePath, 'qstsbl' + os.path.basename(filePath).replace('.ann', '.txt'))
-
-        #写入同样要按照一行原文，一行标注的格式，如果整行都没有标注，则删去
-        with open(theSavePath, 'w', encoding='utf8') as fw:
-            wordsLine = []
-            tagsLine = []
-            posTagsLine = []
-            hasTag = False
-            for word,tag,posTag in zip(newContent,newTags,newPosTags):
-                if (word.find('\n')!=-1):
-                    if (hasTag and len(wordsLine)>1): #有可能去停用词之后一行没有内容了，只剩一个\n，这是不用再写入
-                        fw.write(' '.join(wordsLine))
-                        fw.write('\n')
-                        fw.write(' '.join(tagsLine))
-                        fw.write('\n')
-                        fw.write(' '.join(posTagsLine))
-                        fw.write('\n')
-                    hasTag= False
-                    wordsLine = []
-                    tagsLine = []
-                    posTagsLine = []
-                    continue
-                wordsLine.append(word)
-                tagsLine.append(tag)
-                posTagsLine.append(posTag)
-                if(tag !='O' and tag!='<pad>' and tag !='\n'): #如果是全为O的行去掉
-                    hasTag = True
 
 
 
     if(os.path.isdir(labelFilePath)):
         handlderDir(labelFilePath)
     else:
-        if(mode==1):
-            handlerSingleFile(labelFilePath)
-        elif(mode==2):
-            handlerSingleFile2(labelFilePath)
+        handlerSingleFile(labelFilePath)
+
 
 
     segmentor.release()
@@ -528,24 +451,23 @@ class Relation(object):
     def getParameters(self):
         return self.parameters
 def main():
-    base_path = 'C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF'
+    base_path = r'A:\Bi-LSTM+CRF'
     # base_path = '/root/lstm_crf/data'
     brat_base_path = os.path.join(base_path, 'brat')
     ltp_path = os.path.join(base_path, 'ltp_data_v3.4.0')
     formLabelData(
-        labelFilePath=os.path.join(brat_base_path, 'labeled'),
+        labelFilePath=os.path.join(brat_base_path, 'relabled'),
         savePath=os.path.join(base_path, 'labeled'),
         segmentor_model_path=os.path.join(ltp_path, 'cws.model'),
         segmentor_user_dict_path=os.path.join(ltp_path, 'userDict.txt'),
         pos_model_path=os.path.join(ltp_path, 'pos.model'),
         stop_words_path=os.path.join(base_path, 'newStopWords.txt'),
-        # trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
-        # argu_labels_path=os.path.join(base_path,'argumentLabels.txt'),
-        trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
-        argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
-        #mode=1 Spe
-        #mode=2 Full
-        mode=1)
+        # trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
+        trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
+        # argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
+        argu_labels_path=os.path.join(base_path,'argumentLabels.txt'),
+        #1-第一阶段的标注样例，2-第二阶段的标注样例
+        step=1)
 
 
 #将spe模型下的单句合并为full下的句子
@@ -613,7 +535,7 @@ def merge(path):
             fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
 
 if __name__ == '__main__':
-    # merge('C:\\Users\\13314\\Desktop\\Bi-LSTM+CRF\\labeled\\Spe')
-    main()
+    # main()
+    merge(r'A:\Bi-LSTM+CRF\labeled\Spe_First')
     print ('end')
     sys.exit(0)

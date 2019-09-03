@@ -83,7 +83,7 @@ class single_file_handler(object):
             event_sentence_begin_index = min(event_sentence_begin_index,argu_entity.begin)
             event_sentence_end_index = max(event_sentence_end_index,argu_entity.end)
             '''set the argu of the event'''
-            event.__setArgu(entity_type_and_entity_id[0], argu_entity)
+            event._setArgu(entity_type_and_entity_id[0], argu_entity)
 
         '''find the origin sentence in the origin file'''
         '''find the speaker of the event'''
@@ -108,7 +108,7 @@ class single_file_handler(object):
                 if (begin_index_of_the_line <= event_sentence_begin_index and event_sentence_begin_index <= end_index_of_the_line
                         and begin_index_of_the_line <= event_sentence_end_index and event_sentence_end_index <= end_index_of_the_line):
                     '''整个事件句子在当前句子中'''
-                    event.__addSent(line.strip())
+                    event._addSent(line.strip())
                     event.begin_index = begin_index_of_the_line
 
                     break
@@ -116,17 +116,17 @@ class single_file_handler(object):
                 elif(begin_index_of_the_line <= event_sentence_begin_index and event_sentence_begin_index <= end_index_of_the_line and
                       end_index_of_the_line < event_sentence_end_index):
                     '''只有事件句子的开始在当前句子中'''
-                    event.__addSent(line.strip())
+                    event._addSent(line.strip())
                     event.begin_index = begin_index_of_the_line
 
                 elif (event_sentence_begin_index < begin_index_of_the_line and begin_index_of_the_line <= event_sentence_end_index and
                      event_sentence_end_index<= end_index_of_the_line):
                     '''只有事件句子的结尾在当前句子中'''
-                    event.__addSent(line)
+                    event._addSent(line)
                     break
                 elif(event_sentence_begin_index<=begin_index_of_the_line and end_index_of_the_line<=event_sentence_end_index):
                     '''当前句子整个都在事件句子中'''
-                    event.__addSent(line)
+                    event._addSent(line)
                 cursor = end_index_of_the_line
             event.sentence = event.sentence.replace('\r\n','').replace('\n','')
             event.speaker = speaker
