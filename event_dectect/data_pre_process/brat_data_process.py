@@ -566,62 +566,71 @@ def merge(path):
     #会用到trigger集合，需要初始化Trigger_Tags
     parse = getParser()
     CONFIG.init(parse.root_dir)
-    #新文件的保存路径，保存在传入文件的同级目录
-    #第一个模型的数据
-    savePath = os.path.join(os.path.split(path)[0],'Merge_for_first')
-    #第二个模型的数据保存卢坚
-    savePath2 = os.path.join(os.path.split(path)[0],'Merge_for_Second')
-    if(not os.path.exists(savePath)):
-        os.mkdir(savePath)
-    if (not os.path.exists(savePath2)):
-        os.mkdir(savePath2)
-    for fileName in os.listdir(path):
-        with open(os.path.join(path,fileName),'r',encoding='utf8') as f,open(os.path.join(savePath,fileName),'w',encoding='utf8') as fw,\
-                open(os.path.join(savePath2,fileName),'w',encoding='utf8') as fw2:
-            #words行
-            lastSentence = f.readline().strip()
-            #tag行
-            lastTagsList = []
-            lastTags = f.readline().strip().split()
-            lastTagsList.append(lastTags)
-            #pos行
-            poses = f.readline().strip()
+    first_save_dir = os.path.join(os.path.split(path)[0],'Merge_for_first')
+    second_save_dir = os.path.join(os.path.split(path)[0],'Merge_for_second')
+    dirs = ['03','36','69']
+    for dir in dirs:
+        for i in range(1,11):
+            current_path = os.path.join(os.path.join(path,dir),str(i))
+            #新文件的保存路径，保存在传入文件的同级目录
+            #第一个模型的数据
+            savePath = os.path.join(os.path.join(first_save_dir,dir),str(i))
+            os.makedirs(savePath)
+            #第二个模型的数据保存卢坚
+            savePath2 = os.path.join(os.path.join(second_save_dir,dir),str(i))
+            os.makedirs(savePath2)
 
-            sentence = f.readline().strip()
-            while(sentence):
-                if(sentence==lastSentence):
-                    '''此时时同一行，将tags加入列表'''
-                    lastTagsList.append(f.readline().strip().split())
-                    #去掉pos行
-                    f.readline()
-                    #更新words行
-                    sentence = f.readline().strip()
-                else:
-                    '''来了新的行，将上一种合并写入'''
-                    mergedTags = one_merge(lastTagsList)
-
-                    #更新，生成文件格式：一行原句，一行通用标签，一行pos
-                    fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
-                    #更新，生成文件格式：一行原句，一行通用标签，一行pos，一行细粒度标签
-                    for lastTags in lastTagsList:
-                        fw2.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n'+' '.join(lastTags)+'\n')
-                    #更新缓存
-                    lastSentence = sentence
+            if(not os.path.exists(savePath)):
+                os.mkdir(savePath)
+            if (not os.path.exists(savePath2)):
+                os.mkdir(savePath2)
+            for fileName in os.listdir(current_path):
+                with open(os.path.join(current_path,fileName),'r',encoding='utf8') as f,open(os.path.join(savePath,fileName),'w',encoding='utf8') as fw,\
+                        open(os.path.join(savePath2,fileName),'w',encoding='utf8') as fw2:
+                    #words行
+                    lastSentence = f.readline().strip()
+                    #tag行
                     lastTagsList = []
                     lastTags = f.readline().strip().split()
                     lastTagsList.append(lastTags)
+                    #pos行
                     poses = f.readline().strip()
 
                     sentence = f.readline().strip()
+                    while(sentence):
+                        if(sentence==lastSentence):
+                            '''此时时同一行，将tags加入列表'''
+                            lastTagsList.append(f.readline().strip().split())
+                            #去掉pos行
+                            f.readline()
+                            #更新words行
+                            sentence = f.readline().strip()
+                        else:
+                            '''来了新的行，将上一种合并写入'''
+                            mergedTags = one_merge(lastTagsList)
 
-            #处理缓存
-            mergedTags = one_merge(lastTagsList)
-            fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
-            for lastTags in lastTagsList:
-                fw2.write(lastSentence + '\n' + ' '.join(mergedTags) + '\n' + poses + '\n' + ' '.join(lastTags) + '\n')
-    print(NUM1)
-    print(NUM2)
-    print(SHARE_EVENT)
+                            #更新，生成文件格式：一行原句，一行通用标签，一行pos
+                            fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
+                            #更新，生成文件格式：一行原句，一行通用标签，一行pos，一行细粒度标签
+                            for lastTags in lastTagsList:
+                                fw2.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n'+' '.join(lastTags)+'\n')
+                            #更新缓存
+                            lastSentence = sentence
+                            lastTagsList = []
+                            lastTags = f.readline().strip().split()
+                            lastTagsList.append(lastTags)
+                            poses = f.readline().strip()
+
+                            sentence = f.readline().strip()
+
+                    #处理缓存
+                    mergedTags = one_merge(lastTagsList)
+                    fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
+                    for lastTags in lastTagsList:
+                        fw2.write(lastSentence + '\n' + ' '.join(mergedTags) + '\n' + poses + '\n' + ' '.join(lastTags) + '\n')
+            print(NUM1)
+            print(NUM2)
+            print(SHARE_EVENT)
 
 
 def one_merge(tagsList):
@@ -644,7 +653,7 @@ def one_merge(tagsList):
     return mergedTags
 
 if __name__ == '__main__':
-    main()
+    # main()
     merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
     print ('end')
     sys.exit(0)

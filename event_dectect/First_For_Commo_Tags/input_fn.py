@@ -61,44 +61,52 @@ def paddingAndEmbedding(fileName,words,tags,posTags,max_sequence_length,noEmbedd
     return (words,min(length,max_sequence_length),posTags,triggerFlags),tags
 
 
-def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentences_words_posTags=None,):
+def generator_fn(input_dir,max_sequence_length,dirs,noEmbedding=False,sentences_words_posTags=None,):
     result = []
     if(sentences_words_posTags):
         for one_sentence_words_posTags in sentences_words_posTags:
             result.append(paddingAndEmbedding('sentence', one_sentence_words_posTags[0], one_sentence_words_posTags[1], one_sentence_words_posTags[2], max_sequence_length, noEmbedding))
     elif(input_dir):
-        for input_file in os.listdir(input_dir):
-            with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:
-                sentence = f.readline()#句子行
-                while sentence:
-                    #标记行
-                    label = f.readline()
-                    pos = f.readline()
-                    if not label:
-                        break
-                    words = sentence.strip().split(' ')
-                    words = list(filter(lambda word:word!='',words))
+        dirs = dirs.split(',')
+        for dir in os.listdir(input_dir):
+            #03 36 69
+            dir_path = os.path.join(input_dir,dir)
+            for sub_dir in os.listdir(dir_path):
+                if(sub_dir not in dirs):
+                    continue
+                sub_dir_path = os.path.join(dir_path,sub_dir)
+                for input_file in os.listdir(sub_dir_path):
+                    with open(os.path.join(sub_dir_path,input_file),'r',encoding='utf8') as f:
+                        sentence = f.readline()#句子行
+                        while sentence:
+                            #标记行
+                            label = f.readline()
+                            pos = f.readline()
+                            if not label:
+                                break
+                            words = sentence.strip().split(' ')
+                            words = list(filter(lambda word:word!='',words))
 
-                    tags = label.strip().split(' ')
-                    tags = list(filter(lambda word:word!='',tags))
+                            tags = label.strip().split(' ')
+                            tags = list(filter(lambda word:word!='',tags))
 
-                    posTags = pos.strip().split(' ')
-                    posTags = list(filter(lambda word:word!='',posTags))
+                            posTags = pos.strip().split(' ')
+                            posTags = list(filter(lambda word:word!='',posTags))
 
-                    sentence = f.readline()
+                            sentence = f.readline()
 
-                    if (len(words) != len(tags) or len(tags)!=len(posTags)):
-                        print(input_file, ' words、labels、pos数不匹配：' + sentence + ' words length:' + str(
-                            len(words)) + ' labels length:' + str(len(tags))+' pos length:'+str(len(posTags)))
-                        continue
-                    result.append(paddingAndEmbedding(input_file,words,tags,posTags,max_sequence_length,noEmbedding))
+                            if (len(words) != len(tags) or len(tags)!=len(posTags)):
+                                print(input_file, ' words、labels、pos数不匹配：' + sentence + ' words length:' + str(
+                                    len(words)) + ' labels length:' + str(len(tags))+' pos length:'+str(len(posTags)))
+                                continue
+                            result.append(paddingAndEmbedding(input_file,words,tags,posTags,max_sequence_length,noEmbedding))
     return result
 
-def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentences_words_posTags=None):
+def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,dirs,sentences_words_posTags=None):
     shapes = (([max_sequence_length,CONFIG.WV.vector_size],(),[max_sequence_length,CONFIG.POSs_LEN],[max_sequence_length,1]),[max_sequence_length])
     types = ((tf.float32,tf.int32,tf.float32,tf.float32),tf.int32)
     dataset = tf.data.Dataset.from_generator(
-        functools.partial(generator_fn,input_dir=input_dir,sentences_words_posTags=sentences_words_posTags,max_sequence_length = max_sequence_length),
+        functools.partial(generator_fn,input_dir=input_dir,sentences_words_posTags=sentences_words_posTags,max_sequence_length = max_sequence_length,dirs=dirs),
         output_shapes=shapes,
         output_types=types
     )
@@ -159,4 +167,10 @@ def labelTrigger(words, labeled,beginIndex,endIndex,tag):
     return words,labeled
 
 if __name__ == '__main__':
-    pass
+    str = "1,2,3,4,5,6"
+    strs = str.split(',')
+    s = set(strs)
+    if('1' in strs):
+        print('success')
+    if('1' in s):
+        print('success')

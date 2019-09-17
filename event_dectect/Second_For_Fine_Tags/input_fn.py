@@ -71,38 +71,46 @@ def paddingAndEmbedding(fileName,words,tags,pre_tags,max_sequence_length,noEmbed
     return (words,min(length,max_sequence_length),oneHotOldTags,triggerFeatures),pre_tags
 
 
-def generator_fn(input_dir,max_sequence_length,noEmbedding=False,sentence_words_firstTags_trueTriggerTags=None):
+def generator_fn(input_dir,dirs,max_sequence_length,noEmbedding=False,sentence_words_firstTags_trueTriggerTags=None):
     result = []
     if(sentence_words_firstTags_trueTriggerTags):
         for one_sentence_words_firstTags_trueTriggerTags in sentence_words_firstTags_trueTriggerTags:
             result.append(paddingAndEmbedding('sentence', one_sentence_words_firstTags_trueTriggerTags[0], one_sentence_words_firstTags_trueTriggerTags[1],one_sentence_words_firstTags_trueTriggerTags[2],max_sequence_length, noEmbedding))
     elif(input_dir):
-        for input_file in os.listdir(input_dir):
-            with open(os.path.join(input_dir,input_file),'r',encoding='utf8') as f:
-                sentence = f.readline()#句子行
-                while sentence:
-                    #原词行
-                    words = sentence.strip().split()
-                    #第一个模型的预测标签行
-                    tags = f.readline().strip().split()
-                    #pos行，丢弃
-                    f.readline()
-                    #针对单个触发词时的真实标签行
-                    pre_tags = f.readline().strip().split()
-                    sentence = f.readline()
-                    if (len(words) != len(tags)):
-                        print(input_file, ' words、labels数不匹配：' + sentence + ' words length:' + str(
-                            len(words)) + ' labels length:' + str(len(tags)))
-                        continue
-                    result.append(paddingAndEmbedding(input_file,words,tags,pre_tags,max_sequence_length,noEmbedding))
+        dirs = dirs.split(',')
+        for dir in os.listdir(input_dir):
+            # 03 36 69
+            dir_path = os.path.join(input_dir, dir)
+            for sub_dir in os.listdir(dir_path):
+                if (sub_dir not in dirs):
+                    continue
+                sub_dir_path = os.path.join(dir_path, sub_dir)
+                for input_file in os.listdir(sub_dir_path):
+                    with open(os.path.join(sub_dir_path, input_file), 'r', encoding='utf8') as f:
+                        sentence = f.readline()#句子行
+                        while sentence:
+                            #原词行
+                            words = sentence.strip().split()
+                            #第一个模型的预测标签行
+                            tags = f.readline().strip().split()
+                            #pos行，丢弃
+                            f.readline()
+                            #针对单个触发词时的真实标签行
+                            pre_tags = f.readline().strip().split()
+                            sentence = f.readline()
+                            if (len(words) != len(tags)):
+                                print(input_file, ' words、labels数不匹配：' + sentence + ' words length:' + str(
+                                    len(words)) + ' labels length:' + str(len(tags)))
+                                continue
+                            result.append(paddingAndEmbedding(input_file,words,tags,pre_tags,max_sequence_length,noEmbedding))
     return result
 
-def input_fn(input_dir,shuffe,num_epochs,batch_size,max_sequence_length,sentence_words_firstTags_trueTriggerTags=None):
+def input_fn(input_dir,dirs,shuffe,num_epochs,batch_size,max_sequence_length,sentence_words_firstTags_trueTriggerTags=None):
     '''shape代表((最大句长，词向量长),真实句长，（最大句长，新Trigger类别),(最大句长，旧参数类别)),真实标签)'''
     shapes = (([max_sequence_length,CONFIG.WV.vector_size],(),[max_sequence_length,len(CONFIG.ARGU_TAGs)+len(CONFIG.TRIGGER_TAGs)],[max_sequence_length,1]),[max_sequence_length])
     types = ((tf.float32,tf.int32,tf.float32,tf.float32),tf.int32)
     dataset = tf.data.Dataset.from_generator(
-        functools.partial(generator_fn,input_dir=input_dir,sentence_words_firstTags_trueTriggerTags=sentence_words_firstTags_trueTriggerTags,max_sequence_length = max_sequence_length),
+        functools.partial(generator_fn,input_dir=input_dir,dirs=dirs,sentence_words_firstTags_trueTriggerTags=sentence_words_firstTags_trueTriggerTags,max_sequence_length = max_sequence_length),
         output_shapes=shapes,
         output_types=types
     )

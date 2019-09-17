@@ -8,8 +8,8 @@ __author__ = '13314409603@163.com'
 
 def getParser():
     # 构造参数
-    rootPath = 'A:\Bi-LSTM+CRF'
-    # rootPath = '/root/lstm_crf/data'
+    # rootPath = 'A:\Bi-LSTM+CRF'
+    rootPath = '/root/lstm_crf/data'
     ltpPath = os.path.join(rootPath, 'ltp_data_v3.4.0')
     parser = argparse.ArgumentParser(description='Bi-LSTM+CRF')
     parser.add_argument('--root_dir', help='root dir', default=rootPath)
@@ -38,6 +38,9 @@ def getParser():
                         default=os.path.join(ltpPath, 'userDict.txt'))
     parser.add_argument('--word2vec_path', help='word2vecpath', default=os.path.join(rootPath, 'word2vec'))
     parser.add_argument('--embedded_dim', help='wordembeddeddim', default=300)
+    parser.add_argument('--test_folder',default='10')
+    parser.add_argument('--dev_folder',default='9')
+    parser.add_argument('--train_folder',default='1,2,3,4,5,6,7,8')
     FLAGS, args = parser.parse_known_args()
     return FLAGS
 
