@@ -25,11 +25,11 @@ def predict():
     result = []
     if(isinstance(paragraphs,list)):
         for paragraph in paragraphs:
-            events = extractor.extractor2(paragraph)
+            events = extractor.extractor(paragraph)
             relations = relation_detect(events)
             result.append({'events':events,'relations':relations})
     elif(isinstance(paragraphs,str)):
-        events = extractor.extractor2(paragraphs)
+        events = extractor.extractor(paragraphs)
         relations = relation_detect(events)
         result.append({'events': events, 'relations': relations})
 

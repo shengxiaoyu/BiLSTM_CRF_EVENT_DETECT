@@ -25,6 +25,36 @@ def EventFactory(event_argu_dict,event_argus_index_pair_dict,sentence):
     event =  eventDict[event_argu_dict['Type']](event_argu_dict,event_argus_index_pair_dict,sentence)
     return event
 
+#单句单事件构造,准确地基于标签类型
+def EventFactory2(words,tags):
+    eventDict = {
+        'Know': Know,
+        'BeInLove': BeInLove,
+        'Marry': Marray,
+        'Remarry': Remarray,
+        'Bear': Bear,
+        'FamilyConflict': FamilyConflict,
+        'DomesticViolence': DomesticViolence,
+        'BadHabit': BadHabit,
+        'Derailed': Derailed,
+        'Separation': Separation,
+        'DivorceLawsuit': DivorceLawsuit,
+        'Wealth': Wealth,
+        'Debt': Debt,
+        'Credit': Credit,
+    }
+    type = ''
+    for tag in tags:
+        if(tag.find('_Trigger')!=-1):
+            type = tag[2:-8]
+            break
+    if(type in eventDict):
+        event = eventDict[type].to_simple_model(type,words,tags)
+        event.fit_arguments_by_spe(words,tags)
+        return event
+    else:
+        return None
+
 class baseModel(object):
     def __init__(self,argu_dict,event_argus_index_pair_dict,sentence):
         self.trigger = argu_dict['Trigger']
@@ -65,6 +95,12 @@ class baseModel(object):
 
         return targetWord
 
+    def fit_arguments_by_spe(self, words, new_tags):
+        """传入分词和标签列表，从中选择参数"""
+        raise NotImplementedError()
+
+    def get_score(self):
+        raise NotImplementedError()
 
 #相识事实有一个时间参数，往前找
 class Know(baseModel):
@@ -77,6 +113,22 @@ class Know(baseModel):
         str = self.negated+' '+self.time+' '+self.trigger
         return str.strip()
 
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.time = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_Know_Time') != -1):
+                self.time = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Know_Time'):
+                        self.time = self.time + words[theIndex]
+                break
+
+    def get_score(self):
+        score = 1
+        if (self.time != None and self.time != ''):
+            score += 1
+        return score
+
 class BeInLove(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
         baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
@@ -87,6 +139,22 @@ class BeInLove(baseModel):
     def __str__(self):
         str =  self.negated+' '+self.time + ' ' + self.trigger
         return str.strip()
+
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.time = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_BeInLove_Time') != -1):
+                self.time = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_BeInLove_Time'):
+                        self.time = self.time + words[theIndex]
+                break
+
+    def get_score(self):
+        score = 1
+        if (self.time != None and self.time != ''):
+            score += 1
+        return score
 
 class Marray(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
@@ -99,6 +167,23 @@ class Marray(baseModel):
         str =  self.negated+' '+self.time + ' ' + self.trigger
         return str.strip()
 
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.time = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_Marry_Time') != -1):
+                self.time = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Marry_Time'):
+                        self.time = self.time + words[theIndex]
+                break
+
+    def get_score(self):
+        score = 1
+        if (self.time != None and self.time != ''):
+            score += 1
+        return score
+
+
 class Remarray(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
         baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
@@ -109,6 +194,21 @@ class Remarray(baseModel):
         str =  self.negated+' '+self.participant+' '+self.trigger
         return str.strip()
 
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.person = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_Remarry_Participant') != -1):
+                self.person = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Remarry_Participant'):
+                        self.person = self.person + words[theIndex]
+                break
+
+    def get_score(self):
+        score = 1
+        if (self.person != None and self.person != ''):
+            score += 1
+        return score
 
 class Bear(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
@@ -132,12 +232,57 @@ class Bear(baseModel):
               +((self.childName + ' ') if len(self.childName) > 0 else '') +((self.age + ' ') if len(self.age) > 0 else '')
         return str.strip()
 
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.dateOfBirth = ''
+        self.gender = ''
+        self.childName = ''
+        self.childAge = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_Bear_DateOfBirth') != -1):
+                self.dateOfBirth = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Bear_DateOfBirth'):
+                        self.dateOfBirth = self.dateOfBirth + words[theIndex]
+            if (tag.find('B_Bear_Gender') != -1):
+                self.gender = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Bear_Gender'):
+                        self.gender = self.gender + words[theIndex]
+            if (tag.find('B_Bear_ChildName') != -1):
+                self.childName = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Bear_ChildName'):
+                        self.childName = self.childName + words[theIndex]
+            if (tag.find('B_Bear_Age') != -1):
+                self.childAge = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Bear_Age'):
+                        self.childAge = self.childAge + words[theIndex]
+
+    def get_score(self):
+        score = 1
+        if (self.dateOfBirth != None and self.dateOfBirth != ''):
+            score += 1
+        if (self.gender != None and self.gender != ''):
+            score += 1
+        if (self.childName != None and self.childName != ''):
+            score += 1
+        if (self.childAge != None and self.childAge != ''):
+            score += 1
+        return score
+
 class FamilyConflict(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
         baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
     def __str__(self):
         return self.trigger
 
+    def fit_arguments_by_spe(self, words, new_tags):
+        return
+
+    def get_score(self):
+        score = 1
+        return score
 class DomesticViolence(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
         baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
@@ -158,6 +303,28 @@ class DomesticViolence(baseModel):
 
         return str.strip()
 
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.victim = ''
+        self.perpetrator = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_DomesticViolence_Victim') != -1):
+                self.victim = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_DomesticViolence_Victim'):
+                        self.victim = self.victim + words[theIndex]
+            if (tag.find('B_DomesticViolence_Perpetrators') != -1):
+                self.perpetrator = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_DomesticViolence_Perpetrators'):
+                        self.perpetrator = self.perpetrator + words[theIndex]
+
+    def get_score(self):
+        score = 1
+        if (self.victim != None and self.victim != ''):
+            score += 1
+        if (self.perpetrator != None and self.perpetrator != ''):
+            score += 1
+        return score
 class BadHabit(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
         baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
@@ -170,6 +337,21 @@ class BadHabit(baseModel):
         str = self.negated+' '+((self.person+' ') if len(self.person)>0 else '')+self.trigger
         return str.strip()
 
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.person = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_BadHabit_Participant') != -1):
+                self.person = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_BadHabit_Participant'):
+                        self.person = self.person + words[theIndex]
+                break
+
+    def get_score(self):
+        score = 1
+        if (self.person != None and self.person != ''):
+            score += 1
+        return score
 #出轨
 class Derailed(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
@@ -185,6 +367,29 @@ class Derailed(baseModel):
     def __str__(self):
         str = self.negated+' '+((self.time+' ') if len(self.time)>0 else '')+((self.derailer+' ') if len(self.derailer)>0 else '')+self.trigger
         return str.strip()
+
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.derailer = ''
+        self.time = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_Derailed_Derailer') != -1):
+                self.derailer = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Derailed_Derailer'):
+                        self.derailer = self.derailer + words[theIndex]
+            if (tag.find('B_Derailed_Time') != -1):
+                self.time = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Derailed_Time'):
+                        self.time = self.time + words[theIndex]
+
+    def get_score(self):
+        score = 1
+        if (self.derailer != None and self.derailer != ''):
+            score += 1
+        if (self.time != None and self.time != ''):
+            score += 1
+        return score
 
 class Separation(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
@@ -205,6 +410,38 @@ class Separation(baseModel):
     def __str__(self):
         str = self.negated+' '+((self.beginTime+' ') if len(self.beginTime)>0 else '')+self.trigger+' '+((self.endTime+' ') if len(self.endTime)>0 else '')+((self.duration+' ') if len(self.duration)>0 else '')
         return str.strip()
+
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.beginTime = ''
+        self.endTime = ''
+        self.duration = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_Separation_BeginTime') != -1):
+                self.beginTime = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Separation_BeginTime'):
+                        self.beginTime = self.beginTime + words[theIndex]
+            if (tag.find('B_Separation_EndTime') != -1):
+                self.endTime = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Separation_EndTime'):
+                        self.endTime = self.endTime + words[theIndex]
+            if (tag.find('B_Separation_Duration') != -1):
+                self.duration = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Separation_Duration'):
+                        self.duration = self.duration + words[theIndex]
+
+    def get_score(self):
+        score = 1
+        if (self.beginTime != None and self.beginTime != ''):
+            score += 1
+        if (self.endTime != None and self.endTime != ''):
+            score += 1
+        if (self.duration != None and self.duration != ''):
+            score += 1
+        return score
+
 class DivorceLawsuit(baseModel):
 
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
@@ -234,6 +471,60 @@ class DivorceLawsuit(baseModel):
         self.result_index_pair = event_argus_index_pair_dict['DivorceLawsuit_Result'] if (
                 'DivorceLawsuit_Result' in event_argus_index_pair_dict) else None
 
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.sueTime = ''
+        self.initiator = ''
+        self.court = ''
+        self.judgeTime = ''
+        self.judgeDocument = ''
+        self.result = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_DivorceLawsuit_SueTime') != -1):
+                self.sueTime = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_DivorceLawsuit_SueTime'):
+                        self.sueTime = self.sueTime + words[theIndex]
+            if (tag.find('B_DivorceLawsuit_Initiator') != -1):
+                self.initiator = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_DivorceLawsuit_Initiator'):
+                        self.initiator = self.initiator + words[theIndex]
+            if (tag.find('B_DivorceLawsuit_Court') != -1):
+                self.court = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_DivorceLawsuit_Court'):
+                        self.court = self.court + words[theIndex]
+            if (tag.find('B_DivorceLawsuit_JudgeTime') != -1):
+                self.judgeTime = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_DivorceLawsuit_JudgeTime'):
+                        self.judgeTime = self.judgeTime + words[theIndex]
+            if (tag.find('B_DivorceLawsuit_JudgeDocument') != -1):
+                self.judgeDocument = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_DivorceLawsuit_JudgeDocument'):
+                        self.judgeDocument = self.judgeDocument + words[theIndex]
+            if (tag.find('B_DivorceLawsuit_Result') != -1):
+                self.result = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_DivorceLawsuit_Result'):
+                        self.result = self.result + words[theIndex]
+
+    def get_score(self):
+        score = 1
+        if (self.sueTime != None and self.sueTime != ''):
+            score += 1
+        if (self.initiator != None and self.initiator != ''):
+            score += 1
+        if (self.court != None and self.court != ''):
+            score += 1
+        if (self.result != None and self.result != ''):
+            score += 1
+        if (self.judgeTime != None and self.judgeTime != ''):
+            score += 1
+        if (self.judgeDocument != None and self.judgeDocument != ''):
+            score += 1
+        return score
 class Wealth(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
         baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
@@ -255,6 +546,45 @@ class Wealth(baseModel):
                 'Wealth_Whose' in event_argus_index_pair_dict) else None
     def __str__(self):
         return self.trigger
+
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.value = ''
+        self.isCommon = ''
+        self.isPersonal = ''
+        self.whose = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_Wealth_Value') != -1):
+                self.value = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Wealth_Value'):
+                        self.value = self.value + words[theIndex]
+            if (tag.find('B_Wealth_IsCommon') != -1):
+                self.isCommon = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Wealth_IsCommon'):
+                        self.isCommon = self.isCommon + words[theIndex]
+            if (tag.find('B_Wealth_IsPersonal') != -1):
+                self.isPersonal = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Wealth_IsPersonal'):
+                        self.isPersonal = self.isPersonal + words[theIndex]
+            if (tag.find('B_Wealth_Whose') != -1):
+                self.whose = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Wealth_Whose'):
+                        self.whose = self.whose + words[theIndex]
+
+    def get_score(self):
+        score = 1
+        if (self.value != None and self.value != ''):
+            score += 1
+        if (self.isCommon != None and self.isCommon != ''):
+            score += 1
+        if (self.isPersonal != None and self.isPersonal != ''):
+            score += 1
+        if (self.whose != None and self.whose != ''):
+            score += 1
+        return score
 class Debt(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
         baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
@@ -266,6 +596,29 @@ class Debt(baseModel):
                 'Debt_Value' in event_argus_index_pair_dict) else None
     def __str__(self):
         return self.trigger
+
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.value = ''
+        self.creditor = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_Debt_Value') != -1):
+                self.value = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Debt_Value'):
+                        self.value = self.value + words[theIndex]
+            if (tag.find('B_Debt_Creditor') != -1):
+                self.creditor = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Debt_Creditor'):
+                        self.creditor = self.creditor + words[theIndex]
+
+    def get_score(self):
+        score = 1
+        if (self.value != None and self.value != ''):
+            score += 1
+        if (self.creditor != None and self.creditor != ''):
+            score += 1
+        return score
 class Credit(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
         baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
@@ -279,5 +632,27 @@ class Credit(baseModel):
     def __str__(self):
         return self.trigger
 
+    def fit_arguments_by_spe(self, words, new_tags):
+        self.value = ''
+        self.debtor = ''
+        for index, tag in enumerate(new_tags):
+            if (tag.find('B_Credit_Debtor') != -1):
+                self.debtor = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Credit_Debtor'):
+                        self.debtor = self.debtor + words[theIndex]
+            if (tag.find('B_Credit_Value') != -1):
+                self.value = words[index]
+                for theIndex in range(index + 1, len(new_tags)):
+                    if (new_tags[theIndex] == 'I_Credit_Value'):
+                        self.value = self.value + words[theIndex]
+
+    def get_score(self):
+        score = 1
+        if (self.value != None and self.value != ''):
+            score += 1
+        if (self.debtor != None and self.debtor != ''):
+            score += 1
+        return score
 if __name__ == '__main__':
     sys.exit(0)
