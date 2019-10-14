@@ -55,6 +55,9 @@ class Event(object):
                 event._setArgu(argu_type, argus[argu_type])
             return event
         return None
+
+
+
     def __init__(self, id, type, trigger):
         self.id = id.strip()
         self.type = type

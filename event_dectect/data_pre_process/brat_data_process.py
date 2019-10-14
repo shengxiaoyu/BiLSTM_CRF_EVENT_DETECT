@@ -165,6 +165,8 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 else:
                     # 事件参数处理
                     entity = entitiesDict.get(paramter[1])
+                    if(paramter[0]=='Negation'):
+                        entity.setName(paramter[0])
                     entity.setName(event.getType() + '_' + paramter[0])
                     event.addArgument(entity)
             events.append(event)
@@ -453,10 +455,11 @@ def main():
         segmentor_user_dict_path=os.path.join(ltp_path, 'userDict.txt'),
         pos_model_path=os.path.join(ltp_path, 'pos.model'),
         stop_words_path=os.path.join(base_path, 'newStopWords.txt'),
-        # trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
-        trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
-        # argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
-        argu_labels_path=os.path.join(base_path,'argumentLabels.txt'))
+        trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
+        # trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
+        argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
+        # argu_labels_path=os.path.join(base_path,'argumentLabels.txt')
+        )
 
 
 #将spe模型下的单句合并为full下的句子
@@ -523,8 +526,6 @@ secondeTag_2_firstTag = {
     'I_Credit_Debtor':'I_Person',
     'B_Credit_Value':'B_Price',
     'I_Credit_Value':'I_Price',
-    'B_Negated':'B_Negated',
-    'I_Negated':'I_Negated',
     'B_Know_Trigger':'B_Know',
     'I_Know_Trigger':'I_Know',
     'B_BeInLove_Trigger':'B_BeInLove',
@@ -553,6 +554,8 @@ secondeTag_2_firstTag = {
     'I_Debt_Trigger':'I_Debt',
     'B_Credit_Trigger':'B_Credit',
     'I_Credit_Trigger':'I_Credit',
+    'B_Negation': 'B_Negated',
+    'I_Negation': 'I_Negated',
     'O':'O',
 }
 

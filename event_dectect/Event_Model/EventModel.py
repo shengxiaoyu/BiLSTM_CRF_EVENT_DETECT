@@ -22,10 +22,10 @@ def EventFactory(event_argu_dict,event_argus_index_pair_dict,sentence):
         'Debt': Debt,
         'Credit': Credit,
     }
-    event =  eventDict[event_argu_dict['Type']](event_argu_dict,event_argus_index_pair_dict,sentence)
+    event = eventDict[event_argu_dict['Type']](event_argu_dict,event_argus_index_pair_dict,sentence)
     return event
 
-#单句单事件构造,准确地基于标签类型
+#单句单事件构造,从准确地基于标签类型
 def EventFactory2(words,tags):
     eventDict = {
         'Know': Know,
@@ -55,7 +55,29 @@ def EventFactory2(words,tags):
     else:
         return None
 
+#根据第一层预测结果基于规则生成事件
+def EventFactory3(type, completeTriggerWord, tag_index_pair, sentence, index_pairs, words, tags):
+    eventDict = {
+        'Know':Know,
+        'BeInLove':BeInLove,
+        'Marry':Marray,
+        'Remarry':Remarray,
+        'Bear':Bear,
+        'FamilyConflict':FamilyConflict,
+        'DomesticViolence':DomesticViolence,
+        'BadHabit':BadHabit,
+        'Derailed':Derailed,
+        'Separation':Separation,
+        'DivorceLawsuit':DivorceLawsuit,
+        'Wealth':Wealth,
+        'Debt':Debt,
+        'Credit':Credit,
+    }
+    return eventDict[type](type, completeTriggerWord, tag_index_pair, sentence, index_pairs, words, tags)
+
 class baseModel(object):
+
+
     def __init__(self,argu_dict,event_argus_index_pair_dict,sentence):
         self.trigger = argu_dict['Trigger']
         self.type = argu_dict['Type']

@@ -13,7 +13,7 @@ from event_dectect.First_For_Commo_Tags import config_center as CONFIG,input_fn 
 
 
 #训练、评估、预测,sentece:要预测的句子
-def main(FLAGS,sentences=None,dir=None):
+def main(FLAGS,sentences=None,dir=None,output_path=None):
     print(FLAGS)
 
     tf.enable_eager_execution()
@@ -22,6 +22,8 @@ def main(FLAGS,sentences=None,dir=None):
 
     # 在re train 的时候，才删除上一轮产出的文件，在predicted 的时候不做clean
     output_dir = os.path.join(FLAGS.root_dir,'output_'+str(FLAGS.num_epochs)+'_'+str(FLAGS.batch_size)+'_'+FLAGS.sentence_mode)
+    if(output_path):
+        output_dir = os.path.join(FLAGS.root_dir,output_path)
     if FLAGS.ifTrain:
         if os.path.exists(output_dir):
             def del_file(path):
