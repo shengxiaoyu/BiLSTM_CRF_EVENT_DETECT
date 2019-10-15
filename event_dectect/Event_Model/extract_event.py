@@ -55,7 +55,11 @@ class Extractor(object):
             return []
         words_list,first_tags_list,index_pairs_list = first.main(self.FLAGS, sentences,output_path=self.first_output_path)
         print('第二个模型预测')
-        words_list,second_tags_list,index_pairs_list,sentences,speakers = self.second_label([words_list,first_tags_list,index_pairs_list,sentences,speakers])
+        if(self.FLAGS.second_label):
+            words_list,second_tags_list,index_pairs_list,sentences,speakers = self.second_label([words_list,first_tags_list,index_pairs_list,sentences,speakers])
+        else:
+            words_list,second_tags_list,index_pairs_list,sentences,speakers = self.argu_match_base(words_list,first_tags_list,index_pairs_list,sentences,speakers)
+
 
         events = []
         id_index = 0
@@ -72,16 +76,31 @@ class Extractor(object):
         return second.main(self.FLAGS,words_firstTags_indxPairs_sentences_speaker=words_firstTags_indxPairs_sentences_speaker,output_path=self.second_output_path)
 
     '''第一层模型预测之后基于规则匹配'''
-    def argu_match_base(self,words_list,first_tags_list,index_pairs_list,sentences):
-        tags_list = []
-        for words, tags, words_in_sentence_index_pair, sentence in zip(words_list, first_tags_list,
-                                                                       index_pairs_list, sentences):
-            tags_list.extend(self.__get_final_tags_from_base_tags(words, tags, words_in_sentence_index_pair, sentence))
+    def argu_match_base(self,words_list,first_tags_list,index_pairs_list,sentences,speakers):
+        words_lists=[]
+        second_tags_lists=[]
+        index_pairs_lists=[]
+        sentencess=[]
+        speakerss = []
+        
+        for words, tags, words_in_sentence_index_pair, sentence, speaker in zip(words_list, first_tags_list,
+                                                                       index_pairs_list, sentences,speakers):
+            words_list, second_tags_list, index_pairs_list, sentences, speakers = self.__get_final_tags_from_base_tags(words, tags, words_in_sentence_index_pair, sentence,speaker)
+            words_lists.extend(words_list)
+            second_tags_lists.extend(second_tags_list)
+            index_pairs_lists.extend(index_pairs_list)
+            sentencess.extend(sentences)
+            speakerss.extend(speakers)
+        return words_lists,second_tags_lists,index_pairs_lists,sentencess,speakerss
 
-    def __get_final_tags_from_base_tags(self, words, tags, words_in_sentence_index_pairs, sentence):
+    def __get_final_tags_from_base_tags(self, words,tags,words_in_sentence_index_pair, sentence,speaker):
         # 获取触发词tag
         triggers = CONFIG.TRIGGER_TAGs
-        tags_list = []
+        words_list=[]
+        second_tags_list=[]
+        index_pairs_list=[]
+        sentences=[]
+        speakers = []
         for index, tag in enumerate(tags):
             if (tag in triggers and tag.find('B_') != -1):
                 '''发现触发词'''
@@ -95,52 +114,151 @@ class Extractor(object):
                         tag_index_pair[1] += 1
                     else:
                         break
-                tags_list.append(self.__get_final_tag(type,tag_index_pair,tags))
-        return tags_list
+                words_list.append([x for x in words])
+                second_tags_list.append(self.__get_final_tag(type,tag_index_pair,tags,sentence))
+                index_pairs_list.append([x for x in words_in_sentence_index_pair])
+                sentences.append(sentence)
+                speakers.append(speaker)
+        return words_list, second_tags_list, index_pairs_list, sentences, speakers
 
-    def __get_final_tag(self,type,index_pair,first_tags_list):
+    def __get_final_tag(self,type,index_pair,first_tags_list,sentence):
         final_tags = ['O' for _ in first_tags_list]
         self.__label__(final_tags,index_pair[0],index_pair[1],type+'_Trigger')
 
         negated_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Negated')
         if (not negated_index_pair):
             negated_index_pair = self.__findBack__(index_pair[1], first_tags_list, 'Negated')
-        if (not negated_index_pair):
+        if (negated_index_pair):
             self.__label__(final_tags, negated_index_pair[0], negated_index_pair[1], 'Negation')
 
         if(type=='Know'):
             time_index_pair = self.__findFoward__(index_pair[0],first_tags_list,'Time')
-            if(not time_index_pair):
+            if(time_index_pair):
                 self.__label__(final_tags,time_index_pair[0],time_index_pair[1],type+'_Time')
         elif(type=='BeInLove'):
             time_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
-            if (not time_index_pair):
+            if (time_index_pair):
                 self.__label__(final_tags, time_index_pair[0], time_index_pair[1], type + '_Time')
         elif(type=='Marry'):
             time_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
-            if (not time_index_pair):
+            if (time_index_pair):
                 self.__label__(final_tags, time_index_pair[0], time_index_pair[1], type + '_Time')
         elif(type=='Remarry'):
             participant_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Person')
-            if (not participant_index_pair):
+            if (participant_index_pair):
                 self.__label__(final_tags, participant_index_pair[0], participant_index_pair[1], type + '_Participant')
         elif(type=='Bear'):
             dateOfBirth_index_pair = self.__findFoward__(index_pair[0],first_tags_list,'Time')
-            if(not dateOfBirth_index_pair):
+            if(dateOfBirth_index_pair):
                 self.__label__(final_tags,dateOfBirth_index_pair[0],dateOfBirth_index_pair[1],type+'_DateOfBirth')
 
-            gender_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Gender')
-            if (not gender_index_pair):
+            gender_index_pair = self.__findBack__(index_pair[1], first_tags_list, 'Gender')
+            if (gender_index_pair):
                 self.__label__(final_tags, gender_index_pair[0], gender_index_pair[1], type + '_Gender')
 
-            childName_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Name')
-            if (not gender_index_pair):
+            childName_index_pair = self.__findBack__(index_pair[1], first_tags_list, 'Name')
+            if (childName_index_pair):
                 self.__label__(final_tags, childName_index_pair[0], childName_index_pair[1], type + '_ChildName')
 
-            age_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Age')
-            if (not gender_index_pair):
+            age_index_pair = self.__findBack__(index_pair[1], first_tags_list, 'Age')
+            if (age_index_pair):
                 self.__label__(final_tags, age_index_pair[0], age_index_pair[1], type + '_Age')
-        pass
+        elif(type=='DomesticViolence'):
+            if(sentence.find('被')!=-1):
+                perpetrators = self.__findFoward__(index_pair[0],first_tags_list,'Person',quickStop=True)
+                if (perpetrators):
+                    self.__label__(final_tags, perpetrators[0], perpetrators[1], type + '_Perpetrators')
+                victim = self.__findFoward__(index_pair[0],first_tags_list,'Person')
+                if (victim):
+                    self.__label__(final_tags, victim[0], victim[1], type + '_Victim')
+            else:
+                perpetrators = self.__findFoward__(index_pair[0],first_tags_list,'Person')
+                if (perpetrators):
+                    self.__label__(final_tags, perpetrators[0], perpetrators[1], type + '_Perpetrators')
+                victim = self.__findBack__(index_pair[1],first_tags_list,'Person')
+                if (victim):
+                    self.__label__(final_tags, victim[0], victim[1], type + '_Victim')
+            time = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
+            if (time):
+                self.__label__(final_tags, time[0], time[1], type + '_Time')
+        elif(type=='BadHabit'):
+            perpetrators = self.__findFoward__(index_pair[0], first_tags_list, 'Person')
+            if ( perpetrators):
+                self.__label__(final_tags, perpetrators[0], perpetrators[1], type + '_Perpetrators')
+        elif(type=='Derailed'):
+            time = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
+            if ( time):
+                self.__label__(final_tags, time[0], time[1], type + '_Time')
+            derailer = self.__findFoward__(index_pair[0], first_tags_list, 'Person')
+            if( derailer):
+                self.__label__(final_tags, derailer[0], derailer[1], type + '_Derailer')
+        elif(type=='Separation'):
+            beginTime = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
+            if( beginTime):
+                self.__label__(final_tags, beginTime[0], beginTime[1], type + '_BeginTime')
+            endTime = self.__findBack__(index_pair[1],first_tags_list,'Time')
+            if( endTime):
+                self.__label__(final_tags,endTime[0],endTime[1],type+'_EndTime')
+            duration = self.__findBack__(index_pair[1], first_tags_list, 'Duration')
+            if ( endTime):
+                self.__label__(final_tags, duration[0], duration[1], type + '_Duration')
+        elif(type=='DivorceLawsuit'):
+            sueTime = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
+            if ( sueTime):
+                self.__label__(final_tags, sueTime[0], sueTime[1], type + '_SueTime')
+            initiator = self.__findFoward__(index_pair[0], first_tags_list, 'Person')
+            if ( initiator):
+                self.__label__(final_tags, initiator[0], initiator[1], type + '_Initiator')
+
+            court = self.__findFoward__(index_pair[0], first_tags_list, 'Court')
+            if ( court):
+                court = self.__findBack__(index_pair[1], first_tags_list, 'Court')
+            if ( court):
+                self.__label__(final_tags, court[0], court[1], type+'_Court')
+
+            result = self.__findBack__(index_pair[1], first_tags_list, 'Judgment')
+            if ( result):
+                self.__label__(final_tags, result[0], result[1], type + '_Result')
+            judgeTime = self.__findBack__(index_pair[1], first_tags_list, 'Time')
+            if ( judgeTime):
+                self.__label__(final_tags, judgeTime[0], judgeTime[1], type + '_JudgeTime')
+        elif(type=='Wealth'):
+            value = self.__findFoward__(index_pair[0], first_tags_list, 'Price')
+            if ( value):
+                self.__label__(final_tags, value[0], value[1], type + '_Value')
+
+            isPersonal = self.__findFoward__(index_pair[0], first_tags_list, 'PersonalProperty')
+            if ( isPersonal):
+                isPersonal = self.__findBack__(index_pair[1], first_tags_list, 'PersonalProperty')
+            if ( isPersonal):
+                self.__label__(final_tags, isPersonal[0], isPersonal[1], type + '_IsPersonal')
+
+            isCommon = self.__findFoward__(index_pair[0], first_tags_list, 'CommonProperty')
+            if ( isCommon):
+                isCommon = self.__findBack__(index_pair[1], first_tags_list, 'CommonProperty')
+            if ( isCommon):
+                self.__label__(final_tags, isCommon[0], isCommon[1], type + '_IsCommon')
+
+            whose = self.__findBack__(index_pair[1], first_tags_list, 'Person')
+            if( whose):
+                self.__label__(final_tags, whose[0], whose[1], type + '_Whose')
+        elif(type=='Debt'):
+            creditor = self.__findBack__(index_pair[1],first_tags_list,'Person')
+            if( creditor):
+                self.__label__(final_tags,creditor[0],creditor[1],'_Creditor')
+
+            value = self.__findBack__(index_pair[1], first_tags_list, 'Price')
+            if ( value):
+                self.__label__(final_tags, value[0], value[1], type + '_Value')
+        elif(type=='Credit'):
+            debtor = self.__findBack__(index_pair[1], first_tags_list, 'Person')
+            if ( debtor):
+                self.__label__(final_tags, debtor[0], debtor[1], '_Creditor')
+
+            value = self.__findBack__(index_pair[1], first_tags_list, 'Price')
+            if ( value):
+                self.__label__(final_tags, value[0], value[1], type + '_Value')
+        return final_tags
 
     def __findFoward__ (self,end,tags,target,quickStop=False):
         '''find from 0 to self.trigger_begin_index'''
@@ -156,9 +274,11 @@ class Extractor(object):
                 index_pair[1] = index
                 haveFound=True
                 '''找到完整的'''
-                for index2 in range(index,end):
+                for index2 in range(index+1,end):
                     if(tags[index2]=='I_'+target):
                         index_pair[1]=index2
+                    else:
+                        break
         if(not haveFound):
             return None
         return index_pair
@@ -174,11 +294,14 @@ class Extractor(object):
                 index_pair[1] = end_index
                 hasFound = True
                 '''找到完整的'''
-                for index2 in range(end_index, len(tags)):
+                for index2 in range(end_index+1, len(tags)):
                     if (tags[index2] == 'I_' + target):
                         index_pair[1] = index2
+                    else:
+                        break
                 hasFound=True
                 break
+            end_index+=1
         if(not hasFound):
             return None
         return index_pair

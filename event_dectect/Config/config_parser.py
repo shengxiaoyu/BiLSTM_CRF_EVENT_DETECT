@@ -41,6 +41,7 @@ def getParser():
     parser.add_argument('--test_folder',default='10')
     parser.add_argument('--dev_folder',default='9')
     parser.add_argument('--train_folder',default='1,2,3,4,5,6,7,8')
+    parser.add_argument('--second_label',default=False)
     FLAGS, args = parser.parse_known_args()
     return FLAGS
 
