@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f37fe3ca-cb22-46e0-bc56-0ace397bed4d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event_dectect/Config/config_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/Config/config_parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py" afterDir="false" />
-    </list>
+    <list default="true" id="f37fe3ca-cb22-46e0-bc56-0ace397bed4d" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -229,7 +225,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="953" />
+    <option name="x" value="799" />
+    <option name="y" value="430" />
     <option name="width" value="974" />
     <option name="height" value="1087" />
   </component>
@@ -499,23 +496,23 @@
       <workItem from="1571022563564" duration="2346000" />
       <workItem from="1571063003085" duration="39000" />
       <workItem from="1571063046762" duration="6958000" />
-      <workItem from="1571107707283" duration="5709000" />
+      <workItem from="1571107707283" duration="6002000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="131846000" />
+    <option name="totallyTimeSpent" value="132139000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
+    <frame x="799" y="430" width="974" height="1087" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1734375" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.34759918" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3292683" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.38313007" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.38666666" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.41463414" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />

@@ -200,7 +200,7 @@ class Extractor(object):
             if( endTime):
                 self.__label__(final_tags,endTime[0],endTime[1],type+'_EndTime')
             duration = self.__findBack__(index_pair[1], first_tags_list, 'Duration')
-            if ( endTime):
+            if (duration):
                 self.__label__(final_tags, duration[0], duration[1], type + '_Duration')
         elif(type=='DivorceLawsuit'):
             sueTime = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
@@ -211,7 +211,7 @@ class Extractor(object):
                 self.__label__(final_tags, initiator[0], initiator[1], type + '_Initiator')
 
             court = self.__findFoward__(index_pair[0], first_tags_list, 'Court')
-            if ( court):
+            if (not court):
                 court = self.__findBack__(index_pair[1], first_tags_list, 'Court')
             if ( court):
                 self.__label__(final_tags, court[0], court[1], type+'_Court')
@@ -228,13 +228,13 @@ class Extractor(object):
                 self.__label__(final_tags, value[0], value[1], type + '_Value')
 
             isPersonal = self.__findFoward__(index_pair[0], first_tags_list, 'PersonalProperty')
-            if ( isPersonal):
+            if (not isPersonal):
                 isPersonal = self.__findBack__(index_pair[1], first_tags_list, 'PersonalProperty')
             if ( isPersonal):
                 self.__label__(final_tags, isPersonal[0], isPersonal[1], type + '_IsPersonal')
 
             isCommon = self.__findFoward__(index_pair[0], first_tags_list, 'CommonProperty')
-            if ( isCommon):
+            if (not isCommon):
                 isCommon = self.__findBack__(index_pair[1], first_tags_list, 'CommonProperty')
             if ( isCommon):
                 self.__label__(final_tags, isCommon[0], isCommon[1], type + '_IsCommon')
