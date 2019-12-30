@@ -67,6 +67,8 @@ def paddingAndEmbedding(fileName,words,tags,pre_tags,max_sequence_length,noEmbed
         pre_tags = [NEW_CONFIG.NEW_TAG_2_ID[tag] for tag in pre_tags]
     except:
         print('这个文件tag无法找到正确索引，请检查:'+fileName)
+        print(' '.join(pre_tags))
+        print(NEW_CONFIG.NEW_TAG_2_ID)
 
     return (words,min(length,max_sequence_length),oneHotOldTags,triggerFeatures),pre_tags
 

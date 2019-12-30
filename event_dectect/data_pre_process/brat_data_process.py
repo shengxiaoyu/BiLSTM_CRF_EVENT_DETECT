@@ -168,6 +168,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                     entity.setName(event.getType() + '_' + paramter[0])
                     if (paramter[0] == 'Negation'):
                         entity.setName(paramter[0])
+                        # neg.add(entity.getValue())
                     event.addArgument(entity)
             events.append(event)
 
@@ -322,8 +323,39 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 fw.write('\n')
                 fw.write(' '.join(event.getPosTags()))
                 fw.write('\n')
+                # if ('B_Negation' in event.getTags()):
+                #     begin_Neg = 0
+                #     end_Neg = 0
+                #     begin_Tri = 0
+                #     end_Tri = 0
+                #     the_neg = ''
+                #     for i in range(len(event.getTags())):
+                #         if(event.getTags()[i]=='B_Negation'):
+                #             begin_Neg = i
+                #             end_Neg = i
+                #             the_neg = event.getWords()[i]
+                #         if(event.getTags()[i]=='I_Negation'):
+                #             end_Neg = i
+                #             the_neg = the_neg +'-'+ event.getWords()[i]
+                #         if(event.getTags()[i].find('Trigger')!=-1 and event.getTags()[i].find('B_')!=-1):
+                #             begin_Tri = i
+                #             end_Tri = i
+                #         if(event.getTags()[i].find('Trigger')!=-1 and event.getTags()[i].find('I_')!=-1):
+                #             end_Tri = i
+                #
+                #     the_dis = 0
+                #     if(begin_Neg>begin_Tri):
+                #         the_dis = end_Neg-begin_Tri
+                #     else:
+                #         the_dis = begin_Neg-end_Tri
+                #     if (the_dis in dis):
+                #         dis[the_dis] = dis[the_dis] + 1
+                #     else:
+                #         dis[the_dis] = 1
+                #     neg.add(the_neg)
 
-
+    # dis = {}
+    # neg = set()
 
 
     if(os.path.isdir(labelFilePath)):
@@ -331,7 +363,12 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
     else:
         handlerSingleFile(labelFilePath)
 
-
+    # examples_file = os.path.join(r'A:\研三\学术\test.txt')  # 存储否定的例子
+    # with open(examples_file, 'w', encoding='utf8') as f:
+    #     f.write('\n'.join(neg))
+    #     f.write('\n')
+    #     for key in dis.keys():
+    #         f.write(str(key)+'\t'+str(dis[key])+'\n')
 
     segmentor.release()
     print(eventsType)

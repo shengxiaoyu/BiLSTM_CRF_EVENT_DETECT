@@ -12,7 +12,8 @@ from event_dectect.First_For_Commo_Tags import config_center as CONFIG
 from event_dectect.Second_For_Fine_Tags import config_center as NEW_CONFIG
 from event_dectect.First_For_Commo_Tags import word2vec_lstm_crf_ed as first
 from model import Event
-
+from event_dectect.util.constant import NEGATIONS
+import re
 
 class Extractor(object):
     def __init__(self,first_output_path=None,second_output_path=None):
@@ -61,6 +62,8 @@ class Extractor(object):
         else:
             words_list,second_tags_list,index_pairs_list,sentences,speakers = self.argu_match_base(words_list,first_tags_list,index_pairs_list,sentences,speakers)
 
+        #额外增加处理否定词
+        self.__handle_negation__(words_list,second_tags_list,sentences,index_pairs_list)
 
         events = []
         id_index = 0
@@ -312,7 +315,92 @@ class Extractor(object):
         for index in range(begin+1,end+1):
             tags[index] = 'I_'+tag
 
-#判断是否含有关注事实触发词
+    # def __handle_negation__(self,second_tags_list,sentences,index_pairs_list):
+    #     for tags,sentence,index_pairs in zip(second_tags_list,sentences,index_pairs_list):
+    #         sub_sens = sentence.splite('。|！|？|，|；')
+    #         tags_len = len(tags)
+    #         for i in range(tags_len):
+    #             if(tags[i].find('Trigger')!=-1):
+
+
+    def  __handle_negation__(self,words_list,second_tags_list,sentences,index_pairs_list):
+        for words,tags,sentence,index_pairs in zip(words_list,second_tags_list,sentences,index_pairs_list):
+            #如果已经有否定词了则不找了
+            if('B_Negation' in tags):
+                continue
+            words_len = len(index_pairs)
+
+            #获取触发词的index
+            begin_tri = -1
+            end_tri = -1
+            for i in range(words_len):
+                if(tags[i].find('Trigger')!=-1 and tags[i].find('B_')!=-1):
+                    begin_tri = i
+                    end_tri = i
+                if(tags[i].find('Trigger')!=-1 and tags[i].find('I_')!=-1):
+                    end_tri = i
+
+            if(begin_tri==-1):
+                return
+
+            #规定最多在触发词的前10和后6范围内找
+            begin_index = 0 if(begin_tri-10<0) else begin_tri-10
+            end_index = words_len if(end_tri+6>words_len) else end_tri+6
+
+            #缩小到最小的单句内
+            sub_sens = re.split('，|。|！|？|；',sentence)
+            base_index = 0
+            for sub_sen in sub_sens:
+                #确定是哪一个小句
+                if(base_index<=index_pairs[begin_tri][0] and base_index+len(sub_sen)>=index_pairs[end_tri][1]):
+                    #确定小句的开头
+                    for index_pair_index in range(words_len):
+                        if(index_pairs[index_pair_index][1]>=base_index):
+                            begin_index = index_pair_index
+                            break
+                    #确定小句的结尾
+                    for index_pair_index in range(words_len):
+                        if(index_pairs[index_pair_index][0]>=base_index+len(sub_sen)):
+                            end_index = index_pair_index
+                            break
+                base_index= base_index+len(sub_sen)+1
+            found = False
+
+            #从触发词往前找
+            for i in range(begin_tri-1,begin_index-1,-1):
+                if(found):
+                    break
+                for negation_words in NEGATIONS:
+                    if(words[i]==negation_words[0]):
+                        # 判断是否整个否定词都有
+                        negationg_len = len(negation_words)
+                        if (''.join(words[i:i + negationg_len]) == ''.join(negation_words)):
+                            for target_index in range(negationg_len):
+                                if (target_index == 0):
+                                    tags[i + target_index] = 'B_Negation'
+                                else:
+                                    tags[i + target_index] = 'I_Negation'
+                            found = True
+                            break
+            #从触发词往后找
+            if(found):
+                continue
+            for i in range(end_tri,end_index):
+                if(found):
+                    break
+                for negation_words in NEGATIONS:
+                    if (words[i] == negation_words[0]):
+                        # 判断是否整个否定词都有
+                        negationg_len = len(negation_words)
+                        if (''.join(words[i:i + negationg_len]) == ''.join(negation_words)):
+                            for target_index in range(negationg_len):
+                                if (target_index == 0):
+                                    tags[i + target_index] = 'B_Negation'
+                                else:
+                                    tags[i + target_index] = 'I_Negation'
+                            found = True
+                            break
+    #判断是否含有关注事实触发词
 def ifContainTrigger(sentence):
     # 初始化触发词集
     triggerDict = CONFIG.TRIGGER_WORDS_DICT
@@ -329,7 +417,8 @@ def ifContainTrigger(sentence):
     return True
 if __name__ == '__main__':
     ext = Extractor()
-    events = ext.extractor('原、被告双方1986年上半年经人介绍认识，××××年××月××日在临桂县宛田乡政府登记结婚，××××年××月××日生育女儿李某乙，××××年××月××日生育儿子李某丙，现女儿李某乙、儿子李某丙都已独立生活')
+    events = ext.extractor('被告蒙力健辩称，一、我方不同意离婚，双方经自由恋爱3年方才登记结婚，婚后至今十几年，对原告很好，其即使没工作，我方依然不离不弃，对家庭负'
+                           '责，且又无赌博、酗酒、夫妻不忠，更不存在原告所称的家庭暴力，夫妻感情没有破裂，原告要求离婚，缺乏法律依据')
     json_str = events[0]._obj_to_json()
     print('end')
     exit(0)
