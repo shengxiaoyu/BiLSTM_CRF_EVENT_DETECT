@@ -81,7 +81,7 @@ def run():
                     # 处理最后一个缓存
                     predict_examples.append([currentWords, current_first_tags, current_pos_tags])
                     true_events.append(events)
-    extractor = Extractor(first_output_path='output_1_5_fullPos_trigger_Merge',second_output_path='second_output_1_5_Merge')
+    extractor = Extractor(first_output_path='output_15_64_Merge',second_output_path='second_output_15_64_Merge')
     #单句单事实直接准确匹配
     events = extractor.extractor_from_words_posTags(predict_examples)
 
