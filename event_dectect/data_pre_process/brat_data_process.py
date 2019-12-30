@@ -165,9 +165,9 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 else:
                     # 事件参数处理
                     entity = entitiesDict.get(paramter[1])
-                    if(paramter[0]=='Negation'):
-                        entity.setName(paramter[0])
                     entity.setName(event.getType() + '_' + paramter[0])
+                    if (paramter[0] == 'Negation'):
+                        entity.setName(paramter[0])
                     event.addArgument(entity)
             events.append(event)
 
@@ -656,7 +656,7 @@ def one_merge(tagsList):
     return mergedTags
 
 if __name__ == '__main__':
-    # main()
-    merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
+    main()
+    # merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
     print ('end')
     sys.exit(0)

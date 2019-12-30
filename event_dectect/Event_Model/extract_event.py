@@ -36,8 +36,9 @@ class Extractor(object):
         speakers = []
         isYg = True
         for sentence in self.sentenceSplitter.split(paragraph):
-            if(sentence.find('诉称')!=-1):
-                isYg = True
+            # '''有可能被告辩称内容中含有诉称，因此如果进入辩称段，则不再考虑诉称为原告'''
+            # if(isYg and sentence.find('诉称')!=-1):
+            #     isYg = True
             if(sentence.find('辩称')!=-1):
                 isYg = False
             hasTrigger = ifContainTrigger(sentence)
