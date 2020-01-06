@@ -228,9 +228,13 @@ class Extractor(object):
             if ( judgeTime):
                 self.__label__(final_tags, judgeTime[0], judgeTime[1], type + '_JudgeTime')
         elif(type=='Wealth'):
-            value = self.__findBack__(index_pair[0], first_tags_list, 'Price')
+            value = self.__findFoward__(index_pair[0], first_tags_list, 'Price')
             if ( value):
                 self.__label__(final_tags, value[0], value[1], type + '_Value')
+            else:
+                value = self.__findBack__(index_pair[0], first_tags_list, 'Price')
+                if ( value):
+                    self.__label__(final_tags, value[0], value[1], type + '_Value')
 
             isPersonal = self.__findFoward__(index_pair[0], first_tags_list, 'PersonalProperty')
             if (not isPersonal):
