@@ -229,11 +229,11 @@ class Extractor(object):
                 self.__label__(final_tags, judgeTime[0], judgeTime[1], type + '_JudgeTime')
         elif(type=='Wealth'):
             value = self.__findFoward__(index_pair[0], first_tags_list, 'Price')
-            if ( value):
+            if (value):
                 self.__label__(final_tags, value[0], value[1], type + '_Value')
             else:
                 value = self.__findBack__(index_pair[0], first_tags_list, 'Price')
-                if ( value):
+                if (value):
                     self.__label__(final_tags, value[0], value[1], type + '_Value')
 
             isPersonal = self.__findFoward__(index_pair[0], first_tags_list, 'PersonalProperty')
@@ -467,7 +467,7 @@ def ifContainTrigger(sentence):
         return False
     return True
 if __name__ == '__main__':
-    string = '被告向原告索要彩礼88000元'
+    string = '彼此还有感情，'
     ext = Extractor()
     events = ext.extractor(string)
     json_str = events[0]._obj_to_json()

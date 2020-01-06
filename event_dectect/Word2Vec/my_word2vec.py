@@ -8,6 +8,7 @@ from pyltp import SentenceSplitter, Segmentor
 import os
 from gensim.models import Word2Vec
 from gensim.models.word2vec import PathLineSentences
+import numpy as np
 
 
 class Word2VecModel(object):
@@ -93,19 +94,21 @@ def segment_words(source,savePath,segmentor_model_path, segmentor_user_dict_path
 
 if __name__ == '__main__':
     rootdir = r'A:\Bi-LSTM+CRF'
+    # rootdir = r'/root/lstm_crf/data'
     ltpDir = os.path.join(rootdir,'ltp_data_v3.4.0')
-    # dim = 30
+    word2vecDir = os.path.join(rootdir,'newWord2vec')
+
+    # segment_words(os.path.join(rootdir,'原始_待分句_样例'),
+    #               os.path.join(os.path.join(rootdir,'word2vec'),'train'),
+    #               os.path.join(ltpDir,'cws.model'),
+    #               os.path.join(ltpDir,'userDict.txt'),
+    #               os.path.join(rootdir,'newStopWords.txt'))
+
+    dim = 30
     word2vec_model_save_path = os.path.join(rootdir,'word2vec')
-    wv = Word2VecModel(word2vec_model_save_path, '', 30)
+    wv = Word2VecModel(word2vec_model_save_path, os.path.join(word2vecDir,'train'), 30)
     wv = wv.getEmbedded()
-    # wv.add('<pad>',np.zeros((dim)))
-    # print(wv.most_similar('原告'))
-    # print(wv.similarity('原告', '被告'))
-    # print(wv['原告'])
-    # print(wv['被告'])
-    segment_words(os.path.join(rootdir,'segment_result'),
-                  os.path.join(os.path.join(rootdir,'word2vec'),'train'),
-                  os.path.join(ltpDir,'cws.model'),
-                  os.path.join(ltpDir,'userDict.txt'),
-                  os.path.join(rootdir,'newStopWords.txt'))
-    pass
+    print(wv.most_similar('原告'))
+    print(wv.similarity('原告', '被告'))
+    print(wv['原告'])
+    print(wv['被告'])
