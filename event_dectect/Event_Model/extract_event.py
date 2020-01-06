@@ -14,6 +14,7 @@ from event_dectect.First_For_Commo_Tags import word2vec_lstm_crf_ed as first
 from model import Event
 from event_dectect.util.constant import NEGATIONS
 import re
+import sys
 
 class Extractor(object):
     def __init__(self,first_output_path=None,second_output_path=None):
@@ -64,7 +65,7 @@ class Extractor(object):
 
         #额外增加处理否定词
         self.__handle_negation__(words_list,second_tags_list,sentences,index_pairs_list)
-
+        self.__handle_value__(words_list,second_tags_list,sentences,index_pairs_list)
         events = []
         id_index = 0
         for tags, words,index_pairs,sentence,speaker in zip(second_tags_list, words_list,index_pairs_list,sentences,speakers):
@@ -227,7 +228,7 @@ class Extractor(object):
             if ( judgeTime):
                 self.__label__(final_tags, judgeTime[0], judgeTime[1], type + '_JudgeTime')
         elif(type=='Wealth'):
-            value = self.__findFoward__(index_pair[0], first_tags_list, 'Price')
+            value = self.__findBack__(index_pair[0], first_tags_list, 'Price')
             if ( value):
                 self.__label__(final_tags, value[0], value[1], type + '_Value')
 
@@ -315,12 +316,58 @@ class Extractor(object):
         for index in range(begin+1,end+1):
             tags[index] = 'I_'+tag
 
-    # def __handle_negation__(self,second_tags_list,sentences,index_pairs_list):
-    #     for tags,sentence,index_pairs in zip(second_tags_list,sentences,index_pairs_list):
-    #         sub_sens = sentence.splite('。|！|？|，|；')
-    #         tags_len = len(tags)
-    #         for i in range(tags_len):
-    #             if(tags[i].find('Trigger')!=-1):
+    def __handle_value__(self,words_list,second_tags_list,sentences,index_pairs_list):
+        pattern = re.compile(r'[一|二|三|四|五|六|七|八|九|十|\d]+[\.\，\、]?[一|二|三|四|五|六|七|八|九|十|\d]*[多万元|余万元|万余元|多元|多万|万元|万|元]')
+        for words,tags,sentence,index_pairs in zip(words_list,second_tags_list,sentences,index_pairs_list):
+            if(('B_Wealth_Trigger' in tags and 'B_Wealth_Value' not in tags) or ('B_Debt_Trigger' in tags and 'B_Debt_Value' not in tags) or ('B_Credit_Trigger' in tags and 'B_Credit_Value' not in tags)):
+                length = len(index_pairs)
+                #找到Price的触发词，找到距离触发词最近的Price表达式
+                trigger_label = ''
+                trigger_begin_index = 0
+                trigger_end_index = 0
+                for i in range(length):
+                    if(tags[i]=='B_Wealth_Trigger' or tags[i]=='B_Debt_Trigger' or tags[i]=='B_Credit_Trigger'):
+                        trigger_begin_index = index_pairs[i][0]
+                        trigger_end_index = index_pairs[i][1]
+                        trigger_label = tags[i].split('_')[1]
+                    if(tags[i]=='I_Wealth_Trigger' or tags[i]=='I_Debt_Trigger' or tags[i]=='I_Credit_Trigger'):
+                        trigger_end_index = index_pairs[i][1]
+
+                # 遍历所有的Prcie表达式，标注最近的作为目标
+                it = pattern.finditer(sentence)
+                value = ''
+                value_begin_index = 0
+                value_end_index = 0
+                min_dis = sys.maxsize
+                base_index = 0
+                for match in it:
+                    the_value = match.group()
+                    the_value_begin_index = sentence.find(the_value, base_index)
+                    the_value_end_index = the_value_begin_index+len(the_value)
+                    if(the_value_begin_index>trigger_begin_index):#value在触发词前
+                        dis = trigger_begin_index-the_value_end_index
+                        if(dis<min_dis):
+                            value = the_value
+                            value_begin_index = the_value_begin_index
+                            value_end_index = the_value_end_index
+                    if (the_value_begin_index > trigger_begin_index):  # value在触发词后
+                        dis = the_value_begin_index - trigger_end_index
+                        if (dis < min_dis):
+                            value = the_value
+                            value_begin_index = the_value_begin_index
+                            value_end_index = the_value_end_index
+                    base_index = the_value_end_index
+
+                #根据找到的Value坐标，标注tags
+                for i in range(length):
+                    if(index_pairs[i][0]<=value_begin_index and index_pairs[i][1]>value_begin_index):
+                        tags[i] = 'B_'+trigger_label+'_Value'
+                        continue
+                    if(value_end_index>index_pairs[i][0]):
+                        tags[i]='I_'+trigger_label+'_Value'
+                        continue
+                    if(value_end_index<=index_pairs[i][0]):
+                        break
 
 
     def  __handle_negation__(self,words_list,second_tags_list,sentences,index_pairs_list):
@@ -416,9 +463,10 @@ def ifContainTrigger(sentence):
         return False
     return True
 if __name__ == '__main__':
+    string = '被告向原告索要彩礼88000元'
     ext = Extractor()
-    events = ext.extractor('被告蒙力健辩称，一、我方不同意离婚，双方经自由恋爱3年方才登记结婚，婚后至今十几年，对原告很好，其即使没工作，我方依然不离不弃，对家庭负'
-                           '责，且又无赌博、酗酒、夫妻不忠，更不存在原告所称的家庭暴力，夫妻感情没有破裂，原告要求离婚，缺乏法律依据')
+    events = ext.extractor(string)
     json_str = events[0]._obj_to_json()
-    print('end')
+    # res = string.find('88000元',0)
+    # print('end')
     exit(0)
