@@ -379,7 +379,7 @@ class Extractor(object):
             #如果已经有否定词了则不找了
             if('B_Negation' in tags):
                 continue
-            words_len = min(len(index_pairs),len(words),len(tags)
+            words_len = min(len(index_pairs),len(words),len(tags))
 
             #获取触发词的index
             begin_tri = -1
