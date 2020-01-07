@@ -324,7 +324,7 @@ class Extractor(object):
         pattern = re.compile(r'[一|二|三|四|五|六|七|八|九|十|\d]+[\.\，\、]?[一|二|三|四|五|六|七|八|九|十|\d]*[多万元|余万元|万余元|多元|多万|万元|万|元]')
         for words,tags,sentence,index_pairs in zip(words_list,second_tags_list,sentences,index_pairs_list):
             if(('B_Wealth_Trigger' in tags and 'B_Wealth_Value' not in tags) or ('B_Debt_Trigger' in tags and 'B_Debt_Value' not in tags) or ('B_Credit_Trigger' in tags and 'B_Credit_Value' not in tags)):
-                length = len(index_pairs)
+                length = min(len(index_pairs),len(words),len(tags))
                 #找到Price的触发词，找到距离触发词最近的Price表达式
                 trigger_label = ''
                 trigger_begin_index = 0
@@ -379,7 +379,7 @@ class Extractor(object):
             #如果已经有否定词了则不找了
             if('B_Negation' in tags):
                 continue
-            words_len = len(index_pairs)
+            words_len = min(len(index_pairs),len(words),len(tags)
 
             #获取触发词的index
             begin_tri = -1
@@ -468,10 +468,7 @@ def ifContainTrigger(sentence):
     return True
 if __name__ == '__main__':
     string = \
-        '虽然我方名下有建设银行、工商银行、柳州银行、桂林银行有存款，但不过几千元，原告称存有250000元无证据证实。' \
-             '自2007年始，被告同她人同居。' \
-             '感情还没破裂。' \
-             '彼此还有感情。'
+        '原告刘某某诉称，他和被告于2013年4月通过网络认识，被告离异，并带有一女孩。两人建立恋爱关系后，他找了同村王某丙前往被告家商量结婚事宜，被告向原告索要彩礼88000元。他分三次将彩礼给付被告，第一次给付30000元，第二次给付40000元，第三次给付18000元。彩礼给付后，他和被告于2013年5月17日办理结婚登记，并于同年6月18日举行结婚仪式。被告的陪嫁物有电脑1台、饮水机1台、洗衣机1台、被子2床。婚后夫妻感情一般，且被告对别人说原告不要她的女儿，双方常为此事争吵。2013年7月21日，他去沟里挖蝎子约10点回到家后，被告与女儿已离家出走，他去被告家寻找，被告父母声称不知道被告去处，却又于第二天到他家要人。原告现诉至本院要求与被告离婚；要求被告返还彩礼88000元，并承担索取期间的利息每月4400元整；要求被告赔偿原告结婚期间的经济损失53500元；案件受理费由被告承担。被告王某甲辩称，她与原告认识后，2013年4月17日原告和媒人到她家提亲，因被告同意抚养她与前夫的女儿，她才答应与被告结婚。2013年5月16她与原告举行结婚仪式，同年7月5日办理结婚登记。但是，婚后原告及其家人并未像婚前说的那样接受她的女儿，不给她的女儿办理户口，原告甚至因为孩子的事情与她的父母打闹，致使她母亲心肌梗塞加重。农历六月初五晚，原告又因女儿的去留问题，对她大打出手，将她们母女赶出家门，后一直未归。2013年11月18日，她带侄儿去医院换药，原告将她拉至公安局，她父亲得知后找人到公安局接她，原告又对她拳打脚踢。至于彩礼，原告总共给了50000元，其中2013年4月17日给了30000元，同年农历五月初八给了20000元。她的陪嫁物有台式电脑1台、饮水机1台、洗衣机1台、被子2床、黄金项链1条，项链打架时已经扯断了。她与前夫离婚时男孩由前夫抚养，她承担了54000元的抚养费、前夫买车时她借常花园任才15000元、她母亲被原告殴打致使病情加重在延安住院花费医疗费7000元、她女儿王某乙2013年5月、6月两次在洛川医院住院治疗花费12000余元，共计88000元，应由原告支付。'
     ext = Extractor()
     events = ext.extractor(string)
     json_str = events[0]._obj_to_json()
