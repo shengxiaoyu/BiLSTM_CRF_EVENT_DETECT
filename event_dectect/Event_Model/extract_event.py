@@ -467,7 +467,11 @@ def ifContainTrigger(sentence):
         return False
     return True
 if __name__ == '__main__':
-    string = '彼此还有感情，'
+    string = \
+        '虽然我方名下有建设银行、工商银行、柳州银行、桂林银行有存款，但不过几千元，原告称存有250000元无证据证实。' \
+             '自2007年始，被告同她人同居。' \
+             '感情还没破裂。' \
+             '彼此还有感情。'
     ext = Extractor()
     events = ext.extractor(string)
     json_str = events[0]._obj_to_json()

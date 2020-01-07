@@ -39,7 +39,7 @@ def init(rootdir):
     if(not ifInited):
         initTags(os.path.join(rootdir,'triggerLabels.txt'),os.path.join(rootdir, 'argumentLabels.txt'))
         initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
-        initWord2Vec(os.path.join(rootdir, 'word2vec'))
+        initWord2Vec(os.path.join(rootdir, 'newWord2vec'))
         initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
         initStopWords(os.path.join(rootdir, 'newStopWords.txt'))
         initTriggerWords(os.path.join(rootdir,'triggers'))
@@ -76,6 +76,7 @@ def initTags(triggerLablePath,argumentLabelPath):
     TAGs_LEN = len(TAG_2_ID)
 def initWord2Vec(word2vec_model_path):
     global WV
+    print('加载word2vec模型地址：'+word2vec_model_path)
     WV = Word2VecModel(word2vec_model_path, '', 30).getEmbedded()
     # <pad> -- <pad> fill word2vec and tags，添加一个<pad>-向量为0的，用于填充
     WV.add('<pad>', np.zeros(WV.vector_size))

@@ -27,6 +27,7 @@ def main(FLAGS,sentencs_words_firstTags_list=None,words_firstTags_indxPairs_sent
     output_dir = os.path.join(FLAGS.root_dir,'second_output_'+str(FLAGS.num_epochs)+'_'+str(FLAGS.batch_size)+'_'+FLAGS.sentence_mode)
     if(output_path):
         output_dir = os.path.join(FLAGS.root_dir,output_path)
+    print('加载第二模型地址：'+output_dir)
     if FLAGS.ifTrain:
         if os.path.exists(output_dir):
             def del_file(path):

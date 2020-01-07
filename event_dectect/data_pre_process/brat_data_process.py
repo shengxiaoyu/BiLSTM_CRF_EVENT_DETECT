@@ -326,7 +326,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                 # if('B_Wealth_Value' in event.getTags() or 'B_Debt_Value' in event.getTags() or 'B_Credit_Value' in event.getTags()):
                 #     w1.write(' '.join(event.getWords())+'\n')
 
-    w1 = open(r'C:\Users\13314\Desktop\test\values_Str.txt','w',encoding='utf8')
+    # w1 = open(r'C:\Users\13314\Desktop\test\values_Str.txt','w',encoding='utf8')
     # values = set()
     if(os.path.isdir(labelFilePath)):
         handlderDir(labelFilePath)
@@ -657,7 +657,7 @@ def one_merge(tagsList):
     return mergedTags
 
 if __name__ == '__main__':
-    main()
-    # merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
+    # main()
+    merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
     print ('end')
     sys.exit(0)
