@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from config_parser import getParser
 
 __doc__ = 'description将brat生成的ann文件和源文件.txt结合，生成人工标注的样子的文件'
 __author__ = '13314409603@163.com'
 
 
 import os
+from event_dectect.Config.config_parser import getParser
 import sys
 from pyltp import Segmentor
 from pyltp import Postagger
@@ -657,7 +657,7 @@ def one_merge(tagsList):
     return mergedTags
 
 if __name__ == '__main__':
-    # main()
+    main()
     merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
     print ('end')
     sys.exit(0)

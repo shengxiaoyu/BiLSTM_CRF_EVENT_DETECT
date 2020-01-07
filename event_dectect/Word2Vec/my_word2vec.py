@@ -93,7 +93,7 @@ def segment_words(source,savePath,segmentor_model_path, segmentor_user_dict_path
 
 if __name__ == '__main__':
     # rootdir = r'A:\Bi-LSTM+CRF'
-    rootdir = r'/root/lstm_crf/data'
+    rootdir = r'/hoome/shengyu/data'
     ltpDir = os.path.join(rootdir,'ltp_data_v3.4.0')
     word2vecDir = os.path.join(rootdir,'newWord2vec')
 
@@ -105,8 +105,7 @@ if __name__ == '__main__':
                   os.path.join(rootdir,'newStopWords.txt'))
     #
     dim = 300
-    word2vec_model_save_path = os.path.join(rootdir,'newWord2vec')
-    wv = Word2VecModel(word2vec_model_save_path, os.path.join(word2vecDir,'train'), dim)
+    wv = Word2VecModel(word2vecDir, os.path.join(word2vecDir,'train'), dim)
     wv = wv.getEmbedded()
     print(wv.most_similar('原告'))
     print(wv.similarity('原告', '被告'))
@@ -114,10 +113,3 @@ if __name__ == '__main__':
     print(wv['被告'])
     print(wv['彼此'])
     print(wv['她人'])
-    # count = 0
-    # for file in os.listdir(os.path.join(word2vecDir,'train')):
-    #     with open(os.path.join(os.path.join(word2vecDir,'train'),file),'r',encoding='utf8') as r:
-    #         for line in r.readlines():
-    #             if('她人' in line):
-    #                 count += 1
-    #                 print(count)
