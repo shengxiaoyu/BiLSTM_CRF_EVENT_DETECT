@@ -9,7 +9,7 @@ import os
 from gensim.models import Word2Vec
 from gensim.models.word2vec import PathLineSentences
 import numpy as np
-
+import re
 
 class Word2VecModel(object):
     def __init__(self,model_save_path,train_data_save_path,size,window=5,min_count=1,workers=4):
@@ -51,7 +51,8 @@ class Word2VecModel(object):
 #segmentor_model_path-分词模型存放位置
 #segmentor_user_dict_path-自定义分词词典位置
 #stop_words_path-停用词位置
-def segment_words(source,savePath,segmentor_model_path, segmentor_user_dict_path,stop_words_path):
+#mode-word或char
+def segment_words(source,savePath,segmentor_model_path, segmentor_user_dict_path,stop_words_path,mode='word'):
     #分词器
     segmentor = Segmentor()
     segmentor.load_with_lexicon(segmentor_model_path, segmentor_user_dict_path)
@@ -79,9 +80,14 @@ def segment_words(source,savePath,segmentor_model_path, segmentor_user_dict_path
                 words = list(filter(lambda x:False if(x in stopWords) else True,words))
                 if (len(words) == 0):
                     continue
-                fw.write(' '.join(list(words)))
-                fw.write('\n')
-
+                if(mode=='word'): #按词分割
+                    fw.write(' '.join(list(words)))
+                    fw.write('\n')
+                elif(mode=='char'): #按字分割
+                    words=''.join(list(words))
+                    fw.write(' '.join(pattern.findall(words)))
+                    fw.write('\n')
+    pattern = re.compile('.{1,1}')
     #分别处理三类文件夹
     qstsbl = os.path.join(source, 'qstsbl')
     handFile(qstsbl, 'qstsbl')
@@ -95,21 +101,24 @@ if __name__ == '__main__':
     # rootdir = r'A:\Bi-LSTM+CRF'
     rootdir = r'/hoome/shengyu/data'
     ltpDir = os.path.join(rootdir,'ltp_data_v3.4.0')
-    word2vecDir = os.path.join(rootdir,'newWord2vec')
-
+    # word2vecDir = os.path.join(rootdir,'word2vec')
+    # mode = 'word'
+    word2vecDir = os.path.join(rootdir,'char2vec')
+    mode = 'char'
     # segment_words(os.path.join(rootdir,'原始_待分句_样例'),
-    segment_words(os.path.join(rootdir,'原始_待分句_样例'),
-                  os.path.join(word2vecDir,'train'),
-                  os.path.join(ltpDir,'cws.model'),
-                  os.path.join(ltpDir,'userDict.txt'),
-                  os.path.join(rootdir,'newStopWords.txt'))
+    #               os.path.join(word2vecDir,'train'),
+    #               os.path.join(ltpDir,'cws.model'),
+    #               os.path.join(ltpDir,'userDict.txt'),
+    #               os.path.join(rootdir,'newStopWords.txt'),
+    #               mode
+    #               )
     #
     dim = 300
     wv = Word2VecModel(word2vecDir, os.path.join(word2vecDir,'train'), dim)
     wv = wv.getEmbedded()
-    print(wv.most_similar('原告'))
-    print(wv.similarity('原告', '被告'))
-    print(wv['原告'])
-    print(wv['被告'])
-    print(wv['彼此'])
-    print(wv['她人'])
+    # print(wv.most_similar('原告'))
+    # print(wv.similarity('原告', '被告'))
+    # print(wv['原告'])
+    print(wv.most_similar('生'))
+    print(wv.similarity('生','育'))
+    print(wv['生'])
