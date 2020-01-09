@@ -658,6 +658,6 @@ def one_merge(tagsList):
 
 if __name__ == '__main__':
     main()
-    merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
+    # merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
     print ('end')
     sys.exit(0)

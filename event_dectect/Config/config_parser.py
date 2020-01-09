@@ -28,7 +28,9 @@ def getParser():
     parser.add_argument('--labeled_data_path', help='labeled data path',
                         default=os.path.join(os.path.join(rootPath, 'labeled'), parser.get_default('sentence_mode')))
                         # default=os.path.join(os.path.join(rootPath, 'labeled'), 'newExamples'))
-    parser.add_argument('--max_sequence_length', help='max length of sequence', default= 55 )  # Full - 40,Spe-51,Merge-55
+    # parser.add_argument('--max_sequence_length', help='max length of sequence', default= 52 )  # Full - 40,Spe-51,Merge-55
+    parser.add_argument('--max_sequence_length', help='max length of sequence', default= 120 )  # Full - 40,Spe-51,Merge-55
+    parser.add_argument('--max_char_sequence_length', help='max length of sequence', default= 120 )  # Full - 40,Spe-51,Merge-55
     parser.add_argument('--batch_size', help='batch size', default=64)
     parser.add_argument('--num_epochs', help='num of epochs', default=15)
     parser.add_argument('--device_map', help='which device to see', default='CPU:0')

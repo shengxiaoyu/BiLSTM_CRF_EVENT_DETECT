@@ -3,7 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="f37fe3ca-cb22-46e0-bc56-0ace397bed4d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event_dectect/Config/config_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/Config/config_parser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/config_center.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/config_center.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/input_fn.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/input_fn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/word2vec_lstm_crf_ed.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/word2vec_lstm_crf_ed.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/event_dectect/Word2Vec/my_word2vec.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/Word2Vec/my_word2vec.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event_dectect/data_pre_process/brat_data_process.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/data_pre_process/brat_data_process.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/event_dectect/data_pre_process/cal_sentence_length.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/data_pre_process/cal_sentence_length.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -27,11 +33,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/event_dectect/Word2Vec/my_word2vec.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="445">
-              <caret line="109" column="42" selection-start-line="109" selection-start-column="31" selection-end-line="109" selection-end-column="42" />
+            <state relative-caret-position="-8">
+              <caret line="19" column="30" selection-start-line="19" selection-start-column="30" selection-end-line="19" selection-end-column="30" />
               <folding>
                 <element signature="e#123#168#0" expanded="true" />
               </folding>
@@ -40,43 +46,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/ntpath.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="917">
-              <caret line="74" column="4" selection-start-line="74" selection-start-column="4" selection-end-line="74" selection-end-column="4" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/event_dectect/Second_For_Fine_Tags/input_fn.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="894">
-              <caret line="87" column="28" selection-start-line="87" selection-start-column="28" selection-end-line="87" selection-end-column="28" />
-              <folding>
-                <element signature="e#107#116#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/word2vec_lstm_crf_ed.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4199">
-              <caret line="227" column="30" selection-start-line="227" selection-start-column="29" selection-end-line="227" selection-end-column="30" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/event_dectect/Second_For_Fine_Tags/word2vec_lstm_crf_argu_match.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
-              <caret line="25" column="31" selection-start-line="25" selection-start-column="20" selection-end-line="25" selection-end-column="31" />
-              <folding>
-                <element signature="e#108#124#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="-8">
+              <caret line="83" column="50" selection-start-line="83" selection-start-column="50" selection-end-line="83" selection-end-column="50" />
             </state>
           </provider>
         </entry>
@@ -84,10 +57,82 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/event_dectect/data_pre_process/brat_data_process.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="12445">
-              <caret line="660" column="40" selection-start-line="660" selection-start-column="40" selection-end-line="660" selection-end-column="40" />
+            <state relative-caret-position="-8">
+              <caret line="661" column="12" selection-start-line="661" selection-start-column="12" selection-end-line="661" selection-end-column="12" />
               <folding>
                 <element signature="e#145#154#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/input_fn.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="196">
+              <caret line="65" column="59" selection-start-line="65" selection-start-column="59" selection-end-line="65" selection-end-column="59" />
+              <folding>
+                <element signature="e#47#63#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/model_fn.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-8">
+              <caret line="23" column="73" selection-start-line="23" selection-start-column="61" selection-end-line="23" selection-end-column="73" />
+              <folding>
+                <element signature="e#213#236#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/main.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-8">
+              <caret line="54" column="32" selection-start-line="54" selection-start-column="32" selection-end-line="54" selection-end-column="32" />
+              <folding>
+                <element signature="e#109#118#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/config_center.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-17">
+              <caret line="86" column="37" selection-start-line="86" selection-start-column="37" selection-end-line="86" selection-end-column="37" />
+              <folding>
+                <element signature="e#377#386#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/.PyCharm2019.1/system/python_stubs/-932014861/builtins.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-8">
+              <caret line="2958" column="8" selection-start-line="2958" selection-start-column="8" selection-end-line="2958" selection-end-column="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/event_dectect/data_pre_process/cal_sentence_length.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-8">
+              <caret line="131" column="68" selection-start-line="131" selection-start-column="68" selection-end-line="131" selection-end-column="68" />
+              <folding>
+                <element signature="e#47#56#0" expanded="true" />
+                <element signature="e#780#978#0" />
+                <element signature="e#1442#2921#0" />
+                <element signature="e#2980#4318#0" />
               </folding>
             </state>
           </provider>
@@ -96,27 +141,13 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/event_dectect/Config/config_parser.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="209">
-              <caret line="12" column="35" selection-start-line="12" selection-start-column="35" selection-end-line="12" selection-end-column="35" />
+            <state relative-caret-position="-8">
+              <caret line="31" column="92" selection-start-line="31" selection-start-column="92" selection-end-line="31" selection-end-column="92" />
               <folding>
                 <element signature="e#47#62#0" expanded="true" />
               </folding>
             </state>
           </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="9006">
-              <caret line="474" column="18" selection-start-line="474" selection-start-column="18" selection-end-line="474" selection-end-column="18" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/event_dectect/Word2Vec/__init__.py">
-          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
     </leaf>
@@ -153,8 +184,9 @@
       <find />
       <find>SEGMENTOR</find>
       <find>STOP_WORDS</find>
-      <find>WV</find>
       <find>getParser</find>
+      <find>WV</find>
+      <find>CHAR_WV</find>
     </findStrings>
     <replaceStrings>
       <replace>r'A:\B</replace>
@@ -194,8 +226,6 @@
         <option value="$PROJECT_DIR$/event_dectect/data_pre_process/tsbl_process.py" />
         <option value="$PROJECT_DIR$/event_dectect/data_pre_process/cpws_process.py" />
         <option value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/main.py" />
-        <option value="$PROJECT_DIR$/event_dectect/data_pre_process/cal_sentence_length.py" />
-        <option value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/input_fn.py" />
         <option value="$PROJECT_DIR$/event_dectect/evaluation/EventFactory.py" />
         <option value="$PROJECT_DIR$/event_dectect/evaluation/Event_Detection2.py" />
         <option value="$PROJECT_DIR$/RestApi/service.py" />
@@ -210,12 +240,14 @@
         <option value="$PROJECT_DIR$/event_dectect/evaluation/eval.py" />
         <option value="$PROJECT_DIR$/conflict_detect/util/constant.py" />
         <option value="$PROJECT_DIR$/event_dectect/Second_For_Fine_Tags/word2vec_lstm_crf_argu_match.py" />
-        <option value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/config_center.py" />
-        <option value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/word2vec_lstm_crf_ed.py" />
         <option value="$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py" />
-        <option value="$PROJECT_DIR$/event_dectect/Config/config_parser.py" />
-        <option value="$PROJECT_DIR$/event_dectect/data_pre_process/brat_data_process.py" />
         <option value="$PROJECT_DIR$/event_dectect/Word2Vec/my_word2vec.py" />
+        <option value="$PROJECT_DIR$/event_dectect/data_pre_process/brat_data_process.py" />
+        <option value="$PROJECT_DIR$/event_dectect/data_pre_process/cal_sentence_length.py" />
+        <option value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/word2vec_lstm_crf_ed.py" />
+        <option value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/config_center.py" />
+        <option value="$PROJECT_DIR$/event_dectect/Config/config_parser.py" />
+        <option value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/input_fn.py" />
       </list>
     </option>
   </component>
@@ -252,25 +284,7 @@
               <item name="BiLSTM_CRF_EVENT_DETECT" type="b2602c69:ProjectViewProjectNode" />
               <item name="BiLSTM_CRF_EVENT_DETECT" type="462c0819:PsiDirectoryNode" />
               <item name="event_dectect" type="462c0819:PsiDirectoryNode" />
-              <item name="data_pre_process" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="BiLSTM_CRF_EVENT_DETECT" type="b2602c69:ProjectViewProjectNode" />
-              <item name="BiLSTM_CRF_EVENT_DETECT" type="462c0819:PsiDirectoryNode" />
-              <item name="event_dectect" type="462c0819:PsiDirectoryNode" />
-              <item name="Event_Model" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="BiLSTM_CRF_EVENT_DETECT" type="b2602c69:ProjectViewProjectNode" />
-              <item name="BiLSTM_CRF_EVENT_DETECT" type="462c0819:PsiDirectoryNode" />
-              <item name="event_dectect" type="462c0819:PsiDirectoryNode" />
               <item name="First_For_Commo_Tags" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="BiLSTM_CRF_EVENT_DETECT" type="b2602c69:ProjectViewProjectNode" />
-              <item name="BiLSTM_CRF_EVENT_DETECT" type="462c0819:PsiDirectoryNode" />
-              <item name="event_dectect" type="462c0819:PsiDirectoryNode" />
-              <item name="Second_For_Fine_Tags" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="BiLSTM_CRF_EVENT_DETECT" type="b2602c69:ProjectViewProjectNode" />
@@ -301,7 +315,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -325,8 +339,8 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.my_word2vec">
-    <configuration name="brat_data_process" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager" selected="Python.main">
+    <configuration name="cal_sentence_length" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="BiLSTM_CRF_EVENT_DETECT" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -339,7 +353,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/event_dectect/data_pre_process/brat_data_process.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/event_dectect/data_pre_process/cal_sentence_length.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -370,7 +384,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="main (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="input_fn" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="BiLSTM_CRF_EVENT_DETECT" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -378,12 +392,34 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/event_dectect/Second_For_Fine_Tags" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/event_dectect/Second_For_Fine_Tags/main.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/input_fn.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="BiLSTM_CRF_EVENT_DETECT" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -414,35 +450,13 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="word2vec_lstm_crf_ed" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="BiLSTM_CRF_EVENT_DETECT" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/word2vec_lstm_crf_ed.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.main" />
+        <item itemvalue="Python.input_fn" />
+        <item itemvalue="Python.cal_sentence_length" />
         <item itemvalue="Python.my_word2vec" />
         <item itemvalue="Python.extract_event" />
-        <item itemvalue="Python.brat_data_process" />
-        <item itemvalue="Python.word2vec_lstm_crf_ed" />
-        <item itemvalue="Python.main (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -506,12 +520,13 @@
       <workItem from="1578361398529" duration="15795000" />
       <workItem from="1578399277743" duration="1472000" />
       <workItem from="1578447116160" duration="3736000" />
-      <workItem from="1578488823024" duration="1734000" />
+      <workItem from="1578488823024" duration="2366000" />
+      <workItem from="1578535970304" duration="6208000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="221674000" />
+    <option name="totallyTimeSpent" value="228514000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
@@ -522,8 +537,8 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3292683" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.08841463" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.38109756" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.34756097" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.33841464" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -585,9 +600,19 @@
           <option name="timeStamp" value="87" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/event_dectect/Word2Vec/my_word2vec.py</url>
-          <line>85</line>
-          <option name="timeStamp" value="90" />
+          <url>file://$PROJECT_DIR$/event_dectect/data_pre_process/cal_sentence_length.py</url>
+          <line>142</line>
+          <option name="timeStamp" value="88" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/input_fn.py</url>
+          <line>91</line>
+          <option name="timeStamp" value="99" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/input_fn.py</url>
+          <line>86</line>
+          <option name="timeStamp" value="100" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -602,18 +627,19 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$handle_single_file.coverage" NAME="handle_single_file Coverage Results" MODIFIED="1567129245312" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/conflict_detect/data_pre_process" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$service.coverage" NAME="service Coverage Results" MODIFIED="1571067476122" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/RestApi" />
+    <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$cal_sentence_length.coverage" NAME="cal_sentence_length Coverage Results" MODIFIED="1578537052758" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/data_pre_process" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1577676474145" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/Second_For_Fine_Tags" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$extract_event__1_.coverage" NAME="extract_event (1) Coverage Results" MODIFIED="1566630765268" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/Event_Model" />
-    <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$main.coverage" NAME="main Coverage Results" MODIFIED="1577675677152" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags" />
+    <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$main.coverage" NAME="main Coverage Results" MODIFIED="1578543323652" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$test.coverage" NAME="test Coverage Results" MODIFIED="1569723955698" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$input_fn.coverage" NAME="input_fn Coverage Results" MODIFIED="1568701288856" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$word2vec_lstm_crf_ed.coverage" NAME="word2vec_lstm_crf_ed Coverage Results" MODIFIED="1578387800977" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags" />
+    <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$input_fn.coverage" NAME="input_fn Coverage Results" MODIFIED="1578538695274" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$extract_event.coverage" NAME="extract_event Coverage Results" MODIFIED="1578389728050" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/Event_Model" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$eval__1_.coverage" NAME="eval (1) Coverage Results" MODIFIED="1570693643301" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/evaluation" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$some_try.coverage" NAME="some_try Coverage Results" MODIFIED="1571730667677" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$brat_data_process.coverage" NAME="brat_data_process Coverage Results" MODIFIED="1578388264160" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/data_pre_process" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$eval.coverage" NAME="eval Coverage Results" MODIFIED="1568684196825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/conflict_detect/evaluation" />
-    <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$my_word2vec.coverage" NAME="my_word2vec Coverage Results" MODIFIED="1578490278654" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/Word2Vec" />
+    <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$my_word2vec.coverage" NAME="my_word2vec Coverage Results" MODIFIED="1578490987974" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/Word2Vec" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$chooseFileForExperiment.coverage" NAME="chooseFileForExperiment Coverage Results" MODIFIED="1576654369200" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/evaluation" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$word2vec_lstm_crf_argu_match.coverage" NAME="word2vec_lstm_crf_argu_match Coverage Results" MODIFIED="1577674077988" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/Second_For_Fine_Tags" />
   </component>
@@ -640,47 +666,52 @@
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string>' '.join(pattern.findall(words))</expression-string>
+        <expression-string>CONFIG.CHAR_WV['生'].extend(CONFIG.WV['生育'])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>pattern.findall(words)</expression-string>
+        <expression-string>CONFIG.CHAR_WV['生']</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>CONFIG.TAG_2_ID</expression-string>
+        <expression-string>CONFIG.CHAR_WV['生']+CONFIG.WV['生育']</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>NE</expression-string>
+        <expression-string>CONFIG.CHAR_WV.vector_size+CONFIG.WV.vector_size</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>NEW</expression-string>
+        <expression-string>CONFIG.CHAR_WV['!']</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>tags</expression-string>
+        <expression-string>CONFIG.CHAR_WV['|']</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>words</expression-string>
+        <expression-string>CONFIG.CHAR_WV['j']</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>index_pairs</expression-string>
+        <expression-string>min(length,max_sequence_length)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>sentences_words_posTags</expression-string>
+        <expression-string>CONFIG.WV['!']</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>getMax(0.97)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -777,13 +808,6 @@
           <folding>
             <element signature="e#107#130#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/model_fn.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="11" column="61" selection-start-line="11" selection-start-column="61" selection-end-line="11" selection-end-column="61" />
         </state>
       </provider>
     </entry>
@@ -895,27 +919,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1083">
-          <caret line="66" column="9" selection-start-line="66" selection-start-column="9" selection-end-line="66" selection-end-column="9" />
-          <folding>
-            <element signature="e#109#118#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
           <caret line="17" selection-start-line="17" selection-end-line="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2019.1/system/python_stubs/-932014861/builtins.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="217">
-          <caret line="4742" column="45" selection-start-line="4742" selection-start-column="45" selection-end-line="4742" selection-end-column="45" />
         </state>
       </provider>
     </entry>
@@ -947,20 +954,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/event_dectect/data_pre_process/cal_sentence_length.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="34" column="24" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
-          <folding>
-            <element signature="e#47#56#0" expanded="true" />
-            <element signature="e#385#715#0" />
-            <element signature="e#780#978#0" />
-            <element signature="e#1442#2921#0" />
-            <element signature="e#2980#4318#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/event_dectect/data_pre_process/cpws_process.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1235">
@@ -988,16 +981,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/input_fn.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="19" column="19" selection-start-line="19" selection-start-column="19" selection-end-line="19" selection-end-column="19" />
-          <folding>
-            <element signature="e#47#63#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/event_dectect/data_pre_process/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -1015,20 +998,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/config_center.py">
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/ntpath.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="99" column="21" lean-forward="true" selection-start-line="99" selection-start-column="21" selection-end-line="99" selection-end-column="21" />
-          <folding>
-            <element signature="e#377#386#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="1330">
+          <caret line="74" column="4" selection-start-line="74" selection-start-column="4" selection-end-line="74" selection-end-column="4" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/word2vec_lstm_crf_ed.py">
+    <entry file="file://$PROJECT_DIR$/event_dectect/Second_For_Fine_Tags/input_fn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4199">
-          <caret line="227" column="30" selection-start-line="227" selection-start-column="29" selection-end-line="227" selection-end-column="30" />
+        <state relative-caret-position="1577">
+          <caret line="87" column="28" selection-start-line="87" selection-start-column="28" selection-end-line="87" selection-end-column="28" />
+          <folding>
+            <element signature="e#107#116#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1038,26 +1021,6 @@
           <caret line="25" column="31" selection-start-line="25" selection-start-column="20" selection-end-line="25" selection-end-column="31" />
           <folding>
             <element signature="e#108#124#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/event_dectect/data_pre_process/brat_data_process.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="12445">
-          <caret line="660" column="40" selection-start-line="660" selection-start-column="40" selection-end-line="660" selection-end-column="40" />
-          <folding>
-            <element signature="e#145#154#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/event_dectect/Config/config_parser.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="12" column="35" selection-start-line="12" selection-start-column="35" selection-end-line="12" selection-end-column="35" />
-          <folding>
-            <element signature="e#47#62#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1072,29 +1035,99 @@
     <entry file="file://$PROJECT_DIR$/event_dectect/Word2Vec/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/event_dectect/Second_For_Fine_Tags/input_fn.py">
+    <entry file="file://$PROJECT_DIR$/event_dectect/data_pre_process/brat_data_process.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="894">
-          <caret line="87" column="28" selection-start-line="87" selection-start-column="28" selection-end-line="87" selection-end-column="28" />
+        <state relative-caret-position="-8">
+          <caret line="661" column="12" selection-start-line="661" selection-start-column="12" selection-end-line="661" selection-end-column="12" />
           <folding>
-            <element signature="e#107#116#0" expanded="true" />
+            <element signature="e#145#154#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/ntpath.py">
+    <entry file="file://$PROJECT_DIR$/event_dectect/data_pre_process/cal_sentence_length.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="917">
-          <caret line="74" column="4" selection-start-line="74" selection-start-column="4" selection-end-line="74" selection-end-column="4" />
+        <state relative-caret-position="-8">
+          <caret line="131" column="68" selection-start-line="131" selection-start-column="68" selection-end-line="131" selection-end-column="68" />
+          <folding>
+            <element signature="e#47#56#0" expanded="true" />
+            <element signature="e#780#978#0" />
+            <element signature="e#1442#2921#0" />
+            <element signature="e#2980#4318#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2019.1/system/python_stubs/-932014861/builtins.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8">
+          <caret line="2958" column="8" selection-start-line="2958" selection-start-column="8" selection-end-line="2958" selection-end-column="8" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/event_dectect/Word2Vec/my_word2vec.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="445">
-          <caret line="109" column="42" selection-start-line="109" selection-start-column="31" selection-end-line="109" selection-end-column="42" />
+        <state relative-caret-position="-8">
+          <caret line="19" column="30" selection-start-line="19" selection-start-column="30" selection-end-line="19" selection-end-column="30" />
           <folding>
             <element signature="e#123#168#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/model_fn.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8">
+          <caret line="23" column="73" selection-start-line="23" selection-start-column="61" selection-end-line="23" selection-end-column="73" />
+          <folding>
+            <element signature="e#213#236#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/config_center.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-17">
+          <caret line="86" column="37" selection-start-line="86" selection-start-column="37" selection-end-line="86" selection-end-column="37" />
+          <folding>
+            <element signature="e#377#386#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8">
+          <caret line="54" column="32" selection-start-line="54" selection-start-column="32" selection-end-line="54" selection-end-column="32" />
+          <folding>
+            <element signature="e#109#118#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/event_dectect/Config/config_parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8">
+          <caret line="31" column="92" selection-start-line="31" selection-start-column="92" selection-end-line="31" selection-end-column="92" />
+          <folding>
+            <element signature="e#47#62#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/word2vec_lstm_crf_ed.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8">
+          <caret line="83" column="50" selection-start-line="83" selection-start-column="50" selection-end-line="83" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/input_fn.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="65" column="59" selection-start-line="65" selection-start-column="59" selection-end-line="65" selection-end-column="59" />
+          <folding>
+            <element signature="e#47#63#0" expanded="true" />
           </folding>
         </state>
       </provider>

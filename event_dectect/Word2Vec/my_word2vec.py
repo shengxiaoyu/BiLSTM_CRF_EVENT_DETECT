@@ -98,8 +98,8 @@ def segment_words(source,savePath,segmentor_model_path, segmentor_user_dict_path
 
 
 if __name__ == '__main__':
-    # rootdir = r'A:\Bi-LSTM+CRF'
-    rootdir = r'/hoome/shengyu/data'
+    rootdir = r'A:\Bi-LSTM+CRF'
+    # rootdir = r'/home/shengyu/data'
     ltpDir = os.path.join(rootdir,'ltp_data_v3.4.0')
     # word2vecDir = os.path.join(rootdir,'word2vec')
     # mode = 'word'

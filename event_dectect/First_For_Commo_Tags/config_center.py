@@ -18,6 +18,7 @@ from pyltp import Segmentor
 from event_dectect.Word2Vec.my_word2vec import Word2VecModel
 
 WV = None
+CHAR_WV = None
 TRIGGER_TAGs = None
 ARGU_TAGs =None
 TAG_2_ID = None
@@ -39,7 +40,7 @@ def init(rootdir):
     if(not ifInited):
         initTags(os.path.join(rootdir,'triggerLabels.txt'),os.path.join(rootdir, 'argumentLabels.txt'))
         initPyltpModel(os.path.join(rootdir,'ltp_data_v3.4.0'))
-        initWord2Vec(os.path.join(rootdir, 'newWord2vec'))
+        initWord2Vec(os.path.join(rootdir, 'newWord2vec'),os.path.join(rootdir,'char2vec'))
         initPosTag(os.path.join(rootdir, 'pos_tags.csv'))
         initStopWords(os.path.join(rootdir, 'newStopWords.txt'))
         initTriggerWords(os.path.join(rootdir,'triggers'))
@@ -74,12 +75,16 @@ def initTags(triggerLablePath,argumentLabelPath):
             TRIGGER_TAGs.append(line.strip())
             index += 1
     TAGs_LEN = len(TAG_2_ID)
-def initWord2Vec(word2vec_model_path):
-    global WV
+def initWord2Vec(word2vec_model_path,char2vec_model_path):
+    global WV,CHAR_WV
     print('加载word2vec模型地址：'+word2vec_model_path)
-    WV = Word2VecModel(word2vec_model_path, '', 30).getEmbedded()
+    WV = Word2VecModel(word2vec_model_path, '', 300).getEmbedded()
     # <pad> -- <pad> fill word2vec and tags，添加一个<pad>-向量为0的，用于填充
     WV.add('<pad>', np.zeros(WV.vector_size))
+
+    print('加载char2vec模型地址：'+char2vec_model_path)
+    CHAR_WV = Word2VecModel(char2vec_model_path, '', 300).getEmbedded()
+    CHAR_WV.add('*', np.zeros(CHAR_WV.vector_size))
 def initPosTag(pos_tag_path):
     global POS_2_ID,POSs_LEN
     POS_2_ID={}
