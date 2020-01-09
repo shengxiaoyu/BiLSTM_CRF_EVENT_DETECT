@@ -657,7 +657,30 @@ def one_merge(tagsList):
     return mergedTags
 
 if __name__ == '__main__':
-    main()
+    # main()
     # merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
+    #统计某个标签个数
+    # dir = r'A:\Bi-LSTM+CRF\labeled\Merge_for_first'
+    # b_count = 0
+    # i_count = 0
+    # for sub_dir in os.listdir(dir):
+    #     sub_dir = os.path.join(dir,sub_dir)
+    #     for sub_sub_dir in os.listdir(sub_dir):
+    #         if(sub_sub_dir!='10'):
+    #             continue
+    #         sub_sub_dir = os.path.join(sub_dir,sub_sub_dir)
+    #         for file in os.listdir(sub_sub_dir):
+    #             with open(os.path.join(sub_sub_dir,file),'r',encoding='utf8') as reader:
+    #                 count = -1
+    #                 for line in reader.readlines():
+    #                     count+=1
+    #                     if(count%3==1):
+    #                         for tag in line.split(' '):
+    #                             if(tag=='B_Negated'):
+    #                                 b_count+=1
+    #                             if(tag=='I_Negated'):
+    #                                 i_count+=1
+    # print(b_count)
+    # print(i_count)
     print ('end')
     sys.exit(0)

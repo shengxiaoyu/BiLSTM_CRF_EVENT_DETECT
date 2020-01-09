@@ -170,6 +170,17 @@ def main(FLAGS,sentences=None,dir=None,output_path=None):
         tags_list = []
         for pre_ids in predictions:
             tags_list.append([CONFIG.ID_2_TAG[id]for id in pre_ids])
+
+        #把预测的字标签转换为词级别的标签
+        final_tags_list = []
+        for words,tags in zip(words_list,tags_list):
+            index = 0
+            final_tags = []
+            for word in words:
+                final_tags.append(tags[index])
+                index += len(word)
+            final_tags_list.append(final_tags)
+        tags_list = final_tags_list
         for words,tags in zip(words_list,tags_list):
             print(' '.join(words))
             print('\n')

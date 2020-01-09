@@ -6,17 +6,18 @@ import os
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
 
+
 def getParser():
     # 构造参数
-    # rootPath = 'A:\Bi-LSTM+CRF'
-    rootPath = '/home/shengyu/data'
+    rootPath = 'A:\Bi-LSTM+CRF'
+    # rootPath = '/home/shengyu/data'
     ltpPath = os.path.join(rootPath, 'ltp_data_v3.4.0')
     parser = argparse.ArgumentParser(description='Bi-LSTM+CRF')
     parser.add_argument('--root_dir', help='root dir', default=rootPath)
     parser.add_argument('--ifTrain', help='train and dev', default=False)
     parser.add_argument('--ifTest', help='test', default=False)
-    parser.add_argument('--ifPredict',help='predict input sentence',default=False)
-    parser.add_argument('--ifPredictFile',help='predict sentence in file or dir',default=False)
+    parser.add_argument('--ifPredict', help='predict input sentence', default=False)
+    parser.add_argument('--ifPredictFile', help='predict sentence in file or dir', default=False)
     parser.add_argument('--dropout_rate', help='dropout rate', default=0.9)
     parser.add_argument('--learning_rate', help='learning rate', default=0.001)
     parser.add_argument('--hidden_units', help='hidden units', default=100)
@@ -24,13 +25,14 @@ def getParser():
     parser.add_argument('--sentence_mode',
                         # help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Full')
                         # help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Spe')
-                        help='one sentence one event is Spe,one sentence may have many events is Full,or merge', default='Merge')
+                        help='one sentence one event is Spe,one sentence may have many events is Full,or merge',
+                        default='Merge')
     parser.add_argument('--labeled_data_path', help='labeled data path',
                         default=os.path.join(os.path.join(rootPath, 'labeled'), parser.get_default('sentence_mode')))
-                        # default=os.path.join(os.path.join(rootPath, 'labeled'), 'newExamples'))
+    # default=os.path.join(os.path.join(rootPath, 'labeled'), 'newExamples'))
     # parser.add_argument('--max_sequence_length', help='max length of sequence', default= 52 )  # Full - 40,Spe-51,Merge-55
-    parser.add_argument('--max_sequence_length', help='max length of sequence', default= 120 )  # Full - 40,Spe-51,Merge-55
-    parser.add_argument('--max_char_sequence_length', help='max length of sequence', default= 120 )  # Full - 40,Spe-51,Merge-55
+    parser.add_argument('--max_sequence_length', help='max length of sequence',
+                        default=120)  # char-120 word-52
     parser.add_argument('--batch_size', help='batch size', default=64)
     parser.add_argument('--num_epochs', help='num of epochs', default=15)
     parser.add_argument('--device_map', help='which device to see', default='CPU:0')
@@ -40,12 +42,13 @@ def getParser():
                         default=os.path.join(ltpPath, 'userDict.txt'))
     parser.add_argument('--word2vec_path', help='word2vecpath', default=os.path.join(rootPath, 'word2vec'))
     parser.add_argument('--embedded_dim', help='wordembeddeddim', default=300)
-    parser.add_argument('--test_folder',default='10')
-    parser.add_argument('--dev_folder',default='9')
-    parser.add_argument('--train_folder',default='1,2,3,4,5,6,7,8')
-    parser.add_argument('--second_label',default=False)
+    parser.add_argument('--test_folder', default='10')
+    parser.add_argument('--dev_folder', default='9')
+    parser.add_argument('--train_folder', default='1,2,3,4,5,6,7,8')
+    parser.add_argument('--second_label', default=False)
     FLAGS, args = parser.parse_known_args()
     return FLAGS
+
 
 if __name__ == '__main__':
     pass

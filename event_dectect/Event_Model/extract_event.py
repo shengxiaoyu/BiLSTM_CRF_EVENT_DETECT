@@ -16,8 +16,9 @@ from event_dectect.util.constant import NEGATIONS
 import re
 import sys
 
+
 class Extractor(object):
-    def __init__(self,first_output_path=None,second_output_path=None):
+    def __init__(self, first_output_path=None, second_output_path=None):
         print('构造参数')
         self.FLAGS = getParser()
         self.FLAGS.ifTrain = False
@@ -31,7 +32,8 @@ class Extractor(object):
         self.sentenceSplitter = SentenceSplitter()
 
     '''传入文本段抽取'''
-    def extractor(self,paragraph):
+
+    def extractor(self, paragraph):
         # 调用预测接口
 
         sentences = []
@@ -41,70 +43,83 @@ class Extractor(object):
             # '''有可能被告辩称内容中含有诉称，因此如果进入辩称段，则不再考虑诉称为原告'''
             # if(isYg and sentence.find('诉称')!=-1):
             #     isYg = True
-            if(sentence.find('辩称')!=-1):
+            if (sentence.find('辩称') != -1):
                 isYg = False
             hasTrigger = ifContainTrigger(sentence)
             if (not hasTrigger):
                 print('该句子中无关注事实：' + sentence)
             else:
                 sentences.append(sentence)
-                if(isYg):
+                if (isYg):
                     speakers.append(parties.PLAINTIFF)
                 else:
                     speakers.append(parties.DEFENDANT)
         print('第一个模型预测')
-        if(len(sentences)==0):
+        if (len(sentences) == 0):
             print("整个抽取文本无关注事实")
             return []
-        words_list,first_tags_list,index_pairs_list = first.main(self.FLAGS, sentences,output_path=self.first_output_path)
+        words_list, first_tags_list, index_pairs_list = first.main(self.FLAGS, sentences,
+                                                                   output_path=self.first_output_path)
+        self.__handle_I_Begin__(first_tags_list)
         print('第二个模型预测')
-        if(self.FLAGS.second_label):
-            words_list,second_tags_list,index_pairs_list,sentences,speakers = self.second_label([words_list,first_tags_list,index_pairs_list,sentences,speakers])
+        if (self.FLAGS.second_label):
+            words_list, second_tags_list, index_pairs_list, sentences, speakers = self.second_label(
+                [words_list, first_tags_list, index_pairs_list, sentences, speakers])
         else:
-            words_list,second_tags_list,index_pairs_list,sentences,speakers = self.argu_match_base(words_list,first_tags_list,index_pairs_list,sentences,speakers)
+            words_list, second_tags_list, index_pairs_list, sentences, speakers = self.argu_match_base(words_list,
+                                                                                                       first_tags_list,
+                                                                                                       index_pairs_list,
+                                                                                                       sentences,
+                                                                                                       speakers)
 
-        #额外增加处理否定词
-        self.__handle_negation__(words_list,second_tags_list,sentences,index_pairs_list)
-        self.__handle_value__(words_list,second_tags_list,sentences,index_pairs_list)
+        # 额外增加处理否定词
+        self.__handle_negation__(words_list, second_tags_list, sentences, index_pairs_list)
+        self.__handle_value__(words_list, second_tags_list, sentences, index_pairs_list)
         events = []
         id_index = 0
-        for tags, words,index_pairs,sentence,speaker in zip(second_tags_list, words_list,index_pairs_list,sentences,speakers):
+        for tags, words, index_pairs, sentence, speaker in zip(second_tags_list, words_list, index_pairs_list,
+                                                               sentences, speakers):
             event = Event._formEvent('E' + str(id_index), tags, words, index_pairs, sentence, speaker)
-            if(event):
+            if (event):
                 events.append(event)
                 id_index += 1
-        print('事件抽取完成：\n'+'\n'.join([str(event) for event in events]))
+        print('事件抽取完成：\n' + '\n'.join([str(event) for event in events]))
         return events
 
     '''使用两阶段标记的方式'''
-    def second_label(self,words_firstTags_indxPairs_sentences_speaker):
-        return second.main(self.FLAGS,words_firstTags_indxPairs_sentences_speaker=words_firstTags_indxPairs_sentences_speaker,output_path=self.second_output_path)
+
+    def second_label(self, words_firstTags_indxPairs_sentences_speaker):
+        return second.main(self.FLAGS,
+                           words_firstTags_indxPairs_sentences_speaker=words_firstTags_indxPairs_sentences_speaker,
+                           output_path=self.second_output_path)
 
     '''第一层模型预测之后基于规则匹配'''
-    def argu_match_base(self,words_list,first_tags_list,index_pairs_list,sentences,speakers):
-        words_lists=[]
-        second_tags_lists=[]
-        index_pairs_lists=[]
-        sentencess=[]
+
+    def argu_match_base(self, words_list, first_tags_list, index_pairs_list, sentences, speakers):
+        words_lists = []
+        second_tags_lists = []
+        index_pairs_lists = []
+        sentencess = []
         speakerss = []
-        
+
         for words, tags, words_in_sentence_index_pair, sentence, speaker in zip(words_list, first_tags_list,
-                                                                       index_pairs_list, sentences,speakers):
-            words_list, second_tags_list, index_pairs_list, sentences, speakers = self.__get_final_tags_from_base_tags(words, tags, words_in_sentence_index_pair, sentence,speaker)
+                                                                                index_pairs_list, sentences, speakers):
+            words_list, second_tags_list, index_pairs_list, sentences, speakers = self.__get_final_tags_from_base_tags(
+                words, tags, words_in_sentence_index_pair, sentence, speaker)
             words_lists.extend(words_list)
             second_tags_lists.extend(second_tags_list)
             index_pairs_lists.extend(index_pairs_list)
             sentencess.extend(sentences)
             speakerss.extend(speakers)
-        return words_lists,second_tags_lists,index_pairs_lists,sentencess,speakerss
+        return words_lists, second_tags_lists, index_pairs_lists, sentencess, speakerss
 
-    def __get_final_tags_from_base_tags(self, words,tags,words_in_sentence_index_pair, sentence,speaker):
+    def __get_final_tags_from_base_tags(self, words, tags, words_in_sentence_index_pair, sentence, speaker):
         # 获取触发词tag
         triggers = CONFIG.TRIGGER_TAGs
-        words_list=[]
-        second_tags_list=[]
-        index_pairs_list=[]
-        sentences=[]
+        words_list = []
+        second_tags_list = []
+        index_pairs_list = []
+        sentences = []
         speakers = []
         for index, tag in enumerate(tags):
             if (tag in triggers and tag.find('B_') != -1):
@@ -113,22 +128,22 @@ class Extractor(object):
                 # sentence_char_index_pair = words_in_sentence_index_pairs[index]
                 tag_index_pair = [index, index]
 
-                #寻找完整的触发词
+                # 寻找完整的触发词
                 for endIndex in range(index + 1, len(tags)):
                     if (tags[endIndex] == 'I_' + type):
                         tag_index_pair[1] += 1
                     else:
                         break
                 words_list.append([x for x in words])
-                second_tags_list.append(self.__get_final_tag(type,tag_index_pair,tags,sentence))
+                second_tags_list.append(self.__get_final_tag(type, tag_index_pair, tags, sentence))
                 index_pairs_list.append([x for x in words_in_sentence_index_pair])
                 sentences.append(sentence)
                 speakers.append(speaker)
         return words_list, second_tags_list, index_pairs_list, sentences, speakers
 
-    def __get_final_tag(self,type,index_pair,first_tags_list,sentence):
+    def __get_final_tag(self, type, index_pair, first_tags_list, sentence):
         final_tags = ['O' for _ in first_tags_list]
-        self.__label__(final_tags,index_pair[0],index_pair[1],type+'_Trigger')
+        self.__label__(final_tags, index_pair[0], index_pair[1], type + '_Trigger')
 
         negated_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Negated')
         if (not negated_index_pair):
@@ -136,26 +151,26 @@ class Extractor(object):
         if (negated_index_pair):
             self.__label__(final_tags, negated_index_pair[0], negated_index_pair[1], 'Negation')
 
-        if(type=='Know'):
-            time_index_pair = self.__findFoward__(index_pair[0],first_tags_list,'Time')
-            if(time_index_pair):
-                self.__label__(final_tags,time_index_pair[0],time_index_pair[1],type+'_Time')
-        elif(type=='BeInLove'):
+        if (type == 'Know'):
             time_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
             if (time_index_pair):
                 self.__label__(final_tags, time_index_pair[0], time_index_pair[1], type + '_Time')
-        elif(type=='Marry'):
+        elif (type == 'BeInLove'):
             time_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
             if (time_index_pair):
                 self.__label__(final_tags, time_index_pair[0], time_index_pair[1], type + '_Time')
-        elif(type=='Remarry'):
+        elif (type == 'Marry'):
+            time_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
+            if (time_index_pair):
+                self.__label__(final_tags, time_index_pair[0], time_index_pair[1], type + '_Time')
+        elif (type == 'Remarry'):
             participant_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Person')
             if (participant_index_pair):
                 self.__label__(final_tags, participant_index_pair[0], participant_index_pair[1], type + '_Participant')
-        elif(type=='Bear'):
-            dateOfBirth_index_pair = self.__findFoward__(index_pair[0],first_tags_list,'Time')
-            if(dateOfBirth_index_pair):
-                self.__label__(final_tags,dateOfBirth_index_pair[0],dateOfBirth_index_pair[1],type+'_DateOfBirth')
+        elif (type == 'Bear'):
+            dateOfBirth_index_pair = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
+            if (dateOfBirth_index_pair):
+                self.__label__(final_tags, dateOfBirth_index_pair[0], dateOfBirth_index_pair[1], type + '_DateOfBirth')
 
             gender_index_pair = self.__findBack__(index_pair[1], first_tags_list, 'Gender')
             if (gender_index_pair):
@@ -168,66 +183,66 @@ class Extractor(object):
             age_index_pair = self.__findBack__(index_pair[1], first_tags_list, 'Age')
             if (age_index_pair):
                 self.__label__(final_tags, age_index_pair[0], age_index_pair[1], type + '_Age')
-        elif(type=='DomesticViolence'):
-            if(sentence.find('被')!=-1):
-                perpetrators = self.__findFoward__(index_pair[0],first_tags_list,'Person',quickStop=True)
+        elif (type == 'DomesticViolence'):
+            if (sentence.find('被') != -1):
+                perpetrators = self.__findFoward__(index_pair[0], first_tags_list, 'Person', quickStop=True)
                 if (perpetrators):
                     self.__label__(final_tags, perpetrators[0], perpetrators[1], type + '_Perpetrators')
-                victim = self.__findFoward__(index_pair[0],first_tags_list,'Person')
+                victim = self.__findFoward__(index_pair[0], first_tags_list, 'Person')
                 if (victim):
                     self.__label__(final_tags, victim[0], victim[1], type + '_Victim')
             else:
-                perpetrators = self.__findFoward__(index_pair[0],first_tags_list,'Person')
+                perpetrators = self.__findFoward__(index_pair[0], first_tags_list, 'Person')
                 if (perpetrators):
                     self.__label__(final_tags, perpetrators[0], perpetrators[1], type + '_Perpetrators')
-                victim = self.__findBack__(index_pair[1],first_tags_list,'Person')
+                victim = self.__findBack__(index_pair[1], first_tags_list, 'Person')
                 if (victim):
                     self.__label__(final_tags, victim[0], victim[1], type + '_Victim')
             time = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
             if (time):
                 self.__label__(final_tags, time[0], time[1], type + '_Time')
-        elif(type=='BadHabit'):
+        elif (type == 'BadHabit'):
             perpetrators = self.__findFoward__(index_pair[0], first_tags_list, 'Person')
-            if ( perpetrators):
+            if (perpetrators):
                 self.__label__(final_tags, perpetrators[0], perpetrators[1], type + '_Perpetrators')
-        elif(type=='Derailed'):
+        elif (type == 'Derailed'):
             time = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
-            if ( time):
+            if (time):
                 self.__label__(final_tags, time[0], time[1], type + '_Time')
             derailer = self.__findFoward__(index_pair[0], first_tags_list, 'Person')
-            if( derailer):
+            if (derailer):
                 self.__label__(final_tags, derailer[0], derailer[1], type + '_Derailer')
-        elif(type=='Separation'):
+        elif (type == 'Separation'):
             beginTime = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
-            if( beginTime):
+            if (beginTime):
                 self.__label__(final_tags, beginTime[0], beginTime[1], type + '_BeginTime')
-            endTime = self.__findBack__(index_pair[1],first_tags_list,'Time')
-            if( endTime):
-                self.__label__(final_tags,endTime[0],endTime[1],type+'_EndTime')
+            endTime = self.__findBack__(index_pair[1], first_tags_list, 'Time')
+            if (endTime):
+                self.__label__(final_tags, endTime[0], endTime[1], type + '_EndTime')
             duration = self.__findBack__(index_pair[1], first_tags_list, 'Duration')
             if (duration):
                 self.__label__(final_tags, duration[0], duration[1], type + '_Duration')
-        elif(type=='DivorceLawsuit'):
+        elif (type == 'DivorceLawsuit'):
             sueTime = self.__findFoward__(index_pair[0], first_tags_list, 'Time')
-            if ( sueTime):
+            if (sueTime):
                 self.__label__(final_tags, sueTime[0], sueTime[1], type + '_SueTime')
             initiator = self.__findFoward__(index_pair[0], first_tags_list, 'Person')
-            if ( initiator):
+            if (initiator):
                 self.__label__(final_tags, initiator[0], initiator[1], type + '_Initiator')
 
             court = self.__findFoward__(index_pair[0], first_tags_list, 'Court')
             if (not court):
                 court = self.__findBack__(index_pair[1], first_tags_list, 'Court')
-            if ( court):
-                self.__label__(final_tags, court[0], court[1], type+'_Court')
+            if (court):
+                self.__label__(final_tags, court[0], court[1], type + '_Court')
 
             result = self.__findBack__(index_pair[1], first_tags_list, 'Judgment')
-            if ( result):
+            if (result):
                 self.__label__(final_tags, result[0], result[1], type + '_Result')
             judgeTime = self.__findBack__(index_pair[1], first_tags_list, 'Time')
-            if ( judgeTime):
+            if (judgeTime):
                 self.__label__(final_tags, judgeTime[0], judgeTime[1], type + '_JudgeTime')
-        elif(type=='Wealth'):
+        elif (type == 'Wealth'):
             value = self.__findFoward__(index_pair[0], first_tags_list, 'Price')
             if (value):
                 self.__label__(final_tags, value[0], value[1], type + '_Value')
@@ -239,62 +254,62 @@ class Extractor(object):
             isPersonal = self.__findFoward__(index_pair[0], first_tags_list, 'PersonalProperty')
             if (not isPersonal):
                 isPersonal = self.__findBack__(index_pair[1], first_tags_list, 'PersonalProperty')
-            if ( isPersonal):
+            if (isPersonal):
                 self.__label__(final_tags, isPersonal[0], isPersonal[1], type + '_IsPersonal')
 
             isCommon = self.__findFoward__(index_pair[0], first_tags_list, 'CommonProperty')
             if (not isCommon):
                 isCommon = self.__findBack__(index_pair[1], first_tags_list, 'CommonProperty')
-            if ( isCommon):
+            if (isCommon):
                 self.__label__(final_tags, isCommon[0], isCommon[1], type + '_IsCommon')
 
             whose = self.__findBack__(index_pair[1], first_tags_list, 'Person')
-            if( whose):
+            if (whose):
                 self.__label__(final_tags, whose[0], whose[1], type + '_Whose')
-        elif(type=='Debt'):
-            creditor = self.__findBack__(index_pair[1],first_tags_list,'Person')
-            if( creditor):
-                self.__label__(final_tags,creditor[0],creditor[1],'_Creditor')
+        elif (type == 'Debt'):
+            creditor = self.__findBack__(index_pair[1], first_tags_list, 'Person')
+            if (creditor):
+                self.__label__(final_tags, creditor[0], creditor[1], '_Creditor')
 
             value = self.__findBack__(index_pair[1], first_tags_list, 'Price')
-            if ( value):
+            if (value):
                 self.__label__(final_tags, value[0], value[1], type + '_Value')
-        elif(type=='Credit'):
+        elif (type == 'Credit'):
             debtor = self.__findBack__(index_pair[1], first_tags_list, 'Person')
-            if ( debtor):
+            if (debtor):
                 self.__label__(final_tags, debtor[0], debtor[1], '_Creditor')
 
             value = self.__findBack__(index_pair[1], first_tags_list, 'Price')
-            if ( value):
+            if (value):
                 self.__label__(final_tags, value[0], value[1], type + '_Value')
         return final_tags
 
-    def __findFoward__ (self,end,tags,target,quickStop=False):
+    def __findFoward__(self, end, tags, target, quickStop=False):
         '''find from 0 to self.trigger_begin_index'''
         '''if quickStop = True ,return when first find target, quickStop=False, return until find last target'''
-        index_pair = [0,0]
+        index_pair = [0, 0]
         haveFound = False
         # 从头找到触发词index
         for index in range(0, end):
-            if (tags[index] == 'B_'+target):  # 先找B_ ,后面找到的覆盖前面找到的
-                if(haveFound and quickStop):
+            if (tags[index] == 'B_' + target):  # 先找B_ ,后面找到的覆盖前面找到的
+                if (haveFound and quickStop):
                     break
                 index_pair[0] = index
                 index_pair[1] = index
-                haveFound=True
+                haveFound = True
                 '''找到完整的'''
-                for index2 in range(index+1,end):
-                    if(tags[index2]=='I_'+target):
-                        index_pair[1]=index2
+                for index2 in range(index + 1, end):
+                    if (tags[index2] == 'I_' + target):
+                        index_pair[1] = index2
                     else:
                         break
-        if(not haveFound):
+        if (not haveFound):
             return None
         return index_pair
 
-    def __findBack__(self,begin,tags,target):
+    def __findBack__(self, begin, tags, target):
         index_pair = [0, 0]
-        end_index= begin+1
+        end_index = begin + 1
         # 从触发词开始往后找
         hasFound = False
         while (end_index < len(tags)):
@@ -303,38 +318,59 @@ class Extractor(object):
                 index_pair[1] = end_index
                 hasFound = True
                 '''找到完整的'''
-                for index2 in range(end_index+1, len(tags)):
+                for index2 in range(end_index + 1, len(tags)):
                     if (tags[index2] == 'I_' + target):
                         index_pair[1] = index2
                     else:
                         break
-                hasFound=True
+                hasFound = True
                 break
-            end_index+=1
-        if(not hasFound):
+            end_index += 1
+        if (not hasFound):
             return None
         return index_pair
 
-    def __label__(self,tags,begin,end,tag):
-        tags[begin] = 'B_'+tag
-        for index in range(begin+1,end+1):
-            tags[index] = 'I_'+tag
+    def __label__(self, tags, begin, end, tag):
+        tags[begin] = 'B_' + tag
+        for index in range(begin + 1, end + 1):
+            tags[index] = 'I_' + tag
 
-    def __handle_value__(self,words_list,second_tags_list,sentences,index_pairs_list):
+    def __handle_I_Begin__(self, first_tags_list):
+        for tags in first_tags_list:
+            for index,tag in enumerate(tags):
+                if(tag=='O'):
+                    continue
+                if(tag.find('B_')!=-1):
+                    continue
+                b_tag = tag.replace('I_','B_')
+                if(index==0):
+                    tags[index] = b_tag
+                    continue
+                last_index = index-1
+                while(last_index>=0):
+                    if(tags[last_index]==tag):
+                        last_index = last_index-1
+                        continue
+                    if(tags[last_index]==b_tag):
+                        break
+                    tags[last_index+1] = b_tag
+    def __handle_value__(self, words_list, second_tags_list, sentences, index_pairs_list):
         pattern = re.compile(r'[一|二|三|四|五|六|七|八|九|十|\d]+[\.\，\、]?[一|二|三|四|五|六|七|八|九|十|\d]*[多万元|余万元|万余元|多元|多万|万元|万|元]')
-        for words,tags,sentence,index_pairs in zip(words_list,second_tags_list,sentences,index_pairs_list):
-            if(('B_Wealth_Trigger' in tags and 'B_Wealth_Value' not in tags) or ('B_Debt_Trigger' in tags and 'B_Debt_Value' not in tags) or ('B_Credit_Trigger' in tags and 'B_Credit_Value' not in tags)):
-                length = min(len(index_pairs),len(words),len(tags))
-                #找到Price的触发词，找到距离触发词最近的Price表达式
+        for words, tags, sentence, index_pairs in zip(words_list, second_tags_list, sentences, index_pairs_list):
+            if (('B_Wealth_Trigger' in tags and 'B_Wealth_Value' not in tags) or (
+                    'B_Debt_Trigger' in tags and 'B_Debt_Value' not in tags) or (
+                    'B_Credit_Trigger' in tags and 'B_Credit_Value' not in tags)):
+                length = min(len(index_pairs), len(words), len(tags))
+                # 找到Price的触发词，找到距离触发词最近的Price表达式
                 trigger_label = ''
                 trigger_begin_index = 0
                 trigger_end_index = 0
                 for i in range(length):
-                    if(tags[i]=='B_Wealth_Trigger' or tags[i]=='B_Debt_Trigger' or tags[i]=='B_Credit_Trigger'):
+                    if (tags[i] == 'B_Wealth_Trigger' or tags[i] == 'B_Debt_Trigger' or tags[i] == 'B_Credit_Trigger'):
                         trigger_begin_index = index_pairs[i][0]
                         trigger_end_index = index_pairs[i][1]
                         trigger_label = tags[i].split('_')[1]
-                    if(tags[i]=='I_Wealth_Trigger' or tags[i]=='I_Debt_Trigger' or tags[i]=='I_Credit_Trigger'):
+                    if (tags[i] == 'I_Wealth_Trigger' or tags[i] == 'I_Debt_Trigger' or tags[i] == 'I_Credit_Trigger'):
                         trigger_end_index = index_pairs[i][1]
 
                 # 遍历所有的Prcie表达式，标注最近的作为目标
@@ -347,10 +383,10 @@ class Extractor(object):
                 for match in it:
                     the_value = match.group()
                     the_value_begin_index = sentence.find(the_value, base_index)
-                    the_value_end_index = the_value_begin_index+len(the_value)
-                    if(the_value_begin_index>trigger_begin_index):#value在触发词前
-                        dis = trigger_begin_index-the_value_end_index
-                        if(dis<min_dis):
+                    the_value_end_index = the_value_begin_index + len(the_value)
+                    if (the_value_begin_index > trigger_begin_index):  # value在触发词前
+                        dis = trigger_begin_index - the_value_end_index
+                        if (dis < min_dis):
                             value = the_value
                             value_begin_index = the_value_begin_index
                             value_end_index = the_value_end_index
@@ -362,82 +398,64 @@ class Extractor(object):
                             value_end_index = the_value_end_index
                     base_index = the_value_end_index
 
-                #根据找到的Value坐标，标注tags
+                # 根据找到的Value坐标，标注tags
                 for i in range(length):
-                    if(index_pairs[i][0]<=value_begin_index and index_pairs[i][1]>value_begin_index):
-                        tags[i] = 'B_'+trigger_label+'_Value'
+                    if (index_pairs[i][0] <= value_begin_index and index_pairs[i][1] > value_begin_index):
+                        tags[i] = 'B_' + trigger_label + '_Value'
                         continue
-                    if(value_end_index>index_pairs[i][0]):
-                        tags[i]='I_'+trigger_label+'_Value'
+                    if (value_end_index > index_pairs[i][0]):
+                        tags[i] = 'I_' + trigger_label + '_Value'
                         continue
-                    if(value_end_index<=index_pairs[i][0]):
+                    if (value_end_index <= index_pairs[i][0]):
                         break
 
 
-    def  __handle_negation__(self,words_list,second_tags_list,sentences,index_pairs_list):
-        for words,tags,sentence,index_pairs in zip(words_list,second_tags_list,sentences,index_pairs_list):
-            #如果已经有否定词了则不找了
-            if('B_Negation' in tags):
+    def __handle_negation__(self, words_list, second_tags_list, sentences, index_pairs_list):
+        for words, tags, sentence, index_pairs in zip(words_list, second_tags_list, sentences, index_pairs_list):
+            # 如果已经有否定词了则不找了
+            if ('B_Negation' in tags):
                 continue
-            words_len = min(len(index_pairs),len(words),len(tags))
+            words_len = min(len(index_pairs), len(words), len(tags))
 
-            #获取触发词的index
+            # 获取触发词的index
             begin_tri = -1
             end_tri = -1
             for i in range(words_len):
-                if(tags[i].find('Trigger')!=-1 and tags[i].find('B_')!=-1):
+                if (tags[i].find('Trigger') != -1 and tags[i].find('B_') != -1):
                     begin_tri = i
                     end_tri = i
-                if(tags[i].find('Trigger')!=-1 and tags[i].find('I_')!=-1):
+                if (tags[i].find('Trigger') != -1 and tags[i].find('I_') != -1):
                     end_tri = i
 
-            if(begin_tri==-1):
+            if (begin_tri == -1):
                 return
 
-            #规定最多在触发词的前10和后6范围内找
-            begin_index = 0 if(begin_tri-10<0) else begin_tri-10
-            end_index = words_len if(end_tri+6>words_len) else end_tri+6
+            # 规定最多在触发词的前10和后6范围内找
+            begin_index = 0 if (begin_tri - 10 < 0) else begin_tri - 10
+            end_index = words_len if (end_tri + 6 > words_len) else end_tri + 6
 
-            #缩小到最小的单句内
-            sub_sens = re.split('，|。|！|？|；',sentence)
+            # 缩小到最小的单句内
+            sub_sens = re.split('，|。|！|？|；', sentence)
             base_index = 0
             for sub_sen in sub_sens:
-                #确定是哪一个小句
-                if(base_index<=index_pairs[begin_tri][0] and base_index+len(sub_sen)>=index_pairs[end_tri][1]):
-                    #确定小句的开头
+                # 确定是哪一个小句
+                if (base_index <= index_pairs[begin_tri][0] and base_index + len(sub_sen) >= index_pairs[end_tri][1]):
+                    # 确定小句的开头
                     for index_pair_index in range(words_len):
-                        if(index_pairs[index_pair_index][1]>=base_index):
+                        if (index_pairs[index_pair_index][1] >= base_index):
                             begin_index = index_pair_index
                             break
-                    #确定小句的结尾
+                    # 确定小句的结尾
                     for index_pair_index in range(words_len):
-                        if(index_pairs[index_pair_index][0]>=base_index+len(sub_sen)):
+                        if (index_pairs[index_pair_index][0] >= base_index + len(sub_sen)):
                             end_index = index_pair_index
                             break
-                base_index= base_index+len(sub_sen)+1
+                base_index = base_index + len(sub_sen) + 1
             found = False
 
-            #从触发词往前找
-            for i in range(begin_tri-1,begin_index-1,-1):
-                if(found):
-                    break
-                for negation_words in NEGATIONS:
-                    if(words[i]==negation_words[0]):
-                        # 判断是否整个否定词都有
-                        negationg_len = len(negation_words)
-                        if (''.join(words[i:i + negationg_len]) == ''.join(negation_words)):
-                            for target_index in range(negationg_len):
-                                if (target_index == 0):
-                                    tags[i + target_index] = 'B_Negation'
-                                else:
-                                    tags[i + target_index] = 'I_Negation'
-                            found = True
-                            break
-            #从触发词往后找
-            if(found):
-                continue
-            for i in range(end_tri,end_index):
-                if(found):
+            # 从触发词往前找
+            for i in range(begin_tri - 1, begin_index - 1, -1):
+                if (found):
                     break
                 for negation_words in NEGATIONS:
                     if (words[i] == negation_words[0]):
@@ -451,7 +469,27 @@ class Extractor(object):
                                     tags[i + target_index] = 'I_Negation'
                             found = True
                             break
-    #判断是否含有关注事实触发词
+            # 从触发词往后找
+            if (found):
+                continue
+            for i in range(end_tri, end_index):
+                if (found):
+                    break
+                for negation_words in NEGATIONS:
+                    if (words[i] == negation_words[0]):
+                        # 判断是否整个否定词都有
+                        negationg_len = len(negation_words)
+                        if (''.join(words[i:i + negationg_len]) == ''.join(negation_words)):
+                            for target_index in range(negationg_len):
+                                if (target_index == 0):
+                                    tags[i + target_index] = 'B_Negation'
+                                else:
+                                    tags[i + target_index] = 'I_Negation'
+                            found = True
+                            break
+    # 判断是否含有关注事实触发词
+
+
 def ifContainTrigger(sentence):
     # 初始化触发词集
     triggerDict = CONFIG.TRIGGER_WORDS_DICT
@@ -466,11 +504,14 @@ def ifContainTrigger(sentence):
     if (len(triggerContained) == 0):
         return False
     return True
+
+
 if __name__ == '__main__':
-    string = '感情还没破裂。彼此还有感情。感情已完全破裂无和好可能。夫妻感情是好的。'
+    string = '由于被告的行为已经触犯《刑法》第二百五十八条之规定，涉嫌重婚罪，被告的行为，致使原告身心受到巨大伤害，二人夫妻感情确已破裂。'
     ext = Extractor()
     events = ext.extractor(string)
-    json_str = events[0]._obj_to_json()
+    print(events)
+    # json_str = events[0]._obj_to_json()
     # res = string.find('88000元',0)
     # print('end')
     exit(0)
