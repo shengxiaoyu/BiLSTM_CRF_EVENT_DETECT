@@ -9,8 +9,8 @@ __author__ = '13314409603@163.com'
 
 def getParser():
     # 构造参数
-    rootPath = 'A:\Bi-LSTM+CRF'
-    # rootPath = '/home/shengyu/data'
+    # rootPath = 'A:\Bi-LSTM+CRF'
+    rootPath = '/home/shengyu/data'
     ltpPath = os.path.join(rootPath, 'ltp_data_v3.4.0')
     parser = argparse.ArgumentParser(description='Bi-LSTM+CRF')
     parser.add_argument('--root_dir', help='root dir', default=rootPath)

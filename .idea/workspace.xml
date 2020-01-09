@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f37fe3ca-cb22-46e0-bc56-0ace397bed4d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/event_dectect/Config/config_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/Config/config_parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/word2vec_lstm_crf_ed.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/word2vec_lstm_crf_ed.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/event_dectect/data_pre_process/brat_data_process.py" beforeDir="false" afterPath="$PROJECT_DIR$/event_dectect/data_pre_process/brat_data_process.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -88,7 +84,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/event_dectect/data_pre_process/brat_data_process.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="893">
@@ -124,11 +120,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="467">
-              <caret line="506" lean-forward="true" selection-start-line="506" selection-end-line="506" />
+            <state relative-caret-position="371">
+              <caret line="356" column="25" lean-forward="true" selection-start-line="356" selection-start-column="25" selection-end-line="356" selection-end-column="25" />
               <folding>
                 <element signature="e#3421#3575#0" />
                 <element signature="e#3705#4547#0" />
@@ -136,6 +132,7 @@
                 <element signature="e#5854#14053#0" />
                 <element signature="e#14126#14948#0" />
                 <element signature="e#15004#15710#0" />
+                <element signature="e#15961#18952#0" />
                 <element signature="e#19054#22456#0" />
               </folding>
             </state>
@@ -249,9 +246,9 @@
         <option value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/input_fn.py" />
         <option value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/word2vec_lstm_crf_ed.py" />
         <option value="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags/main.py" />
-        <option value="$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py" />
         <option value="$PROJECT_DIR$/event_dectect/Config/config_parser.py" />
         <option value="$PROJECT_DIR$/event_dectect/data_pre_process/brat_data_process.py" />
+        <option value="$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py" />
       </list>
     </option>
   </component>
@@ -537,23 +534,23 @@
       <workItem from="1578399277743" duration="1472000" />
       <workItem from="1578447116160" duration="3736000" />
       <workItem from="1578488823024" duration="2366000" />
-      <workItem from="1578535970304" duration="11140000" />
+      <workItem from="1578535970304" duration="11745000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="233446000" />
+    <option name="totallyTimeSpent" value="234051000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1734375" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1734375" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3292683" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.2195122" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.2682927" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4898374" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -615,11 +612,6 @@
           <line>142</line>
           <option name="timeStamp" value="88" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py</url>
-          <line>62</line>
-          <option name="timeStamp" value="103" />
-        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -640,7 +632,7 @@
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$test.coverage" NAME="test Coverage Results" MODIFIED="1569723955698" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$word2vec_lstm_crf_ed.coverage" NAME="word2vec_lstm_crf_ed Coverage Results" MODIFIED="1578387800977" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$input_fn.coverage" NAME="input_fn Coverage Results" MODIFIED="1578538695274" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/First_For_Commo_Tags" />
-    <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$extract_event.coverage" NAME="extract_event Coverage Results" MODIFIED="1578553915160" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/Event_Model" />
+    <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$extract_event.coverage" NAME="extract_event Coverage Results" MODIFIED="1578554547212" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/Event_Model" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$eval__1_.coverage" NAME="eval (1) Coverage Results" MODIFIED="1570693643301" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/evaluation" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$some_try.coverage" NAME="some_try Coverage Results" MODIFIED="1571730667677" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/BiLSTM_CRF_EVENT_DETECT$brat_data_process.coverage" NAME="brat_data_process Coverage Results" MODIFIED="1578552324458" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/event_dectect/data_pre_process" />
@@ -1099,22 +1091,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="467">
-          <caret line="506" lean-forward="true" selection-start-line="506" selection-end-line="506" />
-          <folding>
-            <element signature="e#3421#3575#0" />
-            <element signature="e#3705#4547#0" />
-            <element signature="e#4663#5772#0" />
-            <element signature="e#5854#14053#0" />
-            <element signature="e#14126#14948#0" />
-            <element signature="e#15004#15710#0" />
-            <element signature="e#19054#22456#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/event_dectect/Config/config_parser.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-60">
@@ -1142,6 +1118,23 @@
           <caret line="669" column="26" lean-forward="true" selection-start-line="669" selection-start-column="26" selection-end-line="669" selection-end-column="26" />
           <folding>
             <element signature="e#145#154#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/event_dectect/Event_Model/extract_event.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="371">
+          <caret line="356" column="25" lean-forward="true" selection-start-line="356" selection-start-column="25" selection-end-line="356" selection-end-column="25" />
+          <folding>
+            <element signature="e#3421#3575#0" />
+            <element signature="e#3705#4547#0" />
+            <element signature="e#4663#5772#0" />
+            <element signature="e#5854#14053#0" />
+            <element signature="e#14126#14948#0" />
+            <element signature="e#15004#15710#0" />
+            <element signature="e#15961#18952#0" />
+            <element signature="e#19054#22456#0" />
           </folding>
         </state>
       </provider>
