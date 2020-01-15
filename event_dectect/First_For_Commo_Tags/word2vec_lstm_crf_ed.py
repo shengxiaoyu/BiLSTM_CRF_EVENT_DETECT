@@ -179,6 +179,9 @@ def main(FLAGS,sentences=None,dir=None,output_path=None):
             for word in words:
                 final_tags.append(tags[index])
                 index += len(word)
+                if(index>=120):
+                    break
+            final_tags = final_tags[0:index]
             final_tags_list.append(final_tags)
         tags_list = final_tags_list
         for words,tags in zip(words_list,tags_list):

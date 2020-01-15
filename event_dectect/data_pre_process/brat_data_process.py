@@ -11,6 +11,7 @@ import sys
 from pyltp import Segmentor
 from pyltp import Postagger
 from event_dectect.First_For_Commo_Tags import config_center as CONFIG
+from event_dectect.Second_For_Fine_Tags import config_center as NEW_CONFIG
 
 
 #将案号转为indxe 文件名称,brat文件名不能含中文
@@ -157,14 +158,14 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                     # 构造事件object
                     event = Event(relation.id, paramter[0])
                     # 获得触发词对应的entity
-                    entity = entitiesDict.get(paramter[1])
+                    entity = Entity.clone(entitiesDict.get(paramter[1]))
                     # 设置触发词的名称：事件类型_Trigger
                     entity.setName(paramter[0] + '_Trigger')
                     # 填入触发词
                     event.setTrigger(entity)
                 else:
                     # 事件参数处理
-                    entity = entitiesDict.get(paramter[1])
+                    entity = Entity.clone(entitiesDict.get(paramter[1]))
                     entity.setName(event.getType() + '_' + paramter[0])
                     if (paramter[0] == 'Negation'):
                         entity.setName(paramter[0])
@@ -261,6 +262,7 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
         originFile = os.path.join(filePath, filePath.replace('.ann', '.txt'))
         if (not os.path.exists(originFile)):
             return
+
         print(filePath)
         #获取事件list
         events = getEvents(filePath,originFile)
@@ -363,6 +365,10 @@ class Entity(object):
         self.endIndex = int(splits[1].split()[2])
         self.value = splits[2]
         self.name = None #参数在具体事件中的名称，比如Participant_Person
+    @staticmethod
+    def clone(other_entity):
+        string = other_entity.id+'\t'+other_entity.type+' '+str(other_entity.beginIndex)+' '+str(other_entity.endIndex)+'\t'+other_entity.value
+        return Entity(string)
     def getId(self):
         return self.id
     def getBegin(self):
@@ -457,9 +463,7 @@ def main():
         pos_model_path=os.path.join(ltp_path, 'pos.model'),
         stop_words_path=os.path.join(base_path, 'newStopWords.txt'),
         trigger_labels_path=os.path.join(base_path,'full_trigger_labels.txt'),
-        # trigger_labels_path=os.path.join(base_path,'triggerLabels.txt'),
         argu_labels_path=os.path.join(base_path,'full_argu_labels.txt'),
-        # argu_labels_path=os.path.join(base_path,'argumentLabels.txt')
         )
 
 
@@ -570,6 +574,9 @@ def merge(path):
     #会用到trigger集合，需要初始化Trigger_Tags
     parse = getParser()
     CONFIG.init(parse.root_dir)
+    NEW_CONFIG.initNewTags(os.path.join(parse.root_dir, 'full_trigger_labels.txt'),
+                               os.path.join(parse.root_dir, 'full_argu_labels.txt'))
+
     first_save_dir = os.path.join(os.path.split(path)[0],'Merge_for_first')
     second_save_dir = os.path.join(os.path.split(path)[0],'Merge_for_second')
     dirs = ['03','36','69']
@@ -580,7 +587,7 @@ def merge(path):
             #第一个模型的数据
             savePath = os.path.join(os.path.join(first_save_dir,dir),str(i))
             os.makedirs(savePath)
-            #第二个模型的数据保存卢坚
+            #第二个模型的数据保存路径
             savePath2 = os.path.join(os.path.join(second_save_dir,dir),str(i))
             os.makedirs(savePath2)
 
@@ -632,55 +639,100 @@ def merge(path):
                     fw.write(lastSentence+'\n'+' '.join(mergedTags)+'\n'+poses+'\n')
                     for lastTags in lastTagsList:
                         fw2.write(lastSentence + '\n' + ' '.join(mergedTags) + '\n' + poses + '\n' + ' '.join(lastTags) + '\n')
-            print(NUM1)
-            print(NUM2)
-            print(SHARE_EVENT)
+
+
+    global SHARE_ARGU,SHARE_EVENT
+    print('共享参数情况： ')
+    print(SHARE_ARGU)
+    print('事件共现情况：')
+    print(SHARE_EVENT)
 
 
 def one_merge(tagsList):
-    global NUM1,NUM2,SHARE_EVENT,SHARE_ARGU
+    global SHARE_EVENT,SHARE_ARGU
     mergedTags = ['O' for _ in range(len(tagsList[0]))]
+
+    #统计共享参数情况
+    for i in range(len(tagsList)):
+        for j in range(i+1,len(tagsList)):
+            cal_share_argu(tagsList[i],tagsList[j])
+
+    #统计这句中遇到的触发词
+    event_types = []
     for tags in tagsList:
         for index,tag in enumerate(tags):
             if(tag!='O'):
                 if(mergedTags[index]=='O'):
                     mergedTags[index] = secondeTag_2_firstTag[tag]
                     # mergedTags[index] = tag
+                    if(tag in NEW_CONFIG.NEW_TRIGGER_TAGs and tag.find('B_')!=-1):
+                        event_types.append(tag)
                 elif(mergedTags[index] in CONFIG.TRIGGER_TAGs):
                     '''此时产生冲突'''
                     '''原先填入的是触发词'''
                     if(mergedTags[index].find('B_')==-1 and tag.find('B_')!=-1):
                         mergedTags[index] = secondeTag_2_firstTag[tag] #原先的不是B_开头触发词，新来的是B_开头触发词才能覆盖
+                        if (tag in NEW_CONFIG.NEW_TRIGGER_TAGs and tag.find('B_') != -1):
+                            event_types.append(tag)
                 else:#如果以前不是触发词，
                     if((tag in CONFIG.TRIGGER_TAGs or tag.find('B_')!=-1) and mergedTags[index].find('B_')==-1): #只有新来的是触发词或者B_开头的参数，而且老的不是B_开头才能覆盖
                         mergedTags[index] = secondeTag_2_firstTag[tag]
+                        if (tag in NEW_CONFIG.NEW_TRIGGER_TAGs and tag.find('B_') != -1):
+                            event_types.append(tag)
+
+    event_types.sort()
+
+    for i in range(len(event_types)):
+        for j in range(i+1,len(event_types)):
+            if(event_types[i] not in SHARE_EVENT):
+                SHARE_EVENT[event_types[i]] = {}
+            if(event_types[j] not in SHARE_EVENT[event_types[i]]):
+                SHARE_EVENT[event_types[i]][event_types[j]] = 0
+            SHARE_EVENT[event_types[i]][event_types[j]] = SHARE_EVENT[event_types[i]][event_types[j]]+1
     return mergedTags
+
+def cal_share_argu(tags1,tags2):
+    global SHARE_ARGU
+    length = len(tags1)
+    for i in range(length):
+        if(tags1[i] in NEW_CONFIG.NEW_ARGU_TAGs and tags1[i].find('B_')!=-1 and tags2[i] in NEW_CONFIG.NEW_ARGU_TAGs):
+            argus = []
+            argus.append(tags1[i][2:])
+            argus.append(tags2[i][2:])
+            argus.sort()
+            key = argus[0]+':'+argus[1]
+            if(key not in SHARE_ARGU):
+                SHARE_ARGU[key] = 0
+            SHARE_ARGU[key] = SHARE_ARGU[key]+1
+
+def cal_the_number_of_one_tag():
+#    统计某个标签个数
+    dir = r'A:\Bi-LSTM+CRF\labeled\Merge_for_first'
+    b_count = 0
+    i_count = 0
+    for sub_dir in os.listdir(dir):
+        sub_dir = os.path.join(dir,sub_dir)
+        for sub_sub_dir in os.listdir(sub_dir):
+            if(sub_sub_dir!='10'):
+                continue
+            sub_sub_dir = os.path.join(sub_dir,sub_sub_dir)
+            for file in os.listdir(sub_sub_dir):
+                with open(os.path.join(sub_sub_dir,file),'r',encoding='utf8') as reader:
+                    count = -1
+                    for line in reader.readlines():
+                        count+=1
+                        if(count%3==1):
+                            for tag in line.split(' '):
+                                if(tag=='B_Negated'):
+                                    b_count+=1
+                                if(tag=='I_Negated'):
+                                    i_count+=1
+    print(b_count)
+    print(i_count)
 
 if __name__ == '__main__':
     # main()
-    # merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
-    #统计某个标签个数
-    # dir = r'A:\Bi-LSTM+CRF\labeled\Merge_for_first'
-    # b_count = 0
-    # i_count = 0
-    # for sub_dir in os.listdir(dir):
-    #     sub_dir = os.path.join(dir,sub_dir)
-    #     for sub_sub_dir in os.listdir(sub_dir):
-    #         if(sub_sub_dir!='10'):
-    #             continue
-    #         sub_sub_dir = os.path.join(sub_dir,sub_sub_dir)
-    #         for file in os.listdir(sub_sub_dir):
-    #             with open(os.path.join(sub_sub_dir,file),'r',encoding='utf8') as reader:
-    #                 count = -1
-    #                 for line in reader.readlines():
-    #                     count+=1
-    #                     if(count%3==1):
-    #                         for tag in line.split(' '):
-    #                             if(tag=='B_Negated'):
-    #                                 b_count+=1
-    #                             if(tag=='I_Negated'):
-    #                                 i_count+=1
-    # print(b_count)
-    # print(i_count)
+    merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
+
     print ('end')
     sys.exit(0)
