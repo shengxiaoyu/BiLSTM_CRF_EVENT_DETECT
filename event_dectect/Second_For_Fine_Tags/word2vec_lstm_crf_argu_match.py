@@ -196,6 +196,7 @@ def main(FLAGS,sentencs_words_firstTags_list=None,words_firstTags_indxPairs_sent
         '''传入的sentence_words_firstTags_list 包括原文分词和第一个模型的预测标签序列,以及每个原文分词在原句中的起止索引'''
 
         def handlerOneInput(words, first_tags, index_pairs, sentence,speaker):
+
             results = []
             index_pairs_list = []
             sentences = []
@@ -206,15 +207,19 @@ def main(FLAGS,sentencs_words_firstTags_list=None,words_firstTags_indxPairs_sent
                     currentTrigger = tag[2:]
                     # 确定触发词的长度
                     endIndex = index + 1
-                    while (first_tags[endIndex].find(currentTrigger) != -1):
+                    while (endIndex<len(first_tags) and first_tags[endIndex].find(currentTrigger) != -1 ):
                         endIndex += 1
                     # 构造新的tags列：
                     newTags = [first_tags[i] + '_Trigger' if i >= index and i < endIndex else 'O' for i in
                                range(len(first_tags))]
-                    # 深拷贝其余两列
+                    # 深拷贝构造新样例
                     newWords = [x for x in words]
                     new_index_pairs = [x for x in index_pairs]
-                    results.append([newWords, first_tags, newTags])
+                    new_first_tags = [x for x in first_tags]
+
+                    if(len(newWords)!=len(new_first_tags)):
+                        print('error')
+                    results.append([newWords, new_first_tags, newTags])
                     index_pairs_list.append(new_index_pairs)
                     sentences.append(sentence)
                     speakers.append(speaker)

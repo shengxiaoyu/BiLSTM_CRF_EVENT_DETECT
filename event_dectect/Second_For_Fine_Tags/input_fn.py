@@ -27,13 +27,21 @@ def paddingAndEmbedding(fileName,words,tags,pre_tags,max_sequence_length,noEmbed
     if(length<max_sequence_length):
         for i in range(length,max_sequence_length):
             words.append('<pad>')
-            tags.append('<pad>')
-            pre_tags.append('<pad>')
     else:
         words = words[:max_sequence_length]
-        tags = tags[:max_sequence_length]
-        pre_tags = pre_tags[:max_sequence_length]
 
+
+    if(len(tags)<max_sequence_length):
+        for i in range(len(tags),max_sequence_length):
+            tags.append('<pad>')
+    else:
+        tags = tags[:max_sequence_length]
+
+    if(len(pre_tags)<max_sequence_length):
+        for i in range(len(pre_tags),max_sequence_length):
+            pre_tags.append('<pad>')
+    else:
+        pre_tags = pre_tags[:max_sequence_length]
 
 
     #添加是否是所关注的触发词 特征
