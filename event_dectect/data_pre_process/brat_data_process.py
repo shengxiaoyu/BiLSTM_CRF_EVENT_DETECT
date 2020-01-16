@@ -169,7 +169,6 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
                     entity.setName(event.getType() + '_' + paramter[0])
                     if (paramter[0] == 'Negation'):
                         entity.setName(paramter[0])
-                        # neg.add(entity.getValue())
                     event.addArgument(entity)
             events.append(event)
 
@@ -317,24 +316,29 @@ def formLabelData(labelFilePath,savePath,segmentor_model_path,segmentor_user_dic
             theSavePath = os.path.join(savePath,'cpws'+os.path.basename(filePath).replace('.ann', '.txt'))
         if (filePath.find('qstsbl') != -1):
             theSavePath = os.path.join(savePath,'qstsbl'+os.path.basename(filePath).replace('.ann', '.txt'))
-        with open(theSavePath, 'w', encoding='utf8') as fw:
-            for event in events:
-                fw.write(' '.join(event.getWords()))
-                fw.write('\n')
-                fw.write(' '.join(event.getTags()))
-                fw.write('\n')
-                fw.write(' '.join(event.getPosTags()))
-                fw.write('\n')
-                # if('B_Wealth_Value' in event.getTags() or 'B_Debt_Value' in event.getTags() or 'B_Credit_Value' in event.getTags()):
-                #     w1.write(' '.join(event.getWords())+'\n')
+        # with open(theSavePath, 'w', encoding='utf8') as fw:
+        for event in events:
+                # fw.write(' '.join(event.getWords()))
+                # fw.write('\n')
+                # fw.write(' '.join(event.getTags()))
+                # fw.write('\n')
+                # fw.write(' '.join(event.getPosTags()))
+                # fw.write('\n')
+            if('B_Negation' in event.getTags()):
+                for word,tag in zip(words,tags):
+                    if(tag.find('Negation')!=-1):
+                        w1.write(word+'\t')
+                w1.write('\n')
 
-    # w1 = open(r'C:\Users\13314\Desktop\test\values_Str.txt','w',encoding='utf8')
-    # values = set()
+    w1 = open(r'C:\Users\13314\Desktop\test\不_Str.txt','w',encoding='utf8')
+    # neg = set()
     if(os.path.isdir(labelFilePath)):
         handlderDir(labelFilePath)
     else:
         handlerSingleFile(labelFilePath)
 
+    # for value in neg:
+    #     w1.write(value+'\n')
 
     segmentor.release()
     print(eventsType)
@@ -731,8 +735,8 @@ def cal_the_number_of_one_tag():
     print(i_count)
 
 if __name__ == '__main__':
-    # main()
-    merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
+    main()
+    # merge(r'A:\Bi-LSTM+CRF\labeled\Spe')
 
     print ('end')
     sys.exit(0)
