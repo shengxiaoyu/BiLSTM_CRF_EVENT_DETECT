@@ -32,7 +32,6 @@ class Extractor(object):
         self.sentenceSplitter = SentenceSplitter()
 
     '''传入文本段抽取'''
-
     def extractor(self, paragraph):
         # 调用预测接口
 
@@ -58,43 +57,67 @@ class Extractor(object):
         if (len(sentences) == 0):
             print("整个抽取文本无关注事实")
             return []
-        words_list, first_tags_list, index_pairs_list = first.main(self.FLAGS, sentences,
+        words_list, first_tags_list, index_pairs_list = first.main(self.FLAGS, sentences=sentences,
                                                                    output_path=self.first_output_path)
         self.__handle_I_Begin__(first_tags_list)
         print('第二个模型预测')
         if (self.FLAGS.second_label):
-            words_list, second_tags_list, index_pairs_list, sentences, speakers = self.second_label(
-                [words_list, first_tags_list, index_pairs_list, sentences, speakers])
+            words_list, second_tags_list, index_pairs_list, sentences, speakers = second.main(self.FLAGS,
+                           words_firstTags_indxPairs_sentences_speaker=[words_list, first_tags_list, index_pairs_list, sentences, speakers],
+                           output_path=self.second_output_path)
         else:
             words_list, second_tags_list, index_pairs_list, sentences, speakers = self.argu_match_base(words_list,
                                                                                                        first_tags_list,
                                                                                                        index_pairs_list,
                                                                                                        sentences,
                                                                                                        speakers)
-
         # 额外增加处理否定词
         self.__handle_negation__(words_list, second_tags_list, sentences, index_pairs_list)
         self.__handle_value__(words_list, second_tags_list, sentences, index_pairs_list)
-        events = []
-        id_index = 0
-        for tags, words, index_pairs, sentence, speaker in zip(second_tags_list, words_list, index_pairs_list,
-                                                               sentences, speakers):
-            event = Event._formEvent('E' + str(id_index), tags, words, index_pairs, sentence, speaker)
-            if (event):
-                events.append(event)
-                id_index += 1
-        print('事件抽取完成：\n' + '\n'.join([str(event) for event in events]))
-        return events
 
-    '''使用两阶段标记的方式'''
+        return Event.form_events(words_list, second_tags_list,sentences, index_pairs_list, speakers)
 
-    def second_label(self, words_firstTags_indxPairs_sentences_speaker):
-        return second.main(self.FLAGS,
-                           words_firstTags_indxPairs_sentences_speaker=words_firstTags_indxPairs_sentences_speaker,
+
+    '''传入 分词、去停用词之后的words, 是否触发词标签，以及pos标签抽取事件'''
+    '''predict_example: [words,first_tags,pos_tags]'''
+    '''return eventss:[[e1,e2],[e3,e4]..]'''
+    def extractor_from_words_posTags(self,predict_examples):
+
+        words_first_tag_pos = []
+        sentences=[]
+        index_pairs_list=[]
+        speakers = []
+        for example in predict_examples:
+            words_first_tag_pos.append([example[0],example[1],example[2]])
+            sentences.append(example[3])
+            index_pairs_list.append(example[4])
+            speakers.append(example[5])
+        words_list, first_tags_list = first.main(self.FLAGS, sentences_words_posTags=words_first_tag_pos,
+                                                                   output_path=self.first_output_path)
+        self.__handle_I_Begin__(first_tags_list)
+
+        print('第二个模型预测')
+
+        eventss = []
+        if (self.FLAGS.second_label):
+            words_list, second_tags_list, index_pairs_list, sentences,speakers = second.main(self.FLAGS,
+                           words_firstTags_indxPairs_sentences_speaker=[words_list, first_tags_list, index_pairs_list, sentences, speakers],
                            output_path=self.second_output_path)
+        else:
+            words_lists, second_tags_lists, index_pairs_lists, sentencess, speakerss = self.argu_match_base2(words_list, first_tags_list, index_pairs_list, sentences, speakers)
+
+            # 额外增加处理否定词
+            for words_list, second_tags_list, index_pairs_list, sentences, speakers in zip(words_lists, second_tags_lists, index_pairs_lists, sentencess, speakerss):
+                self.__handle_negation__(words_list, second_tags_list, sentences, index_pairs_list)
+                self.__handle_value__(words_list, second_tags_list, sentences, index_pairs_list)
+                eventss.append(Event.form_events(words_list, second_tags_list,sentences, index_pairs_list,  speakers))
+
+        return eventss
+
+
+
 
     '''第一层模型预测之后基于规则匹配'''
-
     def argu_match_base(self, words_list, first_tags_list, index_pairs_list, sentences, speakers):
         words_lists = []
         second_tags_lists = []
@@ -111,6 +134,25 @@ class Extractor(object):
             index_pairs_lists.extend(index_pairs_list)
             sentencess.extend(sentences)
             speakerss.extend(speakers)
+        return words_lists, second_tags_lists, index_pairs_lists, sentencess, speakerss
+
+    '''第二种匹配方法，区别在于每个第一次标记的句子得到的第二层句子组成数组，再在外层组成数组，便于后面同一个句子中抽取得到的事件和真实的事件对比'''
+    def argu_match_base2(self,words_list, first_tags_list, index_pairs_list, sentences, speakers):
+        words_lists = []
+        second_tags_lists = []
+        index_pairs_lists = []
+        sentencess = []
+        speakerss = []
+
+        for words, tags, words_in_sentence_index_pair, sentence, speaker in zip(words_list, first_tags_list,
+                                                                                index_pairs_list, sentences, speakers):
+            words_list, second_tags_list, index_pairs_list, sentences, speakers = self.__get_final_tags_from_base_tags(
+                words, tags, words_in_sentence_index_pair, sentence, speaker)
+            words_lists.append(words_list)
+            second_tags_lists.append(second_tags_list)
+            index_pairs_lists.append(index_pairs_list)
+            sentencess.append(sentences)
+            speakerss.append(speakers)
         return words_lists, second_tags_lists, index_pairs_lists, sentencess, speakerss
 
     def __get_final_tags_from_base_tags(self, words, tags, words_in_sentence_index_pair, sentence, speaker):
@@ -410,8 +452,6 @@ class Extractor(object):
                         continue
                     if (value_end_index <= index_pairs[i][0]):
                         break
-
-
     def __handle_negation__(self, words_list, second_tags_list, sentences, index_pairs_list):
         for words, tags, sentence, index_pairs in zip(words_list, second_tags_list, sentences, index_pairs_list):
             # 如果已经有否定词了则不找了
@@ -489,9 +529,8 @@ class Extractor(object):
                                     tags[i + target_index] = 'I_Negation'
                             found = True
                             break
+
     # 判断是否含有关注事实触发词
-
-
 def ifContainTrigger(sentence):
     # 初始化触发词集
     triggerDict = CONFIG.TRIGGER_WORDS_DICT

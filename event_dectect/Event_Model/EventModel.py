@@ -4,13 +4,13 @@ import sys
 
 __doc__ = 'description'
 __author__ = '13314409603@163.com'
-
+from model import parties
 def EventFactory(event_argu_dict,event_argus_index_pair_dict,sentence):
     eventDict = {
         'Know': Know,
         'BeInLove': BeInLove,
-        'Marry': Marray,
-        'Remarry': Remarray,
+        'Marry': Marry,
+        'Remarry': Remarry,
         'Bear': Bear,
         'FamilyConflict': FamilyConflict,
         'DomesticViolence': DomesticViolence,
@@ -30,8 +30,8 @@ def EventFactory2(words,tags):
     eventDict = {
         'Know': Know,
         'BeInLove': BeInLove,
-        'Marry': Marray,
-        'Remarry': Remarray,
+        'Marry': Marry,
+        'Remarry': Remarry,
         'Bear': Bear,
         'FamilyConflict': FamilyConflict,
         'DomesticViolence': DomesticViolence,
@@ -43,6 +43,14 @@ def EventFactory2(words,tags):
         'Debt': Debt,
         'Credit': Credit,
     }
+    sentence = ''.join(words)
+    index_pairs = []
+    base_index = 0
+    speaker = parties.PLAINTIFF
+    for word in words:
+        index_pairs.append([base_index, base_index + len(word)])
+        base_index += len(word)
+
     type = ''
     for tag in tags:
         if(tag.find('_Trigger')!=-1):
@@ -60,8 +68,8 @@ def EventFactory3(type, completeTriggerWord, tag_index_pair, sentence, index_pai
     eventDict = {
         'Know':Know,
         'BeInLove':BeInLove,
-        'Marry':Marray,
-        'Remarry':Remarray,
+        'Marry':Marry,
+        'Remarry':Remarry,
         'Bear':Bear,
         'FamilyConflict':FamilyConflict,
         'DomesticViolence':DomesticViolence,
@@ -124,6 +132,10 @@ class baseModel(object):
     def get_score(self):
         raise NotImplementedError()
 
+    @staticmethod
+    def to_simple_model(self,type,words,tags):
+        #通过简单的单句构造单个事件
+        pass
 #相识事实有一个时间参数，往前找
 class Know(baseModel):
     def __init__(self,argu_dict,event_argus_index_pair_dict,sentence):
@@ -178,7 +190,7 @@ class BeInLove(baseModel):
             score += 1
         return score
 
-class Marray(baseModel):
+class Marry(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
         baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
         self.time = argu_dict['Marry_Time'] if ('Marry_Time' in argu_dict) else ""
@@ -206,7 +218,7 @@ class Marray(baseModel):
         return score
 
 
-class Remarray(baseModel):
+class Remarry(baseModel):
     def __init__(self, argu_dict, event_argus_index_pair_dict, sentence):
         baseModel.__init__(self, argu_dict, event_argus_index_pair_dict, sentence)
         self.participant = argu_dict['Remarry_Participant'] if ('Remarry_Participant' in argu_dict) else ""

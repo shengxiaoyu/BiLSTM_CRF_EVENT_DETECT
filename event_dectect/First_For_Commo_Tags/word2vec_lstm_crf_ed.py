@@ -13,7 +13,7 @@ from event_dectect.First_For_Commo_Tags import config_center as CONFIG,input_fn 
 
 
 #训练、评估、预测,sentece:要预测的句子
-def main(FLAGS,sentences=None,dir=None,output_path=None):
+def main(FLAGS,sentences=None,dir=None,output_path=None,sentences_words_posTags=None):
     print(FLAGS)
 
     tf.enable_eager_execution()
@@ -224,6 +224,39 @@ def main(FLAGS,sentences=None,dir=None,output_path=None):
             fw.write('\n')
             count -= 1
         fw.close()
+
+    if FLAGS.ifPredict and sentences_words_posTags:
+        pre_inf = functools.partial(INPUT.input_fn, input_dir=None, dirs=None,
+                                    sentences_words_posTags=sentences_words_posTags,
+                                    shuffe=False, num_epochs=1, batch_size=FLAGS.batch_size,
+                                    max_sequence_length=FLAGS.max_sequence_length)
+        predictions = estimator.predict(input_fn=pre_inf)
+        predictions = [x['pre_ids'] for x in list(predictions)]
+
+        words_list = [one_sentence_words_posTags[0] for one_sentence_words_posTags in sentences_words_posTags]
+        tags_list = []
+        for pre_ids in predictions:
+            tags_list.append([CONFIG.ID_2_TAG[id] for id in pre_ids])
+
+        # 把预测的字标签转换为词级别的标签
+        final_tags_list = []
+        for words, tags in zip(words_list, tags_list):
+            index = 0
+            final_tags = []
+            for word in words:
+                final_tags.append(tags[index])
+                index += len(word)
+                if (index >= 120):
+                    break
+            final_tags = final_tags[0:index]
+            final_tags_list.append(final_tags)
+        tags_list = final_tags_list
+        for words, tags in zip(words_list, tags_list):
+            print(' '.join(words))
+            print('\n')
+            print(' '.join(tags))
+            print('\n')
+        return [words_list, tags_list]
 
 def formIndexs(words):
     indexs = []

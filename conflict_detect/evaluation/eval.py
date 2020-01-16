@@ -20,9 +20,9 @@ def run():
     contradictory = {}
     #冲突事件被预测为冲突
     contradictory['p-Contradictory'] = 0
-    #蕴含
+    #冲突事件被预测为蕴含
     contradictory['p-Entailment'] = 0
-    #没有检测出来
+    #冲突事件没有对齐没有检测出来
     contradictory['p-non'] = 0
     #放入result集合
     result['Contradictory'] = contradictory
@@ -37,6 +37,7 @@ def run():
     non = {}
     non['p-Contradictory'] = 0
     non['p-Entailment'] = 0
+    non['p-Non'] = 0
     result['non'] = non
 
     result_events = {}
@@ -62,9 +63,12 @@ def run():
     non_events = {}
     non_events['p-Contradictory'] = []
     non_events['p-Entailment'] = []
+    non_events['p-Non'] = []
     result_events['non'] = non_events
 
 
+    #总共没有对齐的事件数
+    total_p_non = 0
     for dir_name in os.listdir(root):
         dir = os.path.join(root,dir_name)
         if(not os.path.isdir(dir)):
@@ -80,6 +84,8 @@ def run():
                 origin_file = os.path.join(index_dir,file.replace('ann','txt'))
                 if(not os.path.exists(origin_file)):
                     continue
+
+                #真实的事件dict和事件关系集合（冲突和蕴含）
                 event_map,event_relations = file_handler.handler(os.path.join(index_dir,file),origin_file)
 
                 events = list(event_map.values())
@@ -92,19 +98,18 @@ def run():
                                 my_event_relations.append(Relation(None,'Contradictory',events[i],events[j]))
                             else:
                                 my_event_relations.append(Relation(None,'Entailment',events[i],events[j]))
-                cal(result,event_relations,my_event_relations,result_events)
+                        else:
+                            total_p_non += 1
+                cal(result,event_relations,my_event_relations,result_events,total_p_non)
     save_root = r'A:\Bi-LSTM+CRF\bert\data'
     with open(os.path.join(save_root, 'event_relations.txt'), 'w', encoding='utf8') as writer:
         writer.write('\t\tp-Contradictory\tp-Entailment\tp-Non\n')
         for (key,val) in result.items():
-            writer.write(key+'\t'+str(val['p-Contradictory'])+'\t'+str(val['p-Entailment'])+'\t')
-            if(key!='non'):
-                writer.write('\t'+str(val['p-non'])+'\n')
-            else:
-                writer.write('\n')
+            writer.write(key+'\t'+str(val['p-Contradictory'])+'\t'+str(val['p-Entailment'])+'\t'+str(val['p-non'])+'\n')
 
 
-def cal(result,relations,pre_relations,result_events):
+
+def cal(result,relations,pre_relations,result_events,total_p_non):
     if(relations==None or len(relations)==0):
         if(pre_relations!=None and len(pre_relations)>0):
             for relation in pre_relations:
@@ -139,6 +144,8 @@ def cal(result,relations,pre_relations,result_events):
         if(not found):
             result['non']['p-'+pre_relation.type] += 1
             result_events['non']['p-'+pre_relation.type].append(pre_relation)
+
+    result['non']['p-non'] = total_p_non-result['Contradictory']['p-non']-result['Entailment']['p-non']
 
 if __name__ == '__main__':
     run()
