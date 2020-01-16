@@ -356,7 +356,7 @@ class Extractor(object):
                     tags[last_index+1] = b_tag
                     break
     def __handle_value__(self, words_list, second_tags_list, sentences, index_pairs_list):
-        pattern = re.compile(r'[一|二|三|四|五|六|七|八|九|十|\d]+[\.\，\、]?[一|二|三|四|五|六|七|八|九|十|\d]*[多万元|余万元|万余元|多元|多万|万元|万|元]')
+        pattern = re.compile(r'[一|二|三|四|五|六|七|八|九|十|几|\d]+[\.\，\、]?[一|二|三|四|五|六|七|八|九|十|\d]*[多万元|余万元|万余元|多元|多万|万元|万|元]')
         for words, tags, sentence, index_pairs in zip(words_list, second_tags_list, sentences, index_pairs_list):
             if (('B_Wealth_Trigger' in tags and 'B_Wealth_Value' not in tags) or (
                     'B_Debt_Trigger' in tags and 'B_Debt_Value' not in tags) or (
@@ -509,7 +509,7 @@ def ifContainTrigger(sentence):
 
 
 if __name__ == '__main__':
-    string = '原告苏某某诉称，2003年2月其经他人介绍与被告认识，同年农历5月13日按农村习俗举行婚礼结为夫妻。由于婚前缺乏了解，婚姻基础差，婚后双方性格不合，常因家庭琐事引起争吵，被告染上赌博恶习后，多次实施家庭暴力，殴打原告，致使夫妻感情一直不和。被告朱某某辩称，双方夫妻感情尚未破裂，小孩需要双方抚养，故不同意离婚。理由如下：一、婚姻关系存续期间先后生育二男一女，大的9岁，小的3岁，时时刻刻需要父母照顾和父母的爱，此时离婚对孩子的伤害太大，不利于孩子健康成长。二、原告说“双方婚前感情基础不好，婚后感情一直不和，被告赌博和实施家庭暴力”不符合事实。'
+    string = '被告： 四、虽然我方名下有建设银行、工商银行、柳州银行、桂林银行有存款，但不过几千元，原告称存有250000元无证据证实；'
     ext = Extractor()
     events = ext.extractor(string)
     print(events)
